@@ -8,18 +8,24 @@
 import SwiftUI
 
 struct PhotoVideoLocationView: View {
+    let locationId: String
+    
     var body: some View {
         Section {
             VStack {
                 
-                NavigationLink(destination: FeedView()) {
+                NavigationLink(destination: PhotoView(locationId: locationId)) {
                     Text("Choose Photo")
                 }
+                .navigationBarTitleDisplayMode(.inline)
                 .padding()
-                
-                NavigationLink(destination: FeedView()) {
+            }
+            
+            VStack {
+                NavigationLink(destination: VideoView(locationId: locationId)) {
                     Text("Choose Video")
                 }
+                .navigationBarTitleDisplayMode(.inline)
                 .padding()
             }
         }
@@ -27,5 +33,5 @@ struct PhotoVideoLocationView: View {
 }
 
 #Preview {
-    PhotoVideoLocationView()
+    PhotoVideoLocationView(locationId: "")
 }

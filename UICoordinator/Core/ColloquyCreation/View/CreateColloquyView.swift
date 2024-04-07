@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct CreateColloquyView: View {
-    @StateObject var viewModel = CreateThreadViewModel()
+    @StateObject var viewModel = CreateColloquyViewModel()
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
+    let location: Location?
     
     private var user: User? {
         return UserService.shared.currentUser
@@ -31,7 +32,7 @@ struct CreateColloquyView: View {
                         Text(user?.username ?? "no name")
                             .fontWeight(.semibold)
                         
-                        TextField("Start a thread", text: $caption, axis: .vertical)
+                        TextField("Start a colloquy", text: $caption, axis: .vertical)
                         
                     }
                     .font(.footnote)
@@ -53,7 +54,7 @@ struct CreateColloquyView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("New Thread")
+            .navigationTitle("\(location?.name ?? "New") Colloquy")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 
@@ -66,7 +67,8 @@ struct CreateColloquyView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Post") {
                         Task {
-                            try await viewModel.uploadThread(caption: caption)
+                            try await viewModel.uploadColloquy(caption: caption, locatioId: location?.id)
+                            
                             dismiss()
                         }
                     }
@@ -75,12 +77,12 @@ struct CreateColloquyView: View {
                     .fontWeight(.semibold)
                 }
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(.primary)
             .font(.subheadline)
         }
     }
 }
 
 #Preview {
-    CreateColloquyView()
+    CreateColloquyView(location: nil)
 }

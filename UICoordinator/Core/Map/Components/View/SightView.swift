@@ -12,15 +12,15 @@ struct SightView: View {
         ZStack {
             Circle()
                 .foregroundColor(.blue.opacity(0.3))
-                .frame(width: 30, height: 30)
+                .frame(width: 19, height: 19)
             
             Circle()
                 .foregroundColor(.white.opacity(0.5))
-                .frame(width: 20, height: 20)
+                .frame(width: 13, height: 13)
             
             Circle()
                 .foregroundColor(.red.opacity(0.7))
-                .frame(width: 10, height: 10)
+                .frame(width: 7, height: 7)
         }
     }
 }

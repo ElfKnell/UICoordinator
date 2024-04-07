@@ -14,6 +14,7 @@ struct ConfirmationLocationView: View {
     @State private var name = ""
     @State private var description = ""
     @StateObject var viewModel = ConfirmationLocationViewModel()
+    @EnvironmentObject var locationViewModel: LocationViewModel
     @Binding var isSave: Bool
     
     var body: some View {
@@ -28,20 +29,12 @@ struct ConfirmationLocationView: View {
                         TextField("Place name", text: $name)
                             .font(.callout)
                             .padding(9)
-                            .clipShape(RoundedRectangle(cornerRadius: 20.0))
-                            .overlay{
-                                RoundedRectangle(cornerRadius: 20.0)
-                                    .stroke(Color(.systemGray4), lineWidth: 1)
-                            }
+                            .modifier(CornerRadiusModifier())
                         
                         TextField("Description...", text: $description, axis: .vertical)
                             .font(.footnote)
                             .padding(8)
-                            .clipShape(RoundedRectangle(cornerRadius: 20.0))
-                            .overlay{
-                                RoundedRectangle(cornerRadius: 20.0)
-                                    .stroke(Color(.systemGray4), lineWidth: 1)
-                            }
+                            .modifier(CornerRadiusModifier())
                     }
                     .padding(.horizontal)
                     
@@ -78,11 +71,7 @@ struct ConfirmationLocationView: View {
                 }
                 .padding()
                 .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 20.0))
-                .overlay{
-                    RoundedRectangle(cornerRadius: 20.0)
-                        .stroke(Color(.systemGray4), lineWidth: 1)
-                }
+                .modifier(CornerRadiusModifier())
                 .padding()
             }
             .navigationTitle("Create Bookmark")
@@ -101,7 +90,8 @@ struct ConfirmationLocationView: View {
                     Button("Save") {
                         Task {
                             try await viewModel.uploadLocation(name: name, description: description, coordinate: coordinate)
-                            isSave = true
+                            isSave.toggle()
+                            
                             dismiss()
                         }
                     }

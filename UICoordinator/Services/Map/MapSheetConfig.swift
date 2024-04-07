@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+enum MapSheetConfig: Int, Identifiable {
+    case confirmationLocation
+    case locationsDetail
+    
+    var id: Int {
+        self.rawValue
+    }
+}

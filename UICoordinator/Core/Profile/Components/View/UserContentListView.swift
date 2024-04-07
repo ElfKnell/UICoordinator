@@ -8,18 +8,24 @@
 import SwiftUI
 
 struct UserContentListView: View {
-    @State private var selectedFilter: ProfileThreadFilter = .threads
+    @StateObject var viewModel: UserContentListViewModel
+
+    @State private var selectedFilter: ProfileColloquyFilter = .colloquies
     @Namespace var animation
     
+    init(user: User) {
+        self._viewModel = StateObject(wrappedValue: UserContentListViewModel(user: user))
+    }
+    
     private var filterBarWidth: CGFloat {
-        let count = CGFloat(ProfileThreadFilter.allCases.count)
+        let count = CGFloat(ProfileColloquyFilter.allCases.count)
         return UIScreen.main.bounds.width / count - 16
     }
     
     var body: some View {
         VStack {
             HStack {
-                ForEach(ProfileThreadFilter.allCases) { filter in
+                ForEach(ProfileColloquyFilter.allCases) { filter in
                     VStack {
                         Text(filter.title)
                             .font(.subheadline)
@@ -44,16 +50,25 @@ struct UserContentListView: View {
                 }
             }
             
-            LazyVStack {
-                ForEach(1 ... 10, id: \.self) { thread in
-                    ThreadCell(thread: DeveloperPreview.thread)
+            if selectedFilter == .colloquies {
+                LazyVStack {
+                    ForEach(viewModel.colloquies) { colloquy in
+                        ColloquyCell(colloquy: colloquy)
+                    }
                 }
+            } else {
+                
             }
         }
         .padding(.vertical, 8)
+        .onAppear {
+            Task {
+                try await viewModel.fetchUserColloquies()
+            }
+        }
     }
 }
 
 #Preview {
-    UserContentListView()
+    UserContentListView(user: DeveloperPreview.user)
 }

@@ -8,11 +8,39 @@
 import SwiftUI
 
 struct BottomSideMenu: View {
+    let widthButton: CGFloat
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            
+            Button {
+                AuthService.shared.signOut()
+            } label: {
+                Label("Log Out", systemImage: "lock.shield.fill")
+                    .foregroundStyle(.red)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(width: widthButton, height: 44)
+                    .background(.white)
+                    .modifier(CornerRadiusModifier())
+                    .padding(.bottom)
+            }
+
+            Button {
+                
+            } label: {
+                Label("Delete", systemImage: "trash.fill")
+                    .foregroundStyle(.white)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(width: widthButton, height: 44)
+                    .background(.red)
+                    .modifier(CornerRadiusModifier())
+            }
+        }
     }
 }
 
 #Preview {
-    BottomSideMenu()
+    BottomSideMenu(widthButton: 250)
 }

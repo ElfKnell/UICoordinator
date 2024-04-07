@@ -8,11 +8,24 @@
 import SwiftUI
 
 struct LabelButtonView: View {
+    let imageName: String
+    let label: String
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            Image(systemName: imageName)
+            
+            Text(label)
+        }
+        .font(.headline)
+        .padding()
+        .frame(height: 40)
+        .background(Color.blue)
+        .foregroundColor(.white)
+        .modifier(CornerRadiusModifier())
     }
 }
 
 #Preview {
-    LabelButtonView()
+    LabelButtonView(imageName: "", label: "")
 }

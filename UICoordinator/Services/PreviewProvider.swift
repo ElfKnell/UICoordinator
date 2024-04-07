@@ -12,5 +12,9 @@ class DeveloperPreview {
     
     static let user = User(id: NSUUID().uuidString, fullname: "Anri Kyr", username: "anky", email: "test@gmail.com")
     
-    static let thread = Thread(ownerUid: user.id, caption: "", timestamp: Timestamp(), likes: 0)
+    static let colloquy = Colloquy(ownerUid: user.id, caption: "", timestamp: Timestamp(), likes: 0, locationId: nil)
+    
+    static let location = Location(ownerUid: user.id, name: "", description: "", timestamp: Timestamp(), latitude: 51.5010, longitude: -0.1410)
+    
+    static let photo = Photo(locationUid: NSUUID().uuidString, timestamp: Timestamp(), photoURL: "")
 }

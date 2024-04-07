@@ -10,14 +10,31 @@ import SwiftUI
 struct NewPhotoView: View {
     let locationId: String
     @EnvironmentObject var viewModel: PhotoViewModel
+    @State private var currentOrientation = UIDevice.current.orientation
+    @State private var isUserPortrait = true
     
     var body: some View {
         VStack {
-            ImageView(image: viewModel.selectedImage)
-            
-            TextField("Photo name ...", text: $viewModel.namePhoto)
-                .frame(width: 300)
-                .padding(.bottom)
+            if isUserPortrait {
+                
+                VStack {
+                    ImageView(image: viewModel.selectedImage)
+                    
+                    TextField("Photo name ...", text: $viewModel.namePhoto)
+                        .frame(width: 300)
+                        .padding(.bottom)
+                }
+                
+            } else {
+                
+                HStack {
+                    ImageView(image: viewModel.selectedImage)
+                    
+                    TextField("Photo name ...", text: $viewModel.namePhoto)
+                        .frame(width: 300)
+                }
+                
+            }
             
             HStack {
                 
@@ -41,7 +58,18 @@ struct NewPhotoView: View {
 
             }
             
+            Spacer()
+            
         }
+        .onAppear {
+           isUserPortrait = UIScreen.main.bounds.height > UIScreen.main.bounds.width ? true : false
+        }
+        .onChange(of: currentOrientation) {
+            isUserPortrait = UIScreen.main.bounds.height > UIScreen.main.bounds.width ? true : false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                        self.currentOrientation = UIDevice.current.orientation
+                    }
     }
 }
 

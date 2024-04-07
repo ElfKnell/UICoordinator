@@ -9,18 +9,14 @@ import SwiftUI
 
 struct AboutView: View {
     
-    @EnvironmentObject var viewModel: CurrentUserProfileViewModel
-    
-    private var currentUser: User {
-        return viewModel.currentUser ?? DeveloperPreview.user
-    }
+    @StateObject var viewModel = AboutViewModel()
     
     var body: some View {
-        ScrollView {
-            if let user = viewModel.currentUser {
-                UserContentListView(user: user)
-            }
+        VStack {
+            Text(viewModel.info_1)
+            Text(viewModel.info_2)
         }
+        .padding()
     }
 }
 

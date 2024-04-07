@@ -15,10 +15,12 @@ struct Colloquy: Identifiable, Codable {
     let caption: String
     let timestamp: Timestamp
     var likes: Int
+    let locationId: String?
     
     var id: String {
         return threadId ?? NSUUID().uuidString
     }
     
     var user: User?
+    var location: Location?
 }

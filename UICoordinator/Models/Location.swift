@@ -5,4 +5,32 @@
 //  Created by Andrii Kyrychenko on 02/03/2024.
 //
 
-import Foundation
+import FirebaseFirestoreSwift
+import MapKit
+import Firebase
+
+struct Location: Identifiable, Codable, Hashable {
+    
+    @DocumentID var locationId: String?
+    let ownerUid: String
+    var name: String
+    var description: String
+    let timestamp: Timestamp
+    var timeUpdate: Timestamp?
+    let latitude: Double
+    let longitude: Double
+    
+    var id: String {
+        return locationId ?? NSUUID().uuidString
+    }
+    
+    var user: User?
+    
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+    
+    var regionCoordinate: MKCoordinateRegion {
+        MKCoordinateRegion(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+    }
+}

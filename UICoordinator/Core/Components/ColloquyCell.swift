@@ -8,23 +8,23 @@
 import SwiftUI
 
 struct ColloquyCell: View {
-    let thread: Thread
+    let colloquy: Colloquy
     
     var body: some View {
         VStack {
             HStack(alignment: .top, spacing: 12) {
                 
-                CircularProfileImageView(user: thread.user, size: .small)
+                CircularProfileImageView(user: colloquy.user, size: .small)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(thread.user?.username ?? "")
+                        Text(colloquy.user?.username ?? "")
                             .font(.footnote)
                             .fontWeight(.semibold)
                         
                         Spacer()
                         
-                        Text(thread.timestamp.timestampString())
+                        Text(colloquy.timestamp.timestampString())
                             .font(.caption)
                             .foregroundStyle(Color(.systemGray3))
                         
@@ -37,9 +37,20 @@ struct ColloquyCell: View {
                         
                     }
                     
-                    Text(thread.caption)
-                        .font(.footnote)
-                        .multilineTextAlignment(.leading)
+                    HStack {
+                        if let name = colloquy.location?.name {
+                            NavigationLink {
+                                LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
+                            } label: {
+                                Text(name)
+                                    .foregroundStyle(.blue)
+                            }
+                        }
+                        
+                        Text(colloquy.caption)
+                            .font(.footnote)
+                            .multilineTextAlignment(.leading)
+                    }
                     
                     HStack(spacing: 16) {
                         Button {
@@ -79,5 +90,5 @@ struct ColloquyCell: View {
 }
 
 #Preview {
-    ColloquyCell(thread: DeveloperPreview.thread)
+    ColloquyCell(colloquy: DeveloperPreview.colloquy)
 }

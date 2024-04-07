@@ -18,35 +18,35 @@ struct LocationColloquyView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            Map(position: $mapCamera) {
-                Annotation("", coordinate: location.coordinate) {
-                    NavigationLink {
-                        
-                    } label: {
-                        MarkerView(name: location.name)
-                    }
+        
+        Map(position: $mapCamera) {
+            Annotation("", coordinate: location.coordinate) {
+                NavigationLink {
+                    LocationColloquyDetailView(location: location)
+                } label: {
+                    MarkerView(name: location.name)
                 }
             }
-            .overlay {
-                VStack {
-                    HStack {
-                        BackButtonView()
-                            .font(.largeTitle)
-                            .padding()
-                        
-                        Spacer()
-                    }
+        }
+        .overlay {
+            VStack {
+                HStack {
+                    BackButtonView()
+                        .font(.largeTitle)
+                        .padding()
                     
                     Spacer()
                 }
                 
+                Spacer()
             }
-            .mapControls {
-                MapCompass()
-                MapPitchToggle()
-            }
+            
         }
+        .mapControls {
+            MapCompass()
+            MapPitchToggle()
+        }
+        .navigationBarBackButtonHidden()
     }
 }
 

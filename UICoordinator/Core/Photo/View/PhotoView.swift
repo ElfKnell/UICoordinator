@@ -6,13 +6,68 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct PhotoView: View {
+    
+    let locationId: String
+    @StateObject var viewModel = PhotoViewModel()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack {
+                
+                BackgroundView()
+                
+                VStack {
+                    
+                    if !viewModel.photos.isEmpty {
+                        PhotoScrollView(photos: viewModel.photos, bphoto: $viewModel.photo, switcher: $viewModel.switcher, namePhoto: $viewModel.namePhoto)
+                    }
+                    
+                    Spacer()
+                    
+                    if viewModel.isLoading {
+                        LoadingView(width: 130, height: 130)
+                        
+                        Spacer()
+                        
+                    } else {
+                        
+                        switch viewModel.switcher {
+                        case .newPhoto:
+                            NewPhotoView(locationId: locationId)
+                                .environmentObject(viewModel)
+                            
+                        case .oldPhoto:
+                            
+                            OrientationPhotoSelectedView()
+                                .environmentObject(viewModel)
+                            
+                        case .noPhoto:
+                            SelectionPhotoView()
+                                .environmentObject(viewModel)
+                        }
+                    }
+                }
+                .navigationTitle("Photos")
+                .navigationBarBackButtonHidden()
+                .navigationBarTitleDisplayMode(.inline)
+                .onAppear {
+                    Task {
+                        try await viewModel.fetchPhoto(locationId)
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        BackButtonView()
+                    }
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    PhotoView()
+    PhotoView(locationId: "")
 }

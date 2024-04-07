@@ -6,10 +6,35 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ImageView: View {
+    
+    var image: UIImage?
+    var photoURL: String?
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        if let image = image {
+            
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .modifier(CornerRadiusModifier())
+                .padding()
+            
+        } else if let photoURL = photoURL {
+            
+            NavigationLink {
+                SelectedPhotoView(photoURL: photoURL)
+            } label: {
+                KFImage(URL(string: photoURL))
+                    .resizable()
+                    .scaledToFit()
+                    .modifier(CornerRadiusModifier())
+                    .padding()
+            }
+        }
     }
 }
 

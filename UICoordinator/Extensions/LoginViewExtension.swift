@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+extension LoginView: AuthenticationFormProtocol {
+    var formIsValid: Bool {
+        return !loginModel.email.isEmpty
+        && loginModel.email.contains("@")
+        && !loginModel.password.isEmpty
+        && loginModel.password.count > 5
+    }
+}

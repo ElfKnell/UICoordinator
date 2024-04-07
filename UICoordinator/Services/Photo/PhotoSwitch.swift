@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+enum PhotoSwitch {
+    case newPhoto
+    case oldPhoto
+    case noPhoto
+}

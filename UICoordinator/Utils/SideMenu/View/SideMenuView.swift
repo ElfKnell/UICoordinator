@@ -9,8 +9,14 @@ import SwiftUI
 
 struct SideMenuView: View {
     @Binding var isShowind: Bool
-    let user: User
+    @Binding var selectedTab: Int
+    @EnvironmentObject var viewModel: CurrentUserProfileViewModel
+    @State private var selectedOption: OptionModel?
+    
     let widthSideMenu = UIScreen.main.bounds.width / 3 * 2
+    private var user: User {
+        return viewModel.currentUser ?? DeveloperPreview.user
+    }
     
     var body: some View {
         ZStack {
@@ -27,9 +33,26 @@ struct SideMenuView: View {
                     
                     VStack(alignment: .leading, spacing: 32) {
                         
-                        SideMenuHeaderView(user: user)
+                        SideMenuHeaderView()
                         
-                        BodySideMenu(widthButton: widthSideMenu - 32)
+                        Divider()
+                        
+                        VStack {
+                            ForEach(OptionModel.allCases) { option in
+                                Button {
+                                    selectedOption = option
+                                    selectedTab = option.rawValue
+                                    isShowind.toggle()
+                                } label: {
+                                    SideMenuRowView(selected: $selectedOption, option: option)
+                                }
+
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        BottomSideMenu(widthButton: widthSideMenu - 32)
                         
                         Spacer()
                         
@@ -47,5 +70,5 @@ struct SideMenuView: View {
 }
 
 #Preview {
-    SideMenuView(isShowind: .constant(true), user: DeveloperPreview.user)
+    SideMenuView(isShowind: .constant(true), selectedTab: .constant(0))
 }

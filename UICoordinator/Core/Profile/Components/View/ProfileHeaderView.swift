@@ -12,32 +12,36 @@ struct ProfileHeaderView: View {
     let user: User
     
     var body: some View {
-        HStack(alignment: .top) {
+        VStack(spacing: 16) {
             
-            VStack(alignment: .leading, spacing: 12) {
+            VStack {
                 
-                VStack(alignment: .leading) {
+                CircularProfileImageView(user: user, size: .large)
+                
+                Group {
                     Text(user.fullname)
                         .font(.title2)
                         .fontWeight(.semibold)
                     
-                    Text(user.username)
-                        .font(.subheadline)
+                    Text("djufidfidn  ndsinsdivnjdis sjdckjdsn")
+                    
+                    if let bio = user.bio {
+                        Text(bio)
+                            .font(.footnote)
+                    }
                 }
                 
-                if let bio = user.bio {
-                    Text(bio)
-                        .font(.footnote)
-                }
+                Divider()
                 
-                Text("2 followers")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                HStack(spacing: 16) {
+                    
+                    BottomHeaderView(title: "Following", counts: "4", imageName: "person.3.fill")
+                    
+                    BottomHeaderView(title: "Followers", counts: "45", imageName: "person.crop.circle.fill.badge.checkmark")
+                    
+                    BottomHeaderView(title: "Likes", counts: "2345", imageName: "heart.fill")
+                }
             }
-            
-            Spacer()
-            
-            CircularProfileImageView(user: user, size: .medium)
         }
     }
 }

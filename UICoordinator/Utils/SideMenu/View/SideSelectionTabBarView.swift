@@ -8,24 +8,46 @@
 import SwiftUI
 
 struct SideSelectionTabBarView: View {
-    @Binding var selection: Int
+    @State private var showSideMenu = false
+    @State private var selectedTab = 0
     
     var body: some View {
-        TabView(selection: $selection)  {
-            
-            
-            Text("Notifications")
-                .tag(0)
-            
-            Text("Help")
-                .tag(1)
-            
-            Text("About")
-                .tag(3)
+        NavigationStack {
+            ZStack {
+                TabView(selection: $selectedTab)  {
+                    
+                    CurrentUserProfileView()
+                        .tag(0)
+                    
+                    Text("Notifications")
+                        .tag(1)
+                    
+                    Text("Settings")
+                        .tag(2)
+                    
+                    Text("Help")
+                        .tag(3)
+                    
+                    AboutView()
+                        .tag(4)
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                
+                SideMenuView(isShowind: $showSideMenu, selectedTab: $selectedTab)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showSideMenu.toggle()
+                    } label: {
+                        Image(systemName: showSideMenu ? "xmark" : "line.3.horizontal")
+                    }
+                }
+            }
         }
     }
 }
 
 #Preview {
-    SideSelectionTabBarView(selection: .constant(0))
+    SideSelectionTabBarView()
 }

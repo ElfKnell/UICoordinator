@@ -6,13 +6,41 @@
 //
 
 import SwiftUI
+import AVKit
 
 struct LocationVideoView: View {
+    let videos: [Video]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack {
+                
+                BackgroundView()
+                
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(videos) { video in
+                            VStack(alignment: .leading) {
+                                VideoPlayer(player: AVPlayer(url: URL(string: video.videoURL)!))
+                                    .frame(height: 250)
+                                
+                                Text(video.title ?? "")
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Videos")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackButtonView()
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    LocationVideoView()
+    LocationVideoView(videos: [Video]())
 }

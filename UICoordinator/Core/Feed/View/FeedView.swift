@@ -8,11 +8,68 @@
 import SwiftUI
 
 struct FeedView: View {
+    
+    @StateObject var viewModel = FeedViewModel()
+    @State private var showColloquyCreate = false
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack {
+                ScrollView(showsIndicators: false) {
+                    LazyVStack {
+                        ForEach(viewModel.colloquies) { colloquy in
+                            ColloquyCell(colloquy: colloquy)
+                        }
+                    }
+                }
+                .refreshable {
+                    Task {
+                        try await viewModel.fetchColloquies()
+                    }
+                }
+                .navigationTitle("Colloquies")
+                .navigationBarTitleDisplayMode(.inline)
+                
+                VStack() {
+                    
+                    Spacer()
+                    
+                    HStack {
+                        
+                        Spacer()
+                        
+                        Button {
+                            showColloquyCreate.toggle()
+                        } label: {
+                            Image(systemName: "plus.message")
+                        }
+                        .font(.largeTitle)
+                        .padding()
+                        
+                    }
+                }
+            }
+            .sheet(isPresented: $showColloquyCreate, content: {
+                CreateColloquyView(location: nil)
+            })
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Task {
+                            try await viewModel.fetchColloquies()
+                        }
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise")
+                            .foregroundStyle(.black)
+                    }
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    FeedView()
+    NavigationStack {
+        FeedView()
+    }
 }

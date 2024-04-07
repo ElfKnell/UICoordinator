@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct SideMenuHeaderView: View {
-    let user: User
+    @EnvironmentObject var viewModel: CurrentUserProfileViewModel
+    private var user: User {
+        return viewModel.currentUser ?? DeveloperPreview.user
+    }
     
     var body: some View {
         HStack {
@@ -27,5 +30,5 @@ struct SideMenuHeaderView: View {
 }
 
 #Preview {
-    SideMenuHeaderView(user: DeveloperPreview.user)
+    SideMenuHeaderView()
 }

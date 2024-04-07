@@ -8,23 +8,30 @@
 import SwiftUI
 
 struct SideMenuRowView: View {
+    @Binding var selected: OptionModel?
+    let option: OptionModel
     
+    private var isSecected: Bool {
+        option == selected
+    }
     
     var body: some View {
         HStack {
-            Image(systemName: "bell")
+            Image(systemName: option.systemImageName)
                 .imageScale(.small)
             
-            Text("Notifications")
+            Text(option.title)
                 .font(.subheadline)
             
             Spacer()
         }
         .padding(.leading)
         .frame(height: 44)
+        .background(isSecected ? .blue.opacity(0.3) : .clear)
+        .modifier(CornerRadiusModifier())
     }
 }
 
 #Preview {
-    SideMenuRowView()
+    SideMenuRowView(selected: .constant(.notifications), option: .notifications)
 }

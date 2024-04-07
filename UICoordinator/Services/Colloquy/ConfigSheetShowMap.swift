@@ -6,3 +6,13 @@
 //
 
 import Foundation
+
+enum ConfigSheetShowMap: Int, Identifiable {
+    case showMap
+    case showCreatColloquy
+    case showUserProfileedit
+    
+    var id: Int {
+        self.rawValue
+    }
+}
