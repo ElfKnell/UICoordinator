@@ -11,6 +11,7 @@ struct ExploreView: View {
     
     @StateObject var viewModel = ExploreViewModel()
     @State private var searchText = ""
+    @EnvironmentObject var userFollow: UserFollowers
     
     var body: some View {
         NavigationStack {
@@ -34,6 +35,11 @@ struct ExploreView: View {
             })
             .navigationTitle("Search")
             .searchable(text: $searchText, prompt: "Search")
+            .onAppear {
+                Task {
+                    try await userFollow.fetchFollowers()
+                }
+            }
         }
     }
 }

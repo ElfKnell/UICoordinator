@@ -16,4 +16,11 @@ extension Timestamp {
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: self.dateValue(), to: Date()) ?? ""
     }
+    
+    func timestampFullString() -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.second, .minute, .hour, .day, .weekOfMonth]
+        formatter.unitsStyle = .full
+        return formatter.string(from: self.dateValue(), to: Date()) ?? ""
+    }
 }

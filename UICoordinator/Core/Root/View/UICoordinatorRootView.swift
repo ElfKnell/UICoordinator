@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @StateObject var viewModel = ContentViewModel()
+struct UICoordinatorRootView: View {
+    @StateObject var viewModel = UICoordinatorRootViewModel()
     
     var body: some View {
         Group {
@@ -22,5 +22,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    UICoordinatorRootView()
 }

@@ -38,7 +38,7 @@ struct CoordinatorTabView: View {
             
             ActivityView()
                 .tabItem {
-                    Image(systemName: selectedTab == 3 ? "heart.fill" : "heart")
+                    Image(systemName: selectedTab == 3 ? "car.circle.fill" : "car.circle")
                         .environment(\.symbolVariants, selectedTab == 3 ? .fill : .none)
                 }
                 .onAppear { selectedTab = 3 }

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ColloquyCell: View {
     let colloquy: Colloquy
+    @StateObject var viewModel = LikesViewModel(collectionName: "Likes")
+    @State private var showReplieCreate = false
     
     var body: some View {
         VStack {
@@ -28,8 +30,8 @@ struct ColloquyCell: View {
                             .font(.caption)
                             .foregroundStyle(Color(.systemGray3))
                         
-                        Button {
-                            
+                        NavigationLink {
+                            RepliesView(colloquy: colloquy)
                         } label: {
                             Image(systemName: "ellipsis")
                                 .foregroundStyle(Color(.darkGray))
@@ -54,21 +56,22 @@ struct ColloquyCell: View {
                     
                     HStack(spacing: 16) {
                         Button {
-                            
+                            Task {
+                                try await viewModel.doLike(userId: colloquy.ownerUid, colloquyId: colloquy.id)
+                            }
                         } label: {
-                            Image(systemName: "heart")
+                            if viewModel.likeId == nil {
+                                Image(systemName: "heart")
+                            } else {
+                                Image(systemName: "heart.fill")
+                                    .foregroundStyle(.red)
+                            }
                         }
                         
                         Button {
-                            
+                            showReplieCreate.toggle()
                         } label: {
                             Image(systemName: "bubble.right")
-                        }
-                        
-                        Button {
-                            
-                        } label: {
-                            Image(systemName: "arrow.rectanglepath")
                         }
                         
                         Button {
@@ -86,6 +89,14 @@ struct ColloquyCell: View {
             
         }
         .padding()
+        .onAppear {
+            Task {
+                try await viewModel.isLike(cid:colloquy.id)
+            }
+        }
+        .sheet(isPresented: $showReplieCreate, content: {
+            CreateColloquyView(location: nil, colloquy: colloquy)
+        })
     }
 }
 

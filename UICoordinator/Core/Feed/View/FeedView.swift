@@ -22,6 +22,11 @@ struct FeedView: View {
                         }
                     }
                 }
+                .onAppear {
+                    Task {
+                        try await viewModel.fetchColloquies()
+                    }
+                }
                 .refreshable {
                     Task {
                         try await viewModel.fetchColloquies()
@@ -50,20 +55,8 @@ struct FeedView: View {
                 }
             }
             .sheet(isPresented: $showColloquyCreate, content: {
-                CreateColloquyView(location: nil)
+                CreateColloquyView(location: nil, colloquy: nil)
             })
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task {
-                            try await viewModel.fetchColloquies()
-                        }
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
-                            .foregroundStyle(.black)
-                    }
-                }
-            }
         }
     }
 }

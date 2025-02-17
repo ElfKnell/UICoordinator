@@ -12,7 +12,7 @@ class EditLocationViewModel: ObservableObject {
     
     func updateLocation(_ location: Location) async throws {
         guard let locationId = location.locationId else { return }
-        try await LocationService.updateLocation(location, locationId: locationId)
+        try await LocationService.updateLocation(name: location.name, description: location.description, locationId: locationId)
     }
     
 }

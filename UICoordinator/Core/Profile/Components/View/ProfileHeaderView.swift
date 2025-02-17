@@ -10,6 +10,8 @@ import SwiftUI
 struct ProfileHeaderView: View {
     
     let user: User
+    @EnvironmentObject var userFollow: UserFollowers
+    @StateObject var userLikes = UserLikeCount()
     
     var body: some View {
         VStack(spacing: 16) {
@@ -23,8 +25,6 @@ struct ProfileHeaderView: View {
                         .font(.title2)
                         .fontWeight(.semibold)
                     
-                    Text("djufidfidn  ndsinsdivnjdis sjdckjdsn")
-                    
                     if let bio = user.bio {
                         Text(bio)
                             .font(.footnote)
@@ -35,12 +35,19 @@ struct ProfileHeaderView: View {
                 
                 HStack(spacing: 16) {
                     
-                    BottomHeaderView(title: "Following", counts: "4", imageName: "person.3.fill")
+                    BottomHeaderView(title: "Following", counts: "\(userFollow.userFollowing.count)", imageName: "person.3.fill")
                     
-                    BottomHeaderView(title: "Followers", counts: "45", imageName: "person.crop.circle.fill.badge.checkmark")
+                    BottomHeaderView(title: "Followers", counts: "\(userFollow.userFollowers.count)", imageName: "person.crop.circle.fill.badge.checkmark")
                     
-                    BottomHeaderView(title: "Likes", counts: "2345", imageName: "heart.fill")
+                    BottomHeaderView(title: "Likes",
+                                     counts: "\(userLikes.countLikes)",
+                                     imageName: "heart.fill")
                 }
+            }
+        }
+        .onAppear {
+            Task {
+                try await userLikes.fetchLikesCount(userId: user.id)
             }
         }
     }

@@ -10,24 +10,26 @@ import MapKit
 
 struct LocationsDetailView: View {
     
-    @Binding var mapSeliction: MKMapItem?
+    @Binding var mapSeliction: Location?
     @State private var lookAroundScene: MKLookAroundScene?
     @Binding var getDirections: Bool
+    @Binding var isUpdate: MapSheetConfig?
     @Environment(\.dismiss) var dismiss
+    
+    @StateObject var viewModel = MapSearchViewModel()
     
     var body: some View {
         VStack {
             HStack {
                 VStack(alignment: .leading) {
                    
-                    Text(mapSeliction?.placemark.name ?? "")
+                    Text(mapSeliction?.name ?? "")
                         .font(.title2)
                         .fontWeight(.semibold)
-                        
-                    Text(mapSeliction?.placemark.title ?? "")
+                    
+                    Text((mapSeliction?.address ?? mapSeliction?.description) ?? "")
                         .font(.footnote)
-                        .foregroundStyle(.gray)
-                        .lineLimit(2)
+                        .fontWeight(.semibold)
                         .padding(.leading)
                    
                 }
@@ -51,33 +53,51 @@ struct LocationsDetailView: View {
                     .cornerRadius(12)
                     .padding()
             } else {
-                ContentUnavailableView("No preview availible", image: "eye.slash")
+                ContentUnavailableView("No preview availible", systemImage: "eye.slash")
             }
             
             HStack(spacing: 24) {
                 Button {
-                    if let mapSeliction {
-                        mapSeliction.openInMaps()
-                    }
+                    viewModel.openMap(mapSeliction: mapSeliction)
                 } label: {
                     Text("Open in map")
                         .font(.headline)
                         .foregroundStyle(.white)
-                        .frame(width: 170, height: 48)
+                        .frame(width: 110, height: 48)
                         .background(.green)
                         .cornerRadius(12)
                 }
                 
-                Button {
-                    getDirections = true
-                    dismiss()
-                } label: {
-                    Text("Get directions")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(width: 170, height: 48)
-                        .background(.blue)
-                        .cornerRadius(12)
+                if viewModel.currentUser?.id == mapSeliction?.ownerUid {
+                    
+                    if mapSeliction?.isSearch == true {
+                        
+                    } else {
+                        
+                        Button {
+                            isUpdate = .locationUpdate
+                        } label: {
+                            Text("Update")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .frame(width: 110, height: 48)
+                                .background(.yellow)
+                                .cornerRadius(12)
+                        }
+                        
+                    }
+                    
+                    Button {
+                        getDirections = true
+                        dismiss()
+                    } label: {
+                        Text("Get directions")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(width: 110, height: 48)
+                            .background(.blue)
+                            .cornerRadius(12)
+                    }
                 }
             }
         }
@@ -91,7 +111,7 @@ struct LocationsDetailView: View {
 }
 
 #Preview {
-    LocationsDetailView(mapSeliction: .constant(.init()), getDirections: .constant(false))
+    LocationsDetailView(mapSeliction: .constant(DeveloperPreview.location), getDirections: .constant(false), isUpdate: .constant(.locationsDetail))
 }
 
 extension LocationsDetailView {
@@ -99,7 +119,7 @@ extension LocationsDetailView {
         if let mapSeliction {
             lookAroundScene = nil
             Task {
-                let request = MKLookAroundSceneRequest(mapItem: mapSeliction)
+                let request = MKLookAroundSceneRequest(coordinate: mapSeliction.coordinate)
                 lookAroundScene = try? await request.scene
             }
         }

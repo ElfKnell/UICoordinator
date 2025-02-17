@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CurrentUserProfileView: View {
     @EnvironmentObject var viewModel: CurrentUserProfileViewModel
+    @EnvironmentObject var userFollow: UserFollowers
     @State private var showEditProfile = false
     
     private var currentUser: User {
@@ -37,6 +38,12 @@ struct CurrentUserProfileView: View {
                 if let user = viewModel.currentUser {
                     UserContentListView(user: user)
                 }
+            }
+        }
+        .onAppear {
+            Task {
+                try await userFollow.fetchUserFollowers(uid: currentUser.id)
+                try await userFollow.fetchUserFollowing(uid: currentUser.id)
             }
         }
         .sheet(isPresented: $showEditProfile, content: {

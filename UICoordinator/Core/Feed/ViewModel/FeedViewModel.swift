@@ -18,12 +18,14 @@ class FeedViewModel: ObservableObject {
     }
     
     func fetchColloquies() async throws {
-        self.colloquies = try await ColloquyService.fetchColloquies()
+        self.colloquies = try await getColloquesByUsers()
+        self.colloquies.removeAll(where: {$0.ownerColloquy != nil})
         try await fetchUserDataForColloquies()
         try await fetchLocationDataForColloquies()
     }
     
     private func fetchUserDataForColloquies() async throws {
+        
         for i in 0 ..< colloquies.count
         {
             let colloquy = colloquies[i]
@@ -45,7 +47,24 @@ class FeedViewModel: ObservableObject {
         }
     }
     
-    func getLocation(lid: String) async throws -> Location {
+    private func getLocation(lid: String) async throws -> Location {
         return try await LocationService.fetchLocation(withLid: lid)
+    }
+    
+    private func getColloquesByUsers() async throws -> [Colloquy] {
+        let followersData = UserFollowers()
+        try await followersData.fetchFollowers()
+        let followers = followersData.followers
+        guard let currentUserId = UserService.shared.currentUser?.id else { return []}
+        
+        var colloquies = try await ColloquyService.fetchUserColloquy(uid: currentUserId)
+        
+        for follower in followers {
+            let col = try await ColloquyService.fetchUserColloquy(uid: follower.following)
+            
+            colloquies += col
+        }
+        
+        return colloquies.sorted(by: { $0.timestamp.dateValue() > $1.timestamp.dateValue() })
     }
 }

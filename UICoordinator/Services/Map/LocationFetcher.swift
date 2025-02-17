@@ -32,7 +32,7 @@ class LocationFetcher: NSObject, CLLocationManagerDelegate, ObservableObject {
         
         guard let longitude = lastKnownLocation?.longitude else { return }
         
-        coordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03))
+        coordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), latitudinalMeters: 500, longitudinalMeters: 500)
 
     }
 

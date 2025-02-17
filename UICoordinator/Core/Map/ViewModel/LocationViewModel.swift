@@ -17,10 +17,10 @@ class LocationViewModel: ObservableObject {
     @Published var cameraPosition: MapCameraPosition = .region(.startRegion)
     
     @Published var searchText = ""
-    @Published var mapSelection: MKMapItem?
+    @Published var mapSelection: Location?
     @Published var routeDistination: MKMapItem?
     @Published var route: MKRoute?
-    @Published var results = [MKMapItem]()
+    @Published var searchLoc = [Location]()
     @Published var routeDisplaying = false
     @Published var getDirections = false
     
@@ -35,14 +35,15 @@ class LocationViewModel: ObservableObject {
     
     func fetchUserForLocations() async throws {
         guard let userUid = Auth.auth().currentUser?.uid else { return }
-        self.locations = try await LocationService.fetchUserLocations(uid: userUid)
+        let loc_s = try await LocationService.fetchUserLocations(uid: userUid)
+        self.locations = loc_s.filter({ $0.activityId == nil })
         try await getCameraPosition()
     }
     
     private func getCameraPosition() async throws {
         if !locations.isEmpty {
             if let coordinatePosition = coordinatePosition {
-                self.cameraPosition = .region(.init(center: coordinatePosition, latitudinalMeters: 1000, longitudinalMeters: 1000))
+                self.cameraPosition = .region(.init(center: coordinatePosition, latitudinalMeters: 500, longitudinalMeters: 500))
                 self.coordinateRouter = coordinatePosition
                 
             } else {
@@ -54,14 +55,21 @@ class LocationViewModel: ObservableObject {
         }
     }
     
-    func getResults() async throws {
-        try await getCameraPosition()
-        self.results = await MapSearchViewModel.serchPlace(region: cameraPosition.region, searchText: searchText)
+    func getResults(_ cameraPosition: MapCameraPosition) async throws {
+        
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let results = await MapSearchViewModel.serchPlace(region: cameraPosition.region, searchText: searchText)
+        
+        for result in results {
+            let loc: Location = .init(ownerUid: uid, name: result.placemark.name ?? "no name", description: "", address: result.placemark.title, timestamp: Timestamp(), latitude: result.placemark.coordinate.latitude, longitude: result.placemark.coordinate.longitude, isSearch: true, activityId: nil)
+            
+            searchLoc.append(loc)
+        }
     }
     
     func clean() {
         searchText = ""
-        results = []
+        searchLoc = []
         mapSelection = nil
         getDirections = false
         routeDistination = nil
@@ -72,13 +80,14 @@ class LocationViewModel: ObservableObject {
     func fetchRoute() {
         if let mapSelection {
             let request = MKDirections.Request()
+            let mapItem: MKMapItem = .init(placemark: .init(coordinate: mapSelection.coordinate))
             request.source = MKMapItem(placemark: .init(coordinate: coordinateRouter))
-            request.destination = mapSelection
+            request.destination = mapItem
             
             Task {
                 let result = try await MKDirections(request: request).calculate()
                 route = result.routes.first
-                routeDistination = mapSelection
+                routeDistination = mapItem
                 
                 withAnimation(.snappy) {
                     routeDisplaying = true

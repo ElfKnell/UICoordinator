@@ -15,7 +15,7 @@ struct LocationView: View {
 
     @State private var isSave = false
     @State private var showSearch = false
-    
+    @State private var regionCamera: MapCameraPosition = .region(.startRegion)
     
     var body: some View {
         NavigationStack {
@@ -36,11 +36,8 @@ struct LocationView: View {
                     
                     UserAnnotation()
                     
-                    ForEach(viewModel.results, id: \.self) { item in
-                        if (viewModel.routeDisplaying && item == viewModel.routeDistination) || !viewModel.routeDisplaying {
-                            let markPlace = item.placemark
-                            Marker(markPlace.name ?? "", coordinate: markPlace.coordinate)
-                        }
+                    ForEach(viewModel.searchLoc, id: \.self) { item in
+                        Marker(item.name, coordinate: item.coordinate)
                     }
                     
                     if let route = viewModel.route {
@@ -54,8 +51,9 @@ struct LocationView: View {
                     MapPitchToggle()
                     MapUserLocationButton()
                 }
-                .onMapCameraChange { mapCameraUpdateContext in
+                .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
                     viewModel.coordinate = mapCameraUpdateContext.camera.centerCoordinate
+                    regionCamera = .region(mapCameraUpdateContext.region)
                 }
                 
                 SightView()
@@ -86,6 +84,7 @@ struct LocationView: View {
                                 .font(.subheadline)
                                 .padding(12)
                                 .background(.white)
+                                .modifier(CornerRadiusModifier())
                                 .padding()
                                 .shadow(radius: 10)
                         }
@@ -121,7 +120,7 @@ struct LocationView: View {
             }
             .onSubmit(of: .text) {
                 Task {
-                    try await viewModel.getResults()
+                    try await viewModel.getResults(regionCamera)
                 }
             }
             .onChange(of: isSave) {
@@ -139,7 +138,10 @@ struct LocationView: View {
             .onChange(of: viewModel.mapSelection, { oldValue, newValue in
                 
                 if newValue != nil {
+                    viewModel.getDirections = false
                     viewModel.sheetConfig = .locationsDetail
+                } else {
+                    viewModel.sheetConfig = nil
                 }
             })
             .sheet(item: $viewModel.sheetConfig, content: { config in
@@ -147,15 +149,21 @@ struct LocationView: View {
                 case .confirmationLocation:
                     
                     ConfirmationLocationView(coordinate: viewModel.coordinate, isSave: $isSave)
-                        .presentationDetents([.height(300), .medium])
+                        .presentationDetents([.height(340), .medium])
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-                        .environmentObject(viewModel)
 
                 case .locationsDetail:
-                    LocationsDetailView(mapSeliction: $viewModel.mapSelection, getDirections: $viewModel.getDirections)
+                    LocationsDetailView(mapSeliction: $viewModel.mapSelection, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
                         .presentationDetents([.height(340)])
                         .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
                         .presentationCornerRadius(12)
+               
+                case .locationUpdate:
+                    if let location = viewModel.mapSelection {
+                        UpdateLocationView(location: location)
+                            .presentationDetents([.height(340), .medium])
+                            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    }
                 }
             })
         }

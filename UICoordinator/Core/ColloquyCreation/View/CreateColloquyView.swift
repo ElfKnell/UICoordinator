@@ -12,6 +12,7 @@ struct CreateColloquyView: View {
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
     let location: Location?
+    let colloquy: Colloquy?
     
     private var user: User? {
         return UserService.shared.currentUser
@@ -22,6 +23,22 @@ struct CreateColloquyView: View {
         NavigationStack {
             
             VStack {
+                
+                if let colloquy = colloquy {
+                    
+                    ReplyCreateView(colloquy: colloquy)
+                    
+                    HStack(alignment: .top) {
+                        
+                        Text("|")
+                            .font(.title)
+                            .padding(.horizontal)
+                            .opacity(0.5)
+                        
+                        Spacer()
+                    }
+                    
+                }
                 
                 HStack(alignment: .top) {
                     
@@ -67,7 +84,7 @@ struct CreateColloquyView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Post") {
                         Task {
-                            try await viewModel.uploadColloquy(caption: caption, locatioId: location?.id)
+                            try await viewModel.uploadColloquy(caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id)
                             
                             dismiss()
                         }
@@ -84,5 +101,5 @@ struct CreateColloquyView: View {
 }
 
 #Preview {
-    CreateColloquyView(location: nil)
+    CreateColloquyView(location: nil, colloquy: nil)
 }

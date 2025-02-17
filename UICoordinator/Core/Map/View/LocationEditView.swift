@@ -25,22 +25,24 @@ struct LocationEditView: View {
                     .font(.footnote)
             }
             
-            Button {
-                showCreatColloqy.toggle()
-            } label: {
-                HStack {
-                    Text("Creat new colloquy")
-                        .fontWeight(.semibold)
+            Section {
+                Button {
+                    showCreatColloqy.toggle()
+                } label: {
+                    HStack {
+                        Text("Creat new colloquy")
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "plus.message")
+                            .font(.title2)
+                    }
                     
-                    Spacer()
-                    
-                    Image(systemName: "plus.message")
-                        .font(.title2)
                 }
-                    
+                .navigationBarTitleDisplayMode(.inline)
+                .padding(7)
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .padding()
             
             PhotoVideoLocationView(locationId: location.id)
             
@@ -48,13 +50,14 @@ struct LocationEditView: View {
             
         }
         .navigationTitle("Place details")
+        .modifier(CornerRadiusModifier())
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .onAppear {
             viewMod.coordinatePosition = location.coordinate
         }
         .sheet(isPresented: $showCreatColloqy, content: {
-            CreateColloquyView(location: location)
+            CreateColloquyView(location: location, colloquy: nil)
         })
         .toolbar {
             

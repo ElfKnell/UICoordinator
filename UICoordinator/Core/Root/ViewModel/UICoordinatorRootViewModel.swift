@@ -9,8 +9,8 @@ import Foundation
 import Combine
 import Firebase
 
-class ContentViewModel: ObservableObject {
-    @Published var userSession: FirebaseAuth.User?
+class UICoordinatorRootViewModel: ObservableObject {
+    var userSession: FirebaseAuth.User?
     private var cancellables = Set<AnyCancellable>()
     
     init() {

@@ -56,16 +56,25 @@ struct UserContentListView: View {
                         ColloquyCell(colloquy: colloquy)
                     }
                 }
+                .onAppear {
+                    Task  {
+                        try await viewModel.fetchUserColloquies()
+                    }
+                }
             } else {
-                
+                LazyVStack {
+                    ForEach(viewModel.replies) { colloquy in
+                        RepliesView(colloquy: colloquy)
+                    }
+                }
+                .onAppear {
+                    Task {
+                        try await viewModel.fetchUserReplies()
+                    }
+                }
             }
         }
         .padding(.vertical, 8)
-        .onAppear {
-            Task {
-                try await viewModel.fetchUserColloquies()
-            }
-        }
     }
 }
 

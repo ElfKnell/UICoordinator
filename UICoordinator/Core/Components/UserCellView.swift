@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UserCellView: View {
     let user: User
+    @EnvironmentObject var userFollow: UserFollowers
     
     var body: some View {
         HStack {
@@ -27,7 +28,7 @@ struct UserCellView: View {
             
             Spacer()
             
-            Text("Follow")
+            Text(userFollow.checkFollow(uid: user.id) ? "Unfollow" : "Follow")
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .frame(width: 100, height: 32)
@@ -35,6 +36,7 @@ struct UserCellView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(Color(.systemGray4), lineWidth: 1)
                 }
+
         }
         .padding(.horizontal)
     }

@@ -10,6 +10,9 @@ import SwiftUI
 struct ProfileView: View {
     
     let user: User
+    @StateObject var viewModel = ProfileViewModel()
+    @EnvironmentObject var userFollow: UserFollowers
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         
@@ -20,9 +23,16 @@ struct ProfileView: View {
                 ProfileHeaderView(user: user)
                 
                 Button {
-                    
+                    Task {
+                        if userFollow.checkFollow(uid: user.id) {
+                            try await viewModel.unfollow(uId: user.id, followers: userFollow.followers)
+                        } else {
+                            try await viewModel.follow(user: user)
+                        }
+                        dismiss()
+                    }
                 } label: {
-                    Text("Follow")
+                    Text(userFollow.checkFollow(uid: user.id) ? "Unfollow" : "Follow")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.white)
@@ -36,6 +46,11 @@ struct ProfileView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .padding(.horizontal)
+        .onAppear {
+            Task {
+                try await userFollow.fetchUserFollows(uid: user.id)
+            }
+        }
     }
 }
 

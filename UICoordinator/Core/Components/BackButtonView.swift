@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BackButtonView: View {
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         

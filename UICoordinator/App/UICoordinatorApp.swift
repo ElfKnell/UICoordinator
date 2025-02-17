@@ -22,18 +22,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct UICoordinatorApp: App {
     @StateObject var locatonFetcher = LocationFetcher()
     @StateObject var currentUserViewModel = CurrentUserProfileViewModel()
+    @StateObject var userFollowers = UserFollowers()
     
     // register app delegate for Firebase setup
       @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            UICoordinatorRootView()
                 .onAppear {
                     locatonFetcher.start()
                 }
                 .environmentObject(locatonFetcher)
                 .environmentObject(currentUserViewModel)
+                .environmentObject(userFollowers)
         }
     }
 }

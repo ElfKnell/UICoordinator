@@ -11,6 +11,8 @@ import SwiftUI
 @MainActor
 class MapSearchViewModel: ObservableObject {
 
+    let currentUser = UserService.shared.currentUser
+    
     static func serchPlace(region: MKCoordinateRegion?, searchText: String) async -> [MKMapItem] {
         guard let region = region else {
             return []
@@ -23,4 +25,10 @@ class MapSearchViewModel: ObservableObject {
         return result?.mapItems ?? []
     }
 
+    func openMap(mapSeliction: Location?) {
+        if let mapSeliction {
+            let mapToOpen: MKMapItem = .init(placemark: .init(coordinate: mapSeliction.coordinate))
+            mapToOpen.openInMaps()
+        }
+    }
 }

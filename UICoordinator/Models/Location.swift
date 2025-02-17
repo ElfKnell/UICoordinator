@@ -15,10 +15,14 @@ struct Location: Identifiable, Codable, Hashable {
     let ownerUid: String
     var name: String
     var description: String
+    var address: String?
     let timestamp: Timestamp
     var timeUpdate: Timestamp?
     let latitude: Double
     let longitude: Double
+    var isSearch: Bool?
+    
+    let activityId: String?
     
     var id: String {
         return locationId ?? NSUUID().uuidString
@@ -31,6 +35,6 @@ struct Location: Identifiable, Codable, Hashable {
     }
     
     var regionCoordinate: MKCoordinateRegion {
-        MKCoordinateRegion(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+        MKCoordinateRegion(center: coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
     }
 }
