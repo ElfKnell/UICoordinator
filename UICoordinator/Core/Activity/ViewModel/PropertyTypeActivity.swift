@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TypeOfActivity {
+enum PropertyTypeActivity {
     case myActivity
     case likeActivity
     case followerActivity

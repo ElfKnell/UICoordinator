@@ -8,7 +8,7 @@
 import SwiftUI
 import MapKit
 
-struct ActivityRoutesEditView: View {
+struct ActivityEditView: View {
     
     @State var activity: Activity
     @State private var cameraPosition: MapCameraPosition
@@ -63,13 +63,13 @@ struct ActivityRoutesEditView: View {
             }
             .onAppear {
                 Task {
-                    try await viewModel.getRoutes(aId: activity.id, first: false)
+                    try await viewModel.getRoutes(activity: activity, first: false)
                 }
             }
             .onChange(of: viewModel.isSave) {
                 if viewModel.isSave {
                     Task {
-                        try await viewModel.getRoutes(aId: activity.id, first: true)
+                        try await viewModel.getRoutes(activity: activity, first: true)
                     }
                 }
             }
@@ -219,5 +219,5 @@ struct ActivityRoutesEditView: View {
 }
 
 #Preview {
-    ActivityRoutesEditView(activity: DeveloperPreview.activity)
+    ActivityEditView(activity: DeveloperPreview.activity)
 }

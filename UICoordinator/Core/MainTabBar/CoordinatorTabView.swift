@@ -11,6 +11,7 @@ struct CoordinatorTabView: View {
     @State private var selectedTab = 0
     
     var body: some View {
+        
         TabView(selection: $selectedTab) {
             
             LocationView()
@@ -38,7 +39,7 @@ struct CoordinatorTabView: View {
             
             ActivityView()
                 .tabItem {
-                    Image(systemName: selectedTab == 3 ? "car.circle.fill" : "car.circle")
+                    Image(systemName: selectedTab == 3 ? "mappin.and.ellipse.circle.fill" : "mappin.and.ellipse.circle")
                         .environment(\.symbolVariants, selectedTab == 3 ? .fill : .none)
                 }
                 .onAppear { selectedTab = 3 }

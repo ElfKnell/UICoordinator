@@ -1,16 +1,15 @@
 //
-//  ActivityMapViewModel.swift
+//  ActivityRoutesViewModel.swift
 //  UICoordinator
 //
-//  Created by Andrii Kyrychenko on 13/07/2024.
+//  Created by Andrii Kyrychenko on 06/10/2024.
 //
 
-import Foundation
 import MapKit
 import SwiftUI
 import Firebase
 
-class ActivityMapViewModel: ObservableObject {
+class ActivityEditViewModel: ObservableObject {
     
     @Published var locations = [Location]()
     @Published var searchLoc = [Location]()
@@ -24,6 +23,8 @@ class ActivityMapViewModel: ObservableObject {
     @Published var sheetConfig: MapSheetConfig?
     
     @Published var getDirections = false
+    
+    @Published var routes: [MKRoute] = []
     
     @MainActor
     func getResults(_ cameraPosition: MapCameraPosition, searchText: String) async throws {
@@ -44,8 +45,8 @@ class ActivityMapViewModel: ObservableObject {
     }
     
     @MainActor
-    func getLocations(activityId: String) async throws {
-        self.locations = try await LocationService.fetchActivityLocations(activityId: activityId)
+    func getLocations(activityId: String) async throws -> [Location] {
+        return try await LocationService.fetchActivityLocations(activityId: activityId)
     }
     
     func saveRegione(_ region: MKCoordinateRegion?, activityId: String) async throws {
@@ -71,4 +72,19 @@ class ActivityMapViewModel: ObservableObject {
             sheetConfig = .confirmationLocation
         }
     }
+    
+    @MainActor
+    func getRoutes(activity: Activity, first: Bool) async throws {
+
+        if activity.typeActivity == .track {
+            let locations = try await LocationService.fetchActivityLocations(activityId: activity.id)
+            self.locations = locations
+            let activityRouter = ActivityRouters()
+            self.routes = try await activityRouter.getRoutes(locations: locations, first: first)
+        } else {
+            self.locations = try await LocationService.fetchActivityLocations(activityId: activity.id)
+        }
+
+    }
 }
+
