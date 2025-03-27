@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 
-struct PhotoView: View {
+struct PhotosWithChangingView: View {
     
     let locationId: String
     @StateObject var viewModel = PhotoViewModel()
@@ -69,5 +69,5 @@ struct PhotoView: View {
 }
 
 #Preview {
-    PhotoView(locationId: "")
+    PhotosWithChangingView(locationId: "")
 }
