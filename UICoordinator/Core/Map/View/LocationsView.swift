@@ -9,13 +9,16 @@ import SwiftUI
 import MapKit
 import Firebase
 
-struct LocationView: View {
+struct LocationsView: View {
 
     @StateObject var viewModel = LocationViewModel()
 
     @State private var isSave = false
     @State private var showSearch = false
+    @State private var routerColor: Color = .blue
     @State private var regionCamera: MapCameraPosition = .region(.startRegion)
+    
+    @AppStorage("styleMap") private var styleMap: ActivityMapStyle = .standard
     
     var body: some View {
         NavigationStack {
@@ -31,6 +34,15 @@ struct LocationView: View {
                                 MarkerView(name: location.name)
                                     
                             }
+                            .contextMenu {
+                                Button("Preview") {
+                                    viewModel.mapSelection = location
+                                }
+                                
+                                Button("Update") {
+                                    viewModel.updateLocation(location)
+                                }
+                            }
                         }
                     }
                     
@@ -42,7 +54,7 @@ struct LocationView: View {
                     
                     if let route = viewModel.route {
                         MapPolyline(route.polyline)
-                            .stroke(.green, lineWidth: 7 )
+                            .stroke(routerColor, lineWidth: 5)
                     }
                     
                 }
@@ -51,6 +63,7 @@ struct LocationView: View {
                     MapPitchToggle()
                     MapUserLocationButton()
                 }
+                .mapStyle(styleMap.value)
                 .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
                     viewModel.coordinate = mapCameraUpdateContext.camera.centerCoordinate
                     regionCamera = .region(mapCameraUpdateContext.region)
@@ -69,7 +82,7 @@ struct LocationView: View {
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath")
                         }
-                        .padding(.horizontal)
+                        .padding()
                         .font(.title2)
                         
                         Spacer()
@@ -113,8 +126,14 @@ struct LocationView: View {
                     }
                 }
             }
+            .navigationTitle("Map Locations")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 Task {
+                    if let loadedColor = Color.loadFromAppStorage("routerColor") {
+                        routerColor = Color(red: loadedColor.red, green: loadedColor.green, blue: loadedColor.blue, opacity: loadedColor.alpha)
+                    }
+                    
                     try await viewModel.fetchUserForLocations()
                 }
             }
@@ -124,10 +143,8 @@ struct LocationView: View {
                 }
             }
             .onChange(of: isSave) {
-                if isSave {
-                    Task {
-                        try await viewModel.fetchUserForLocations()
-                    }
+                Task {
+                    try await viewModel.fetchUserForLocations()
                 }
             }
             .onChange(of: viewModel.getDirections, { oldValue, newValue in
@@ -136,10 +153,11 @@ struct LocationView: View {
                 }
             })
             .onChange(of: viewModel.mapSelection, { oldValue, newValue in
-                
-                if newValue != nil {
-                    viewModel.getDirections = false
-                    viewModel.sheetConfig = .locationsDetail
+
+                if let selectedPlace = viewModel.mapSelection {
+
+                    viewModel.mapSelection = viewModel.verifyLocation(selectedLocation: selectedPlace)
+                    
                 } else {
                     viewModel.sheetConfig = nil
                 }
@@ -153,17 +171,16 @@ struct LocationView: View {
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
 
                 case .locationsDetail:
+                    
                     LocationsDetailView(mapSeliction: $viewModel.mapSelection, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
                         .presentationDetents([.height(340)])
                         .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
                         .presentationCornerRadius(12)
                
-                case .locationUpdate:
-                    if let location = viewModel.mapSelection {
-                        UpdateLocationView(location: location)
-                            .presentationDetents([.height(340), .medium])
-                            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-                    }
+                case .locationUpdateOrSave:
+                    
+                    UpdateLocationView(location: $viewModel.mapSelection, isSave: $isSave)
+                        .presentationDetents([.height(350), .medium])
                 }
             })
         }
@@ -171,5 +188,5 @@ struct LocationView: View {
 }
 
 #Preview {
-    LocationView()
+    LocationsView()
 }

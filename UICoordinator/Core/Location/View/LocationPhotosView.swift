@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct LocationColloquyDetailView: View {
-    let location: Location
+struct LocationPhotosView<T: LocationAndActivity>: View {
+    
+    let activity: T
     @StateObject var viewModel = LocationColloquyDetailViewModel()
-    @State private var showVideo = false
     
     var body: some View {
         ZStack {
@@ -48,43 +48,25 @@ struct LocationColloquyDetailView: View {
                             .padding()
                     }
                     
-                    
-                    HStack {
-                        Text("Description: ")
-                        
-                        Text(location.description)
-                    }
-                    .padding(.bottom)
                 }
                 .padding(.top)
             }
         }
-        .navigationTitle(location.name)
+        .navigationTitle(activity.name)
         .navigationBarBackButtonHidden()
         .onAppear {
             Task {
-                try await viewModel.fetchPhoto(location.id)
-                try await viewModel.fetchVideos(location.id)
+                try await viewModel.fetchPhoto(activity.id)
             }
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 BackButtonView()
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showVideo.toggle()
-                } label: {
-                    Image(systemName: "play.circle")
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showVideo) {
-            LocationVideoView(videos: viewModel.videos)
         }
     }
 }
 
 #Preview {
-    LocationColloquyDetailView(location: DeveloperPreview.location)
+    LocationPhotosView(activity: DeveloperPreview.location)
 }
