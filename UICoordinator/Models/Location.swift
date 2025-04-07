@@ -9,7 +9,7 @@ import FirebaseFirestoreSwift
 import MapKit
 import Firebase
 
-struct Location: Identifiable, Codable, Hashable {
+struct Location: Identifiable, Codable, Hashable, MapSelectionProtocol {
     
     @DocumentID var locationId: String?
     let ownerUid: String

@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+enum LikeError: Error {
+    case invalidType
+    
+    var description: String {
+        switch self {
+        case .invalidType:
+            return "Invalide type"
+        }
+    }
+}

@@ -8,7 +8,7 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-struct Follow: Identifiable, Codable {
+struct Follow: Identifiable, Codable, Hashable {
     
     @DocumentID var followId: String?
     let follower: String

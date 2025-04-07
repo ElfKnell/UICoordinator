@@ -8,28 +8,36 @@
 import SwiftUI
 
 struct SideSelectionTabBarView: View {
+    
+    @Binding var mainSelectedTab: Int
     @State private var showSideMenu = false
     @State private var selectedTab = 0
+    var selectedTabIndex: Int
     
     var body: some View {
         NavigationStack {
             ZStack {
                 TabView(selection: $selectedTab)  {
                     
-                    CurrentUserProfileView()
+                    LocationsView()
+                        .onAppear { mainSelectedTab = 0 }
                         .tag(0)
                     
-                    Text("Notifications")
+                    CurrentUserProfileView()
+                        .onAppear { mainSelectedTab = 4 }
                         .tag(1)
                     
-                    Text("Settings")
+                    Text("Notifications")
                         .tag(2)
                     
-                    Text("Help")
+                    Settings()
                         .tag(3)
                     
-                    AboutView()
+                    Text("Help")
                         .tag(4)
+                    
+                    AboutView()
+                        .tag(5)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
@@ -44,10 +52,13 @@ struct SideSelectionTabBarView: View {
                     }
                 }
             }
+            .onAppear {
+                selectedTab = selectedTabIndex
+            }
         }
     }
 }
 
 #Preview {
-    SideSelectionTabBarView()
+    SideSelectionTabBarView(mainSelectedTab: .constant(0), selectedTabIndex: 0)
 }

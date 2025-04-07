@@ -13,16 +13,40 @@ struct ColloquyCell: View {
     @State private var showReplieCreate = false
     
     var body: some View {
+        
         VStack {
+            
             HStack(alignment: .top, spacing: 12) {
                 
-                CircularProfileImageView(user: colloquy.user, size: .small)
+                NavigationLink {
+                    
+                    if UserService.shared.currentUser == colloquy.user {
+                        CurrentUserProfileView()
+                    } else {
+                        ProfileView(user: colloquy.user ?? DeveloperPreview.user)
+                    }
+                    
+                } label: {
+                    CircularProfileImageView(user: colloquy.user, size: .small)
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
+                    
                     HStack {
-                        Text(colloquy.user?.username ?? "")
-                            .font(.footnote)
-                            .fontWeight(.semibold)
+                        
+                        NavigationLink {
+                            
+                            if UserService.shared.currentUser == colloquy.user {
+                                CurrentUserProfileView()
+                            } else {
+                                ProfileView(user: colloquy.user ?? DeveloperPreview.user)
+                            }
+                            
+                        } label: {
+                            Text(colloquy.user?.username ?? "")
+                                .font(.footnote)
+                                .fontWeight(.semibold)
+                        }
                         
                         Spacer()
                         
@@ -55,9 +79,12 @@ struct ColloquyCell: View {
                     }
                     
                     HStack(spacing: 16) {
+                        
+                        Spacer()
+                        
                         Button {
                             Task {
-                                try await viewModel.doLike(userId: colloquy.ownerUid, colloquyId: colloquy.id)
+                                try await viewModel.doLike(userId: colloquy.ownerUid, likeToObject: colloquy)
                             }
                         } label: {
                             if viewModel.likeId == nil {
@@ -68,17 +95,29 @@ struct ColloquyCell: View {
                             }
                         }
                         
+                        if colloquy.likes > 0 {
+                            Text("\(colloquy.likes)")
+                        }
+                        
+                        Spacer()
+                        
                         Button {
                             showReplieCreate.toggle()
                         } label: {
                             Image(systemName: "bubble.right")
                         }
                         
-                        Button {
-                            
-                        } label: {
+                        if let count = colloquy.repliesCount {
+                            Text("\(count)")
+                        }
+                        
+                        Spacer()
+                        
+                        ShareLink(item: colloquy.caption) {
                             Image(systemName: "paperplane")
                         }
+                        
+                        Spacer()
                     }
                     .foregroundStyle(.black)
                     .padding(.vertical, 8)
@@ -88,14 +127,14 @@ struct ColloquyCell: View {
             Divider()
             
         }
-        .padding()
+        .padding([.horizontal, .top])
         .onAppear {
             Task {
                 try await viewModel.isLike(cid:colloquy.id)
             }
         }
         .sheet(isPresented: $showReplieCreate, content: {
-            CreateColloquyView(location: nil, colloquy: colloquy)
+            CreateColloquyView(colloquy: colloquy)
         })
     }
 }

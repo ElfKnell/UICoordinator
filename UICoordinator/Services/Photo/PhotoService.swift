@@ -31,7 +31,7 @@ class  PhotoService {
         try await Firestore.firestore().collection("photos").addDocument(data: photoData)
     }
     
-    static func fetchPhotoByLocation(_ locationId: String) async throws -> [Photo] {
+    static func fetchPhotosByLocation(_ locationId: String) async throws -> [Photo] {
         let snapshot = try await Firestore.firestore().collection("photos").whereField("locationUid", isEqualTo: locationId).getDocuments()
         
         let photos = snapshot.documents.compactMap({ try? $0.data(as: Photo.self) })

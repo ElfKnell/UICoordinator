@@ -16,39 +16,67 @@ struct ProfileView: View {
     
     var body: some View {
         
-        ScrollView(showsIndicators: false) {
+        NavigationStack {
             
-            VStack(spacing: 20) {
+            ScrollView(showsIndicators: false) {
                 
-                ProfileHeaderView(user: user)
-                
-                Button {
-                    Task {
-                        if userFollow.checkFollow(uid: user.id) {
-                            try await viewModel.unfollow(uId: user.id, followers: userFollow.followers)
-                        } else {
-                            try await viewModel.follow(user: user)
+                VStack(spacing: 20) {
+                    
+                    ProfileHeaderView(user: user)
+                    
+                    HStack {
+                        
+                        Spacer()
+                        
+                        Button {
+                            Task {
+                                if userFollow.checkFollow(uid: user.id) {
+                                    try await viewModel.unfollow(uId: user.id, followers: userFollow.followers)
+                                } else {
+                                    try await viewModel.follow(user: user)
+                                }
+                                dismiss()
+                            }
+                        } label: {
+                            Text(userFollow.checkFollow(uid: user.id) ? "Unfollow" : "Follow")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity, minHeight: 32)
+                                .background(.black)
+                                .cornerRadius(11)
                         }
-                        dismiss()
+                        
+                        Spacer()
+                        
+                        NavigationLink {
+                            UserLocationsView(userId: user.id)
+                        } label: {
+                            Text("Map")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity, minHeight: 32)
+                                .background(.black)
+                                .cornerRadius(11)
+                        }
+                        
+                        Spacer()
                     }
-                } label: {
-                    Text(userFollow.checkFollow(uid: user.id) ? "Unfollow" : "Follow")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                        .frame(width: 352, height: 32)
-                        .background(.black)
-                        .cornerRadius(8)
+                    .padding()
+                    .frame(height: 39)
+                    .modifier(CornerRadiusModifier())
+                    .padding()
+                    
+                    UserContentListView(user: user)
                 }
-                
-                UserContentListView(user: user)
             }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .padding(.horizontal)
-        .onAppear {
-            Task {
-                try await userFollow.fetchUserFollows(uid: user.id)
+            .navigationBarTitleDisplayMode(.inline)
+            .padding(.horizontal)
+            .onAppear {
+                Task {
+                    try await userFollow.fetchUserFollows(uid: user.id)
+                }
             }
         }
     }

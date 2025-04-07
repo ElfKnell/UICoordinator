@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct InfoView<T: LocationAndActivity>: View {
-    let activity: T
+struct InfoView: View {
+    let activity: MapSelectionProtocol
+    @State private var showCreatColloqy = false
     
     var body: some View {
         
@@ -20,7 +21,7 @@ struct InfoView<T: LocationAndActivity>: View {
                 
                 Spacer()
                 
-                PhotoVideoLocationView(locationId: activity.id, isAccessible: ActivityUser.isCurrentUser(activity.ownerUid))
+                PhotoVideoLocationView(location: activity)
                     .padding(.horizontal)
                     .background(
                         RoundedRectangle(cornerRadius: 15, style: .continuous)
@@ -41,6 +42,36 @@ struct InfoView<T: LocationAndActivity>: View {
                 .frame(height: 44)
                 .modifier(CornerRadiusModifier())
                 .padding()
+                
+                HStack {
+                    
+                    Spacer()
+                    
+                    Button {
+                        showCreatColloqy.toggle()
+                    } label: {
+                        HStack {
+                            Text("Creat new colloquy")
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "plus.message")
+                                .font(.title2)
+                        }
+                        
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
+                    .padding()
+                    
+                    Spacer()
+                    
+                }
+                .padding()
+                .frame(height: 44)
+                .modifier(CornerRadiusModifier())
+                .padding()
+                
                 
                 if let activity = activity as? Activity {
                     
@@ -108,6 +139,9 @@ struct InfoView<T: LocationAndActivity>: View {
             .navigationTitle(activity.name)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
+            .sheet(isPresented: $showCreatColloqy, content: {
+                CreateColloquyView(location: activity as? Location, activityId: ((activity as? Activity) != nil) ? activity.id : nil)
+            })
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackButtonView()

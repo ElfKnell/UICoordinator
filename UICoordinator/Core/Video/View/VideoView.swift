@@ -12,6 +12,7 @@ import AVKit
 struct VideoView: View {
     
     let locationId: String
+    let isAccessible: Bool
     @StateObject var viewModel = VideoViewModel()
     
     var body: some View {
@@ -47,9 +48,12 @@ struct VideoView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        PhotosPicker(selection: $viewModel.selectedItem, matching: .any(of: [.videos, .not(.images)])) {
-                            Image(systemName: "plus.circle")
+                    
+                    if isAccessible {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            PhotosPicker(selection: $viewModel.selectedItem, matching: .any(of: [.videos, .not(.images)])) {
+                                Image(systemName: "plus.circle")
+                            }
                         }
                     }
                     
@@ -65,5 +69,5 @@ struct VideoView: View {
 }
 
 #Preview {
-    VideoView(locationId: "")
+    VideoView(locationId: "", isAccessible: false)
 }

@@ -16,7 +16,7 @@ struct ActivityCreate: View {
     var body: some View {
         Group {
             if activity != nil {
-                ActivityRoutesEditView(activity: activity!)
+                ActivityEditView(activity: activity!)
             } else {
                 LoadingView(width: 150, height: 150)
             }

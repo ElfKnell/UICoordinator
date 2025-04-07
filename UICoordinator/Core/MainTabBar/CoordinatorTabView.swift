@@ -8,49 +8,49 @@
 import SwiftUI
 
 struct CoordinatorTabView: View {
-    @State private var selectedTab = 0
+    @State private var mainSelectedTab = 0
     
     var body: some View {
         
-        TabView(selection: $selectedTab) {
+        TabView(selection: $mainSelectedTab) {
             
-            LocationView()
+            SideSelectionTabBarView(mainSelectedTab: $mainSelectedTab, selectedTabIndex: 0)
                 .tabItem {
-                    Image(systemName: selectedTab == 0 ? "map.fill" : "map")
-                        .environment(\.symbolVariants, selectedTab == 0 ? .fill : .none)
+                    Image(systemName: mainSelectedTab == 0 ? "map.fill" : "map")
+                        .environment(\.symbolVariants, mainSelectedTab == 0 ? .fill : .none)
                 }
-                .onAppear { selectedTab = 0 }
+                .onAppear { mainSelectedTab = 0 }
                 .tag(0)
             
             FeedView()
                 .tabItem {
-                    Image(systemName: selectedTab == 1 ? "list.bullet.rectangle.fill" : "list.bullet.rectangle")
-                        .environment(\.symbolVariants, selectedTab == 1 ? .fill : .none)
+                    Image(systemName: mainSelectedTab == 1 ? "list.bullet.rectangle.fill" : "list.bullet.rectangle")
+                        .environment(\.symbolVariants, mainSelectedTab == 1 ? .fill : .none)
                 }
-                .onAppear { selectedTab = 1 }
+                .onAppear { mainSelectedTab = 1 }
                 .tag(1)
             
-            ExploreView()
+            MainUsersView()
                 .tabItem {
                     Image(systemName: "magnifyingglass")
                 }
-                .onAppear { selectedTab = 2 }
+                .onAppear { mainSelectedTab = 2 }
                 .tag(2)
             
             ActivityView()
                 .tabItem {
-                    Image(systemName: selectedTab == 3 ? "mappin.and.ellipse.circle.fill" : "mappin.and.ellipse.circle")
-                        .environment(\.symbolVariants, selectedTab == 3 ? .fill : .none)
+                    Image(systemName: mainSelectedTab == 3 ? "mappin.and.ellipse.circle.fill" : "mappin.and.ellipse.circle")
+                        .environment(\.symbolVariants, mainSelectedTab == 3 ? .fill : .none)
                 }
-                .onAppear { selectedTab = 3 }
+                .onAppear { mainSelectedTab = 3 }
                 .tag(3)
             
-            SideSelectionTabBarView()
+            SideSelectionTabBarView(mainSelectedTab: $mainSelectedTab, selectedTabIndex: 1)
                 .tabItem {
-                    Image(systemName: selectedTab == 4 ? "person.fill" : "person")
-                        .environment(\.symbolVariants, selectedTab == 4 ? .fill : .none)
+                    Image(systemName: mainSelectedTab == 4 ? "person.fill" : "person")
+                        .environment(\.symbolVariants, mainSelectedTab == 4 ? .fill : .none)
                 }
-                .onAppear { selectedTab = 4 }
+                .onAppear { mainSelectedTab = 4 }
                 .tag(4)
         }
         .tint(.primary)

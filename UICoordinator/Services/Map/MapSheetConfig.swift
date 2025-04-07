@@ -10,7 +10,7 @@ import Foundation
 enum MapSheetConfig: Int, Identifiable {
     case confirmationLocation
     case locationsDetail
-    case locationUpdate
+    case locationUpdateOrSave
     
     var id: Int {
         self.rawValue

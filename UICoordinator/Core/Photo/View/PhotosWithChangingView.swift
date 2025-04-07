@@ -28,6 +28,7 @@ struct PhotosWithChangingView: View {
                     Spacer()
                     
                     if viewModel.isLoading {
+                        
                         LoadingView(width: 130, height: 130)
                         
                         Spacer()

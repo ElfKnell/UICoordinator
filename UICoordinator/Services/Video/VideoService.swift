@@ -31,7 +31,7 @@ class VideoService {
         try await Firestore.firestore().collection("Video").addDocument(data: videoData)
     }
     
-    static func fetchVideoByLocation(_ locationId: String) async throws -> [Video] {
+    static func fetchVideosByLocation(_ locationId: String) async throws -> [Video] {
         let snapshot = try await Firestore
             .firestore()
             .collection("Video")

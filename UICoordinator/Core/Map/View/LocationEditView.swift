@@ -13,7 +13,7 @@ struct LocationEditView: View {
     @State var location: Location
     @StateObject var viewModel = EditLocationViewModel()
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var viewMod: LocationViewModel
+    @EnvironmentObject var locationViewModel: LocationViewModel
     @State private var showCreatColloqy = false
     
     var body: some View {
@@ -44,7 +44,9 @@ struct LocationEditView: View {
                 .padding(7)
             }
             
-            PhotoVideoLocationView(locationId: location.id)
+            Section {
+                PhotoVideoLocationView(location: location)
+            }
             
             InformationLocationView(coordinate: location.coordinate)
             
@@ -54,7 +56,7 @@ struct LocationEditView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .onAppear {
-            viewMod.coordinatePosition = location.coordinate
+            locationViewModel.coordinatePosition = location.coordinate
         }
         .sheet(isPresented: $showCreatColloqy, content: {
             CreateColloquyView(location: location, colloquy: nil)
@@ -62,11 +64,13 @@ struct LocationEditView: View {
         .toolbar {
             
             ToolbarItem(placement: .topBarTrailing) {
+                
                 Button {
                     Task {
-                        try await viewModel.updateLocation(location)
+                        await viewModel.updateLocation(location)
                         dismiss()
                     }
+                    
                 } label: {
                      Label("Save", systemImage: "checkmark.gobackward")
                 }

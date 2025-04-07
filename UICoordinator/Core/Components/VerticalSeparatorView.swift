@@ -9,7 +9,16 @@ import SwiftUI
 
 struct VerticalSeparatorView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        HStack(alignment: .top) {
+            
+            Text("|")
+                .font(.title)
+                .padding(.horizontal)
+                .opacity(0.5)
+            
+            Spacer()
+        }
     }
 }
 

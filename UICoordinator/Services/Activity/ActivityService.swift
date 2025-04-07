@@ -55,7 +55,7 @@ class ActivityService {
             try await Firestore.firestore()
                 .collection("Activity")
                 .document(id)
-                .updateData(["name": activity.name, "description": activity.description, "typeActivity": activity.typeActivity.id, "udateTime": Timestamp(), "status": activity.status])
+                .updateData(["name": activity.name, "description": activity.description, "typeActivity": activity.typeActivity.id, "udateTime": Timestamp(), "status": activity.status, "mapStyle" : activity.mapStyle?.id as Any])
 
         } catch {
             print(error.localizedDescription)
@@ -109,5 +109,29 @@ class ActivityService {
             .collection("Activity")
             .document(activity.id)
             .delete()
+    }
+    
+    static func updateLikeCount(activityId: String, countLikes: Int) async throws {
+        do {
+            try await Firestore.firestore()
+                .collection("Activity")
+                .document(activityId)
+                .updateData(["likes": countLikes])
+
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    static func incrementRepliesCount(activityId: String) async throws {
+        do {
+            try await Firestore.firestore()
+                .collection("Activity")
+                .document(activityId)
+                .updateData(["repliesCount": FieldValue.increment(Int64(1)) ])
+
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }

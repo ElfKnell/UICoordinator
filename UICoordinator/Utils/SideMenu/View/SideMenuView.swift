@@ -11,9 +11,10 @@ struct SideMenuView: View {
     @Binding var isShowind: Bool
     @Binding var selectedTab: Int
     @EnvironmentObject var viewModel: CurrentUserProfileViewModel
+    @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @State private var selectedOption: OptionModel?
     
-    let widthSideMenu = UIScreen.main.bounds.width / 3 * 2
+    let widthSideMenu = UIScreen.main.bounds.width / 3 //* 2
     private var user: User {
         return viewModel.currentUser ?? DeveloperPreview.user
     }
@@ -23,42 +24,46 @@ struct SideMenuView: View {
             if isShowind {
                 Rectangle()
                     .opacity(0.3)
-                    .ignoresSafeArea()
                     .onTapGesture {
                         isShowind.toggle()
                     }
                 
                 HStack {
+                    
                     Spacer()
                     
                     VStack(alignment: .leading, spacing: 32) {
                         
-                        SideMenuHeaderView()
-                        
-                        Divider()
-                        
-                        VStack {
-                            ForEach(OptionModel.allCases) { option in
-                                Button {
-                                    selectedOption = option
-                                    selectedTab = option.rawValue
-                                    isShowind.toggle()
-                                } label: {
-                                    SideMenuRowView(selected: $selectedOption, option: option)
+                        ScrollView {
+                            SideMenuHeaderView()
+                            
+                            Divider()
+                                .padding()
+                            
+                            VStack {
+                                
+                                ForEach(OptionModel.allCases) { option in
+                                    Button {
+                                        selectedOption = option
+                                        selectedTab = option.rawValue
+                                        isShowind.toggle()
+                                    } label: {
+                                        SideMenuRowView(selected: $selectedOption, option: option)
+                                    }
+                                    
                                 }
-
                             }
+                            
+                            Divider()
+                                .padding()
+                            
+                            BottomSideMenu(widthButton: (isLandscape ? widthSideMenu : widthSideMenu * 2) - 32)
+                            
                         }
-                        
-                        Divider()
-                        
-                        BottomSideMenu(widthButton: widthSideMenu - 32)
-                        
-                        Spacer()
                         
                     }
                     .padding()
-                    .frame(width: widthSideMenu, alignment: .leading)
+                    .frame(width: isLandscape ? widthSideMenu : widthSideMenu * 2, alignment: .leading)
                     .background()
                 }
                 .transition(.move(edge: .trailing))
@@ -66,6 +71,19 @@ struct SideMenuView: View {
         }
         
         .animation(.easeInOut, value: isShowind)
+        .onAppear {
+            
+            UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+            NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
+                isLandscape = UIDevice.current.orientation.isLandscape
+            }
+            
+            for option in OptionModel.allCases {
+                if option.rawValue == selectedTab {
+                    selectedOption = option
+                }
+            }
+        }
     }
 }
 

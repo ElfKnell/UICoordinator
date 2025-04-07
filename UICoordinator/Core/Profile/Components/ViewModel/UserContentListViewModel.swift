@@ -11,6 +11,10 @@ class UserContentListViewModel: ObservableObject {
     
     @Published var colloquies = [Colloquy]()
     @Published var replies = [Colloquy]()
+    @Published var isLoading = false
+    
+    private var fetchLocation = FetchLocationFromFirebase()
+    private var pageSize = 10
     
     let user: User
     
@@ -20,47 +24,126 @@ class UserContentListViewModel: ObservableObject {
     
     @MainActor
     func fetchUserColloquies() async throws {
-        var colloquies = try await ColloquyService.fetchUserColloquy(uid: user.id)
-        colloquies.removeAll(where: {$0.ownerColloquy != nil})
-        for i in 0 ..< colloquies.count {
-            colloquies[i].user = self.user
-            guard let lid = colloquies[i].locationId else { continue }
-            let colloquyLocation = try await LocationService.fetchLocation(withLid: lid)
-            colloquies[i].location = colloquyLocation
-        }
         
-        self.colloquies = colloquies
+        self.isLoading = true
+        ColloquyService.lastDocument = nil
+        self.colloquies.removeAll()
+        self.replies.removeAll()
+        
+        try await fetchItems()
+        
+        if !self.colloquies.isEmpty {
+            try await fetchUserDataForColloquies()
+        }
+        self.isLoading = false
+
     }
     
     @MainActor
     func fetchUserReplies() async throws {
-        var colloquies = try await ColloquyService.fetchUserColloquy(uid: user.id)
-        colloquies.removeAll(where: {$0.ownerColloquy != nil})
+        ColloquyService.lastDocument = nil
+        self.colloquies.removeAll()
+        self.replies.removeAll()
         
-        var replies = try await ColloquyService.fetchColloquies()
-        replies.removeAll(where: {$0.ownerColloquy == nil})
-        
-        var repliesColloquies = [Colloquy]()
-        var ownerColloquyId = [String]()
-        
-        for reply in replies {
-            ownerColloquyId.append(reply.ownerColloquy!)
+        try await fetchReplies()
+        if !self.replies.isEmpty {
+            try await fetchUserDataForReplies()
         }
-        let setReplies = Set(ownerColloquyId)
+    }
+    
+    @MainActor
+    private func fetchUserDataForColloquies() async throws {
         
-        for colloquy in colloquies {
-            if setReplies.contains(colloquy.id) {
-                repliesColloquies.append(colloquy)
+        do {
+            for i in 0 ..< colloquies.count
+            {
+                let colloquy = colloquies[i]
+                let ownerUid = colloquy.ownerUid
+                let colloquyUser = try await UserService.fetchUser(withUid: ownerUid)
+                
+                colloquies[i].user = colloquyUser
+                
+                guard let lid = colloquy.locationId else { continue }
+                let colloquyLocation = try await getLocation(lid: lid)
+                
+                colloquies[i].location = colloquyLocation
             }
+        } catch {
+            print("ERROR: \(error.localizedDescription)")
         }
         
-        for i in 0 ..< repliesColloquies.count {
-            repliesColloquies[i].user = self.user
-            guard let lid = repliesColloquies[i].locationId else { continue }
-            let colloquyLocation = try await LocationService.fetchLocation(withLid: lid)
-            repliesColloquies[i].location = colloquyLocation
+    }
+    
+    @MainActor
+    private func fetchUserDataForReplies() async throws {
+        
+        for i in 0 ..< replies.count
+        {
+            let colloquy = replies[i]
+            let ownerUid = colloquy.ownerUid
+            let colloquyUser = try await UserService.fetchUser(withUid: ownerUid)
+            
+            replies[i].user = colloquyUser
+            
+            guard let lid = colloquy.locationId else { continue }
+            let colloquyLocation = try await getLocation(lid: lid)
+            
+            replies[i].location = colloquyLocation
         }
         
-        self.replies = repliesColloquies.sorted(by: { $0.timestamp.dateValue() > $1.timestamp.dateValue() })
+    }
+    
+    private func getLocation(lid: String) async throws -> Location {
+        
+        return try await fetchLocation.fetchLocation(withId: lid)
+        
+    }
+    
+    @MainActor
+    private func fetchItems() async throws {
+        
+        let items = try await ColloquyService.fetchUserColloquy(uid: user.id, pageSize: pageSize)
+        self.colloquies.append(contentsOf: items)
+        
+    }
+    
+    @MainActor
+    func fetchColloquiesNext() async throws {
+        
+        do {
+        
+            self.isLoading = true
+            try await fetchItems()
+            try await fetchUserDataForColloquies()
+            self.isLoading = false
+            
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
+        
+    }
+    
+    @MainActor
+    private func fetchReplies() async throws {
+        
+        let items = try await ColloquyService.fetchUserColloquyHasReplies(uid: user.id, pageSize: pageSize)
+        self.replies.append(contentsOf: items)
+        
+    }
+
+    @MainActor
+    func fetchNextReplies() async throws {
+        
+        do {
+        
+            self.isLoading = true
+            try await fetchReplies()
+            try await fetchUserDataForReplies()
+            self.isLoading = false
+            
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
+        
     }
 }

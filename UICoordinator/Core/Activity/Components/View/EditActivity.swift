@@ -49,6 +49,22 @@ struct EditActivity: View {
             }
             .padding(.horizontal)
             
+            HStack {
+                
+                Text("Map Style")
+                
+                Spacer()
+                
+                Picker("Style", selection: $activity.mapStyle) {
+                    Text("Default").tag(nil as ActivityMapStyle?)
+                    ForEach(ActivityMapStyle.allCases) { option in
+                        Text(option.description).tag(option as ActivityMapStyle?)
+                    }
+                }
+                
+            }
+            .padding(.horizontal)
+            
             Toggle(isOn: $activity.status) {
                 
                 Text("Privaty status")
@@ -84,7 +100,7 @@ struct EditActivity: View {
             .padding()
         }
         .padding()
-        .background(Color.white .opacity(0.3))
+        .background(Color.white .opacity(0.7))
     }
 }
 

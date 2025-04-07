@@ -39,7 +39,7 @@ class VideoViewModel: ObservableObject {
     @MainActor
     func fetchVideoByLocation() async throws {
         guard let lId = self.locationId else { return }
-        self.locationVideo = try await VideoService.fetchVideoByLocation(lId)
+        self.locationVideo = try await VideoService.fetchVideosByLocation(lId)
     }
     
     @MainActor

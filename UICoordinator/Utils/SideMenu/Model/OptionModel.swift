@@ -8,11 +8,13 @@
 import Foundation
 
 enum OptionModel: Int, CaseIterable, Identifiable {
+    case mapLocations
     case profile
     case notifications
     case settings
     case help
     case about
+
     
     var title: String {
         switch self {
@@ -26,6 +28,8 @@ enum OptionModel: Int, CaseIterable, Identifiable {
             "Help"
         case .about:
             "About"
+        case .mapLocations:
+            "Home"
         }
     }
     
@@ -41,6 +45,8 @@ enum OptionModel: Int, CaseIterable, Identifiable {
             "questionmark.diamond"
         case .about:
             "exclamationmark.shield"
+        case .mapLocations:
+            "house"
         }
     }
     

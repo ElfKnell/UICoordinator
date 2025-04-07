@@ -14,7 +14,7 @@ struct ActivityEditView: View {
     @State private var cameraPosition: MapCameraPosition
     @FocusState private var isSearch: Bool
     
-    @StateObject var viewModel = ActivityRoutesViewModel()
+    @StateObject var viewModel = ActivityEditViewModel()
     
     init(activity: Activity) {
         _cameraPosition = .init(wrappedValue: .region(activity.region ?? .startRegion))
@@ -34,7 +34,7 @@ struct ActivityEditView: View {
                 
                 UserAnnotation()
                 
-                ForEach(viewModel.searchLoc, id: \.self) { item in
+                ForEach(viewModel.searchLocations, id: \.self) { item in
 
                     Marker(item.name, coordinate: item.coordinate)
                 }
@@ -51,6 +51,7 @@ struct ActivityEditView: View {
                 MapPitchToggle()
                 MapUserLocationButton()
             }
+            .mapStyle(activity.mapStyle?.value ?? .standard)
             .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
                 cameraPosition = .region(mapCameraUpdateContext.region)
             }
@@ -63,18 +64,17 @@ struct ActivityEditView: View {
             }
             .onAppear {
                 Task {
-                    try await viewModel.getRoutes(activity: activity, first: false)
+                    try await viewModel.getRoutes(activity: activity)
                 }
             }
             .onChange(of: viewModel.isSave) {
-                if viewModel.isSave {
-                    Task {
-                        try await viewModel.getRoutes(activity: activity, first: true)
-                    }
+                Task {
+                    try await viewModel.getRoutes(activity: activity)
                 }
             }
             .onChange(of: viewModel.selectedPlace, { oldValue, newValue in
-                if viewModel.selectedPlace != nil {
+                if let selectedPlace = viewModel.selectedPlace {
+                    viewModel.selectedPlace = viewModel.verifyLocation(selectedLocation: selectedPlace)
                     viewModel.sheetConfig = .locationsDetail
                 } else {
                     viewModel.sheetConfig = nil
@@ -94,26 +94,38 @@ struct ActivityEditView: View {
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
 
                 case .locationsDetail:
-                    LocationsDetailView(mapSeliction: $viewModel.selectedPlace, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
+                    LocationsDetailView(mapSeliction: $viewModel.selectedPlace, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig, activity: activity)
                         .presentationDetents([.height(340)])
                         .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
                         .presentationCornerRadius(12)
                 
-                case .locationUpdate:
-                    if let location = viewModel.selectedPlace {
-                        UpdateLocationView(location: location)
-                            .presentationDetents([.height(340), .medium])
-                            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-                    }
+                case .locationUpdateOrSave:
+                    UpdateLocationView(location: $viewModel.selectedPlace, isSave: $viewModel.isSave, activityId: activity.id)
+                        .presentationDetents([.height(340), .medium])
+                        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
             })
             .overlay(alignment: .top) {
                 
                 HStack {
                     
-                    VStack {
+                    VStack(alignment: .leading) {
                         
-                        ButtonBoolView(isCheck: $viewModel.isSettings, imageName: "gear")
+                        HStack {
+                            
+                            ButtonBoolView(isCheck: $viewModel.isSettings, imageName: "gear")
+                            
+                            NavigationLink {
+                                
+                                InfoView(activity: activity)
+                                
+                            } label: {
+                                Image(systemName: "camera.fill")
+                                    .imageScale(.large)
+                            }
+                            .padding(7)
+                            
+                        }
                         
                         ButtonBoolView(isCheck: $viewModel.isMark, imageName: "cursorarrow.click.2")
                         
@@ -153,59 +165,7 @@ struct ActivityEditView: View {
                             
                         }
                         
-                        HStack {
-                            
-                            TextField("Search", text: $viewModel.searctText)
-                                .textFieldStyle(.roundedBorder)
-                                .modifier(CornerRadiusModifier())
-                                .focused($isSearch)
-                                .overlay(alignment: .trailing) {
-                                    
-                                    if isSearch {
-                                        
-                                        Button {
-                                            viewModel.searctText = ""
-                                            isSearch = false
-                                            
-                                        } label: {
-                                            
-                                            Image(systemName: "xmark.circle.fill")
-                                                .foregroundStyle(.red)
-                                            
-                                        }
-                                        .offset(x: -5)
-                                    }
-                                }
-                                .onSubmit {
-                                    
-                                    Task {
-                                        try await viewModel.getResults(cameraPosition, searchText: viewModel.searctText)
-                                        
-                                        viewModel.searctText = ""
-                                    }
-                                    
-                                }
-                            
-                            
-                            if !viewModel.searchLoc.isEmpty {
-                                
-                                Button {
-                                    
-                                    viewModel.clean()
-                                    
-                                } label: {
-                                    
-                                    Image(systemName: "mappin.slash.circle.fill")
-                                        .imageScale(.large)
-                                }
-                                .foregroundStyle(.white)
-                                .padding(5)
-                                .background(.red)
-                                .clipShape(.circle)
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom)
+                        SearchLocationView(searchLocations: $viewModel.searchLocations, cameraPosition: cameraPosition)
                     }
                     
                 } else if viewModel.isSettings {

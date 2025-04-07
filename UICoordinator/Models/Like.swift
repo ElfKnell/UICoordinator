@@ -8,7 +8,7 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-struct Like: Identifiable, Codable {
+struct Like: Identifiable, Codable, Hashable {
     
     @DocumentID var likeId: String?
     let ownerUid: String

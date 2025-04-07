@@ -9,7 +9,7 @@ import Firebase
 import FirebaseFirestoreSwift
 
 struct Colloquy: Identifiable, Codable, Hashable {
-    
+
     @DocumentID var threadId: String?
     let ownerUid: String
     let caption: String
@@ -17,6 +17,7 @@ struct Colloquy: Identifiable, Codable, Hashable {
     var likes: Int
     let locationId: String?
     let ownerColloquy: String?
+    var repliesCount: Int?
     
     var id: String {
         return threadId ?? NSUUID().uuidString

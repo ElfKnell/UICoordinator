@@ -14,7 +14,6 @@ struct ActivityContentListView: View {
     @Namespace var animation
     @State var isDelete = false
     @State var isUpdate = false
-    //let allActivity: Task
     
     private var filterBarWidth: CGFloat {
         let count = CGFloat(ActivityOwner.allCases.count)

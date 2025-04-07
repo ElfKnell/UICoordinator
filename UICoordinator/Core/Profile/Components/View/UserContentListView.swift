@@ -10,6 +10,7 @@ import SwiftUI
 struct UserContentListView: View {
     @StateObject var viewModel: UserContentListViewModel
 
+    @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @State private var selectedFilter: ProfileColloquyFilter = .colloquies
     @Namespace var animation
     
@@ -51,24 +52,79 @@ struct UserContentListView: View {
             }
             
             if selectedFilter == .colloquies {
+                
                 LazyVStack {
+                    
                     ForEach(viewModel.colloquies) { colloquy in
+                        
                         ColloquyCell(colloquy: colloquy)
+                            .padding(.horizontal, isLandscape ? 41 : 1)
+                            .onAppear {
+                                
+                                if colloquy == viewModel.colloquies.last {
+                                    
+                                    Task {
+                                        try await viewModel.fetchColloquiesNext()
+                                        
+                                    }
+                                }
+                                
+                            }
+                    }
+                    
+                    if viewModel.isLoading {
+                        
+                        ProgressView()
+                            .padding()
                     }
                 }
                 .onAppear {
                     Task  {
+                        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+                        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
+                            isLandscape = UIDevice.current.orientation.isLandscape
+                        }
+                        
                         try await viewModel.fetchUserColloquies()
                     }
                 }
             } else {
                 LazyVStack {
-                    ForEach(viewModel.replies) { colloquy in
-                        RepliesView(colloquy: colloquy)
+                    if !viewModel.replies.isEmpty {
+                        ForEach(viewModel.replies) { colloquy in
+                            RepliesView(colloquy: colloquy)
+                                .padding(.horizontal, isLandscape ? 41 : 1)
+                                .onAppear {
+                                    
+                                    if colloquy == viewModel.colloquies.last {
+                                        
+                                        Task {
+                                            try await viewModel.fetchNextReplies()
+                                        }
+                                    }
+                                }
+                        }
+                        
+                        if viewModel.isLoading {
+                            
+                            ProgressView()
+                                .padding()
+                        }
+                    } else {
+                        
+                        Text("  \(viewModel.user.fullname) has not yet responded, and we are still waiting for their reply.")
+                            .font(.title)
+                            .padding()
                     }
                 }
                 .onAppear {
                     Task {
+                        
+                        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+                        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
+                            isLandscape = UIDevice.current.orientation.isLandscape
+                        }
+                        
                         try await viewModel.fetchUserReplies()
                     }
                 }

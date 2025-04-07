@@ -50,7 +50,7 @@ struct ConfirmationLocationView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         Task {
-                            try await viewModel.uploadLocation(coordinate: coordinate, activityId: activityId)
+                            try await viewModel.uploadLocationWithCoordinate(coordinate: coordinate, activityId: activityId)
                             isSave.toggle()
                             
                             dismiss()

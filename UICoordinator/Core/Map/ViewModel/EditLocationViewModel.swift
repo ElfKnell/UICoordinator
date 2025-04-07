@@ -10,9 +10,12 @@ import Firebase
 
 class EditLocationViewModel: ObservableObject {
     
-    func updateLocation(_ location: Location) async throws {
+    private var serviseLocation = LocationService()
+    
+    func updateLocation(_ location: Location) async {
+        
         guard let locationId = location.locationId else { return }
-        try await LocationService.updateLocation(name: location.name, description: location.description, locationId: locationId)
+        await serviseLocation.updateNameAndDescriptionLocation(name: location.name, description: location.description, locationId: locationId)
     }
     
 }

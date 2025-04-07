@@ -10,6 +10,7 @@ import FirebaseCore
 import FirebaseAppCheck
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+    
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     FirebaseApp.configure()
@@ -20,20 +21,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct UICoordinatorApp: App {
-    @StateObject var locatonFetcher = LocationFetcher()
     @StateObject var currentUserViewModel = CurrentUserProfileViewModel()
     @StateObject var userFollowers = UserFollowers()
     
     // register app delegate for Firebase setup
-      @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     var body: some Scene {
         WindowGroup {
             UICoordinatorRootView()
-                .onAppear {
-                    locatonFetcher.start()
-                }
-                .environmentObject(locatonFetcher)
                 .environmentObject(currentUserViewModel)
                 .environmentObject(userFollowers)
         }

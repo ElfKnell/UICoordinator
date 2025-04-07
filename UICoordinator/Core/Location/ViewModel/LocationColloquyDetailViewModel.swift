@@ -16,7 +16,7 @@ class LocationColloquyDetailViewModel: ObservableObject {
     
     @MainActor
     func fetchPhoto(_ locationId: String) async throws {
-        self.photos = try await PhotoService.fetchPhotoByLocation(locationId)
+        self.photos = try await PhotoService.fetchPhotosByLocation(locationId)
         
         if !self.photos.isEmpty {
             self.switcher = .newPhoto
@@ -27,6 +27,6 @@ class LocationColloquyDetailViewModel: ObservableObject {
     
     @MainActor
     func fetchVideos(_ locationId: String) async throws {
-        self.videos = try await VideoService.fetchVideoByLocation(locationId)
+        self.videos = try await VideoService.fetchVideosByLocation(locationId)
     }
 }

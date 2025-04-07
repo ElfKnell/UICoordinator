@@ -12,25 +12,25 @@ import Firebase
 struct LocationsView: View {
 
     @StateObject var viewModel = LocationViewModel()
-
-    @State private var isSave = false
-    @State private var showSearch = false
-    @State private var routerColor: Color = .blue
-    @State private var regionCamera: MapCameraPosition = .region(.startRegion)
-    
-    @AppStorage("styleMap") private var styleMap: ActivityMapStyle = .standard
     
     var body: some View {
+        
         NavigationStack {
+            
             ZStack{
                 
                 Map(position: $viewModel.cameraPosition, selection: $viewModel.mapSelection) {
+                    
                     ForEach(viewModel.locations) { location in
                         Annotation("", coordinate: location.coordinate) {
+                            
                             NavigationLink {
+                                
                                 LocationEditView(location: location)
                                     .environmentObject(viewModel)
+                                
                             } label: {
+                                
                                 MarkerView(name: location.name)
                                     
                             }
@@ -54,7 +54,7 @@ struct LocationsView: View {
                     
                     if let route = viewModel.route {
                         MapPolyline(route.polyline)
-                            .stroke(routerColor, lineWidth: 5)
+                            .stroke(viewModel.routerColor, lineWidth: 5)
                     }
                     
                 }
@@ -63,10 +63,12 @@ struct LocationsView: View {
                     MapPitchToggle()
                     MapUserLocationButton()
                 }
-                .mapStyle(styleMap.value)
+                .mapStyle(viewModel.styleMap.value)
                 .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
                     viewModel.coordinate = mapCameraUpdateContext.camera.centerCoordinate
-                    regionCamera = .region(mapCameraUpdateContext.region)
+                    viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
+                    
+                    viewModel.fetchMoreLocationsByCurentUser()
                 }
                 
                 SightView()
@@ -77,7 +79,7 @@ struct LocationsView: View {
                         
                         Button {
                             Task {
-                                try await viewModel.fetchUserForLocations()
+                                try await viewModel.fetchLocationsByCurrentUser()
                             }
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath")
@@ -89,25 +91,19 @@ struct LocationsView: View {
                     }
                     
                     Spacer()
+                    
                     VStack {
                         
-                        if showSearch {
+                        if viewModel.showSearch {
                             
-                            TextField("Search ...", text: $viewModel.searchText)
-                                .font(.subheadline)
-                                .padding(12)
-                                .background(.white)
-                                .modifier(CornerRadiusModifier())
-                                .padding()
-                                .shadow(radius: 10)
+                            SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: viewModel.cameraPosition)
                         }
                         
                         HStack {
                             Button {
-                                viewModel.clean()
-                                showSearch.toggle()
+                                viewModel.showSearch.toggle()
                             } label: {
-                                Image(systemName: showSearch ? "xmark.circle" : "magnifyingglass.circle")
+                                Image(systemName: viewModel.showSearch ? "xmark.circle" : "magnifyingglass.circle")
                                     .font(.largeTitle)
                                     .padding(.bottom)
                             }
@@ -130,21 +126,13 @@ struct LocationsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 Task {
-                    if let loadedColor = Color.loadFromAppStorage("routerColor") {
-                        routerColor = Color(red: loadedColor.red, green: loadedColor.green, blue: loadedColor.blue, opacity: loadedColor.alpha)
-                    }
                     
-                    try await viewModel.fetchUserForLocations()
+                    try await viewModel.fetchLocationsByCurrentUser()
                 }
             }
-            .onSubmit(of: .text) {
+            .onChange(of: viewModel.isSave) {
                 Task {
-                    try await viewModel.getResults(regionCamera)
-                }
-            }
-            .onChange(of: isSave) {
-                Task {
-                    try await viewModel.fetchUserForLocations()
+                    await viewModel.addLocation()
                 }
             }
             .onChange(of: viewModel.getDirections, { oldValue, newValue in
@@ -166,9 +154,8 @@ struct LocationsView: View {
                 switch config {
                 case .confirmationLocation:
                     
-                    ConfirmationLocationView(coordinate: viewModel.coordinate, isSave: $isSave)
+                    ConfirmationLocationView(coordinate: viewModel.coordinate, isSave: $viewModel.isSave)
                         .presentationDetents([.height(340), .medium])
-                        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
 
                 case .locationsDetail:
                     
@@ -179,7 +166,7 @@ struct LocationsView: View {
                
                 case .locationUpdateOrSave:
                     
-                    UpdateLocationView(location: $viewModel.mapSelection, isSave: $isSave)
+                    UpdateLocationView(location: $viewModel.mapSelection, isSave: $viewModel.isSave)
                         .presentationDetents([.height(350), .medium])
                 }
             })

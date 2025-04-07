@@ -9,6 +9,8 @@ import Foundation
 
 class ActivityCellViewModel: ObservableObject {
     
+    private var deleteLocation = DeleteLocation()
+    
     func deleteActivity(activity: Activity) async throws {
         
         let likes = try await LikeService.fetchUsersLikes(userId: activity.ownerUid, collectionName: "ActivityLikes")
@@ -21,7 +23,7 @@ class ActivityCellViewModel: ObservableObject {
         
         if !activity.locationsId.isEmpty {
             for i in 0 ..< activity.locationsId.count {
-                try await LocationService.deleteLocation(locationId: activity.locationsId[i])
+                await deleteLocation.deleteLocation(at: activity.locationsId[i])
             }
         }
         

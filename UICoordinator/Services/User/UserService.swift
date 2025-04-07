@@ -42,6 +42,20 @@ class UserService {
         return try snapshot.data(as: User.self)
     }
     
+    func updateUserProfile(nickname: String, bio: String, link: String) async throws {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        
+        do {
+            try await Firestore.firestore()
+                .collection("users")
+                .document(currentUid)
+                .updateData(["username": nickname, "bio": bio, "link": link])
+            try await uploadUser(withUid: currentUid)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     func reset() {
         self.currentUser = nil
     }
@@ -55,11 +69,11 @@ class UserService {
         try await Firestore.firestore().collection("users").document(currentUid).updateData([
             "profileImageURL": imageURL
         ])
-        try await updateUser(withUid: currentUid)
+        try await uploadUser(withUid: currentUid)
     }
     
     @MainActor
-    private func updateUser(withUid uid: String) async throws {
+    private func uploadUser(withUid uid: String) async throws {
         let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
         self.currentUser = try snapshot.data(as: User.self)
     }

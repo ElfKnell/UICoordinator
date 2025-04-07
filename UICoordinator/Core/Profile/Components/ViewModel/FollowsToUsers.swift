@@ -11,8 +11,11 @@ class FollowsToUsers: ObservableObject {
     @Published var followingUsers = [User]()
     @Published var followerUsers = [User]()
     
-    func fetchFollowing(usersFollowing: [Follow], usersFollower: [Follow]) async throws {
+    @MainActor
+    func fetchFollowsToUsers(usersFollowing: [Follow], usersFollower: [Follow]) async throws {
         do {
+            self.followingUsers = []
+            self.followerUsers = []
             
             let followings = Set(usersFollowing.map { $0.following })
             
@@ -20,7 +23,7 @@ class FollowsToUsers: ObservableObject {
             
             for following in followings {
                 let user = try await UserService.fetchUser(withUid: following)
-                self.followerUsers.append(user)
+                self.followingUsers.append(user)
             }
             
             for follower in followers {

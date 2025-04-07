@@ -10,9 +10,16 @@ import Firebase
 class CreateColloquyViewModel: ObservableObject {
     
     @MainActor
-    func uploadColloquy(caption: String, locatioId: String?, ownerColloquy: String?) async throws {
+    func uploadColloquy(caption: String, locatioId: String?, ownerColloquy: String?, activityId: String?) async throws {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-        let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: ownerColloquy)
+        
+        let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: ownerColloquy ?? activityId)
+        
         try await ColloquyService.uploadeColloquy(colloquy)
+        if let ownerColloquy = ownerColloquy {
+            try await ColloquyService.incrementRepliesCount(colloquyId: ownerColloquy)
+        } else if let activityId = activityId {
+            try await ActivityService.incrementRepliesCount(activityId: activityId)
+        }
     }
 }

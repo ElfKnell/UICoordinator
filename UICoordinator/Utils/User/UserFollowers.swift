@@ -20,8 +20,12 @@ class UserFollowers: ObservableObject {
     
     @MainActor
     func fetchFollowers() async throws {
-        guard let currentUserId = UserService.shared.currentUser?.id else { return }
-        self.followers = try await FollowService.fitchFollow(uid: currentUserId, follow: "follower")
+        do {
+            guard let currentUserId = UserService.shared.currentUser?.id else { return }
+            self.followers = try await FollowService.fitchFollow(uid: currentUserId, follow: "follower")
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     @MainActor
@@ -50,4 +54,5 @@ class UserFollowers: ObservableObject {
         try await fetchUserFollowers(uid: uid)
         try await fetchUserFollowing(uid: uid)
     }
+    
 }

@@ -13,40 +13,42 @@ class FetchLocationsFromFirebase: FetchLocationsProtocol {
     private var isDataLoaded = false
     private var lastDocument: DocumentSnapshot?
     
-    func getLocations(userId: String, pageSize: Int) async throws -> [Location] {
+    func getLocations(userId: String, pageSize: Int) async -> [Location] {
         
-        if isDataLoaded { return [] }
-        var query = Firestore
-            .firestore()
-            .collection("locations")
-            .whereField("ownerUid", isEqualTo: userId)
-            .order(by: "timestamp", descending: true)
-            .limit(to: pageSize)
+        do {
+            if isDataLoaded { return [] }
+            var query = Firestore
+                .firestore()
+                .collection("locations")
+                .whereField("ownerUid", isEqualTo: userId)
+                .order(by: "timestamp", descending: true)
+                .limit(to: pageSize)
             
-        if let lastDocument = lastDocument {
-            query = query.start(afterDocument: lastDocument)
-        }
-        
-        let snapshot = try await query.getDocuments()
-        
-        if snapshot.documents.isEmpty {
-            isDataLoaded = true  // Set flag to true if no data is returned
+            if let lastDocument = lastDocument {
+                query = query.start(afterDocument: lastDocument)
+            }
+            
+            let snapshot = try await query.getDocuments()
+            
+            if snapshot.documents.isEmpty {
+                isDataLoaded = true  // Set flag to true if no data is returned
+                return []
+            }
+            
+            self.lastDocument = snapshot.documents.last
+            
+            return snapshot.documents.compactMap { document in
+                let location = try? document.data(as: Location.self)
+                
+                if location?.activityId == nil {
+                    return location
+                } else {
+                    return nil
+                }
+            }
+        } catch {
+            print("ERROR with fetching locations \(error.localizedDescription)")
             return []
         }
-        
-        self.lastDocument = snapshot.documents.last
-        
-        return snapshot.documents.compactMap { document in
-            let location = try? document.data(as: Location.self)
-            
-            if location?.activityId == nil {
-                return location
-            } else {
-                return nil
-            }
-        }
     }
-    
-    
-    
 }

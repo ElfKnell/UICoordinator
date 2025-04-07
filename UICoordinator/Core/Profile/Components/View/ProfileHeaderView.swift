@@ -12,6 +12,7 @@ struct ProfileHeaderView: View {
     let user: User
     @EnvironmentObject var userFollow: UserFollowers
     @StateObject var userLikes = UserLikeCount()
+    @StateObject var followToUser = FollowsToUsers()
     
     var body: some View {
         VStack(spacing: 16) {
@@ -35,19 +36,41 @@ struct ProfileHeaderView: View {
                 
                 HStack(spacing: 16) {
                     
-                    BottomHeaderView(title: "Following", counts: "\(userFollow.userFollowing.count)", imageName: "person.3.fill")
+                    if userFollow.userFollowing.count == followToUser.followingUsers.count &&
+                        userFollow.userFollowers.count == followToUser.followerUsers.count {
+                        
+                        NavigationLink {
+                            ExploreView(users: followToUser.followingUsers)
+                        } label: {
+                            BottomHeaderView(title: "Following",
+                                             counts: "\(userFollow.userFollowing.count)",
+                                             imageName: "person.3.fill")
+                        }
                     
-                    BottomHeaderView(title: "Followers", counts: "\(userFollow.userFollowers.count)", imageName: "person.crop.circle.fill.badge.checkmark")
+                        NavigationLink {
+                            ExploreView(users: followToUser.followerUsers)
+                        } label: {
+                            BottomHeaderView(title: "Followers",
+                                             counts: "\(userFollow.userFollowers.count)",
+                                             imageName: "person.crop.circle.fill.badge.checkmark")
+                        }
+                    }
                     
-                    BottomHeaderView(title: "Likes",
-                                     counts: "\(userLikes.countLikes)",
-                                     imageName: "heart.fill")
+                    NavigationLink {
+                        ExploreView(users: userLikes.usersLike)
+                    } label: {
+                        BottomHeaderView(title: "Likes",
+                                         counts: "\(userLikes.countLikes)",
+                                         imageName: "heart.fill")
+                    }
                 }
             }
         }
         .onAppear {
             Task {
-                try await userLikes.fetchLikesCount(userId: user.id)
+                try await userLikes.fetchLikes(userId: user.id)
+                
+                try await followToUser.fetchFollowsToUsers(usersFollowing: userFollow.userFollowing, usersFollower: userFollow.userFollowers)
             }
         }
     }

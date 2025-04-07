@@ -17,6 +17,7 @@ struct AboutView: View {
             Text(viewModel.info_2)
         }
         .padding()
+        .navigationTitle("About Us")
     }
 }
 

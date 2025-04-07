@@ -68,7 +68,7 @@ struct LocationsDetailView: View {
                         .cornerRadius(12)
                 }
                 
-                if viewModel.isCurrentUserUpdateLocation(mapSeliction: mapSeliction, activity: activity) {
+                if isUpdate != nil && viewModel.isCurrentUserUpdateLocation(mapSeliction: mapSeliction, activity: activity) {
                     
                     Button {
                         isUpdate = .locationUpdateOrSave
@@ -82,7 +82,7 @@ struct LocationsDetailView: View {
                     }
                 }
                 
-                if activity == nil {
+                if isUpdate != nil && activity == nil {
                     Button {
                         getDirections = true
                         dismiss()
@@ -99,11 +99,6 @@ struct LocationsDetailView: View {
         }
         .onAppear {
             fetchLookAroundPreview()
-            if mapSeliction?.isSearch == true {
-                Task {
-                    mapSeliction = try await viewModel.notSave(mapSeliction: mapSeliction, activityId: activity?.id)
-                }
-            }
         }
         .onChange(of: mapSeliction) {
             fetchLookAroundPreview()

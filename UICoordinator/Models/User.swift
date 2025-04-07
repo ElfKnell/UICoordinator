@@ -14,6 +14,7 @@ struct User: Identifiable, Codable, Hashable {
     let email: String
     var profileImageURL: String?
     var bio: String?
+    var link: String?
     
     var initials: String {
         let formatter = PersonNameComponentsFormatter()

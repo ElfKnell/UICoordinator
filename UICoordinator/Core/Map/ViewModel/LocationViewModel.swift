@@ -11,93 +11,151 @@ import SwiftUI
 
 @MainActor
 class LocationViewModel: ObservableObject {
+    
     @Published var locations = [Location]()
+    @Published var searchLoc = [Location]()
+    
     @Published var coordinate: CLLocationCoordinate2D = .startLocation
-    @Published var coordinatePosition: CLLocationCoordinate2D?
+    
     @Published var cameraPosition: MapCameraPosition = .region(.startRegion)
     
-    @Published var searchText = ""
     @Published var mapSelection: Location?
-    @Published var routeDistination: MKMapItem?
     @Published var route: MKRoute?
-    @Published var searchLoc = [Location]()
-    @Published var routeDisplaying = false
+    
     @Published var getDirections = false
+    @Published var sheetConfig: MapSheetConfig? = nil
     
-    @Published var sheetConfig: MapSheetConfig?
-    @Published var coordinateRouter: CLLocationCoordinate2D = .startLocation
+    @Published var isSave = false
+    @Published var showSearch = false
+    @Published var routerColor: Color = .blue
     
-    init() {
-        Task {
-            try await fetchUserForLocations()
+    var coordinatePosition: CLLocationCoordinate2D?
+    
+    private var addLocation = FetchLocationFromFirebase()
+    private var createRouter = CreateRouter()
+    private var fetchLocations = FetchLocations()
+    
+    @AppStorage("styleMap") var styleMap: ActivityMapStyle = .standard
+    
+    func fetchLocationsByCurrentUser() async throws {
+        
+        do {
+            
+            clean()
+            
+            self.locations = await fetchLocations.fetchLocation()
+            
+            try await getCameraPosition()
+            
+            loadColor()
+            
+        } catch {
+            print("ERROR: \(error.localizedDescription)")
         }
     }
     
-    func fetchUserForLocations() async throws {
-        guard let userUid = Auth.auth().currentUser?.uid else { return }
-        let loc_s = try await LocationService.fetchUserLocations(uid: userUid)
-        self.locations = loc_s.filter({ $0.activityId == nil })
-        try await getCameraPosition()
+    func fetchMoreLocationsByCurentUser() {
+        
+        Task {
+            
+            self.locations.append(contentsOf: await fetchLocations.fetchLocation())
+            
+        }
+    }
+    
+    func addLocation() async {
+        
+        guard let userId = AuthService.shared.userSession?.uid else { return }
+        
+        let location = addLocation.getLocation(userId: userId, coordinate: coordinate)
+        
+        if let location = location {
+            
+            if !locations.contains(location) {
+                locations.append(location)
+            }
+            cameraPosition = .region(location.regionCoordinate)
+            
+        }
     }
     
     private func getCameraPosition() async throws {
+        
         if !locations.isEmpty {
+            
             if let coordinatePosition = coordinatePosition {
+                
                 self.cameraPosition = .region(.init(center: coordinatePosition, latitudinalMeters: 500, longitudinalMeters: 500))
-                self.coordinateRouter = coordinatePosition
                 
             } else {
+                
                 self.cameraPosition = .region(locations[0].regionCoordinate)
-                self.coordinateRouter = locations[0].coordinate
+                self.coordinatePosition = locations[0].coordinate
+                
             }
-        } else {
-            self.cameraPosition = .region(.startRegion)
-        }
-    }
-    
-    func getResults(_ cameraPosition: MapCameraPosition) async throws {
-        
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        let results = await MapSearchViewModel.serchPlace(region: cameraPosition.region, searchText: searchText)
-        
-        for result in results {
-            let loc: Location = .init(ownerUid: uid, name: result.placemark.name ?? "no name", description: "", address: result.placemark.title, timestamp: Timestamp(), latitude: result.placemark.coordinate.latitude, longitude: result.placemark.coordinate.longitude, isSearch: true, activityId: nil)
             
-            searchLoc.append(loc)
         }
     }
     
-    func clean() {
-        searchText = ""
-        searchLoc = []
-        mapSelection = nil
-        getDirections = false
-        routeDistination = nil
-        route = nil
-        routeDisplaying = false
+    private func clean() {
+    
+        self.fetchLocations = FetchLocations()
+        self.locations.removeAll()
+        self.mapSelection = nil
+        self.getDirections = false
+        self.route = nil
+        
     }
     
     func fetchRoute() {
-        if let mapSelection {
-            let request = MKDirections.Request()
-            let mapItem: MKMapItem = .init(placemark: .init(coordinate: mapSelection.coordinate))
-            request.source = MKMapItem(placemark: .init(coordinate: coordinateRouter))
-            request.destination = mapItem
+        
+        Task {
             
-            Task {
-                let result = try await MKDirections(request: request).calculate()
-                route = result.routes.first
-                routeDistination = mapItem
+            do {
+                
+                self.route = try await createRouter.getRouter(coordinate: self.coordinatePosition, mapSelection: self.mapSelection)
                 
                 withAnimation(.snappy) {
-                    routeDisplaying = true
-                    sheetConfig = nil
+                    self.sheetConfig = nil
                     
-                    if let rect = route?.polyline.boundingMapRect, routeDisplaying {
-                        cameraPosition = .rect(rect)
+                    if let rect = self.route?.polyline.boundingMapRect {
+                        self.cameraPosition = .rect(rect)
                     }
                 }
+                
+            } catch {
+                print("ERROR: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    func verifyLocation(selectedLocation: Location) -> Location {
+        
+        getDirections = false
+        route = nil
+        
+        if sheetConfig == .locationUpdateOrSave { return selectedLocation }
+        
+        let locationVerifyId = locations.firstIndex(where: { $0.longitude == selectedLocation.longitude && $0.latitude == $0.latitude })
+        
+        sheetConfig = .locationsDetail
+        
+        if let id = locationVerifyId {
+            return locations[id]
+        } else {
+            return selectedLocation
+        }
+        
+    }
+    
+    func updateLocation(_ location: Location) {
+        mapSelection = location
+        sheetConfig = .locationUpdateOrSave
+    }
+    
+    private func loadColor() {
+        if let loadedColor = Color.loadFromAppStorage("routerColor") {
+            routerColor = Color(red: loadedColor.red, green: loadedColor.green, blue: loadedColor.blue, opacity: loadedColor.alpha)
         }
     }
 }

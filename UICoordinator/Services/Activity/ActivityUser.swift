@@ -10,9 +10,9 @@ import Firebase
 
 class ActivityUser {
     
-    static func isCurrentUser(_ activity: Activity) -> Bool {
+    static func isCurrentUser(_ ownerUid: String) -> Bool {
         guard let uid = Auth.auth().currentUser?.uid else { return false }
-        if uid == activity.ownerUid {
+        if uid == ownerUid {
             return true
         } else {
             return false

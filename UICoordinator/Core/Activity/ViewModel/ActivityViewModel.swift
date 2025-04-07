@@ -68,7 +68,7 @@ class ActivityViewModel: ObservableObject {
         try await fetchUserForActivity()
     }
     
-    func fetchActivity(typeActivity: TypeOfActivity) async throws {
+    func fetchActivity(typeActivity: PropertyTypeActivity) async throws {
         
         switch typeActivity {
         case .myActivity:

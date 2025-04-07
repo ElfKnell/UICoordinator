@@ -31,6 +31,7 @@ class AuthService {
     
     @MainActor
     func createUser(withEmail email: String, passsword: String, fullname: String, username: String) async throws {
+        
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: passsword)
             self.userSession = result.user
@@ -49,6 +50,7 @@ class AuthService {
     
     @MainActor
     private func uploadUserData(id: String, withEmail email: String, fullname: String, username: String) async throws {
+        
         let user = User(id: id, fullname: fullname, username: username, email: email)
         guard let userData = try? Firestore.Encoder().encode(user) else { return }
         try await Firestore.firestore().collection("users").document(id).setData(userData)

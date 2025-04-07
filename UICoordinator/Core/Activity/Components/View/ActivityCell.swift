@@ -12,8 +12,10 @@ struct ActivityCell: View {
     let activity: Activity
     @StateObject var viewModelLike = LikesViewModel(collectionName: "ActivityLikes")
     @StateObject var viewModel = ActivityCellViewModel()
+    @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @Binding var isDelete: Bool
     @Binding var isUpdate: Bool
+    @State private var showReplies = false
     
     var body: some View {
         VStack {
@@ -26,9 +28,9 @@ struct ActivityCell: View {
                     
                     NavigationLink {
                         
-                        if ActivityUser.isCurrentUser(activity) {
+                        if ActivityUser.isCurrentUser(activity.ownerUid) {
                             
-                            ActivityRoutesEditView(activity: activity)
+                            ActivityEditView(activity: activity)
                                 .onDisappear {
                                     isUpdate.toggle()
                                 }
@@ -80,7 +82,7 @@ struct ActivityCell: View {
                         
                         Button {
                             Task {
-                                try await viewModelLike.doLike(userId: activity.ownerUid, colloquyId: activity.id)
+                                try await viewModelLike.doLike(userId: activity.ownerUid, likeToObject: activity)
                                 
                                 isUpdate.toggle()
                             }
@@ -93,7 +95,17 @@ struct ActivityCell: View {
                             }
                         }
                         
-                        if ActivityUser.isCurrentUser(activity) {
+                        Button {
+                            showReplies.toggle()
+                        } label: {
+                            Image(systemName: "bubble.right")
+                        }
+                        
+                        if let count = activity.repliesCount {
+                            Text("\(count)")
+                        }
+                        
+                        if ActivityUser.isCurrentUser(activity.ownerUid) {
                             
                             Button {
                                 Task {
@@ -117,12 +129,23 @@ struct ActivityCell: View {
             Divider()
             
         }
-        .padding()
+        .padding([.horizontal, .top])
+        .padding(.horizontal, isLandscape ? 21 : 1)
         .onAppear {
+            
+            UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+            NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
+                isLandscape = UIDevice.current.orientation.isLandscape
+            }
+            
             Task {
                 try await viewModelLike.isLike(cid: activity.id)
             }
+            
         }
+        .sheet(isPresented: $showReplies, content: {
+            ActivityRepliesView(activity: activity)
+        })
     }
 }
 

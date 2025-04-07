@@ -9,16 +9,25 @@ import SwiftUI
 
 struct ExploreView: View {
     
-    @StateObject var viewModel = ExploreViewModel()
+    var users: [User]
     @State private var searchText = ""
     @EnvironmentObject var userFollow: UserFollowers
     
     var body: some View {
         NavigationStack {
+            
             ScrollView {
+                
                 LazyVStack {
-                    ForEach(viewModel.users) { user in
-                        NavigationLink(value: user) {
+                    
+                    ForEach(filteredPeople) { user in
+
+                        NavigationLink {
+                            
+                            ProfileView(user: user)
+                            
+                        } label: {
+                            
                             VStack {
                                 
                                 UserCellView(user: user)
@@ -30,10 +39,8 @@ struct ExploreView: View {
                     }
                 }
             }
-            .navigationDestination(for: User.self, destination: { user in
-                ProfileView(user: user)
-            })
-            .navigationTitle("Search")
+            .navigationTitle("Users Search")
+            .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search")
             .onAppear {
                 Task {
@@ -42,8 +49,16 @@ struct ExploreView: View {
             }
         }
     }
+    
+    private var filteredPeople: [User] {
+        if searchText.isEmpty {
+            return users
+        } else {
+            return users.filter { $0.username.lowercased().contains(searchText.lowercased()) }
+        }
+    }
 }
 
 #Preview {
-    ExploreView()
+    ExploreView(users: [])
 }

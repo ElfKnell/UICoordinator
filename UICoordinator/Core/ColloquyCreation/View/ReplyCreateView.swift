@@ -12,42 +12,49 @@ struct ReplyCreateView: View {
     let colloquy: Colloquy
     
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        
+        VStack {
             
-            CircularProfileImageView(user: colloquy.user, size: .small)
-            
-            VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .top, spacing: 12) {
                 
-                HStack {
-                    
-                    Text(colloquy.user?.username ?? "")
-                        .font(.footnote)
-                        .fontWeight(.semibold)
-                    
-                    Spacer()
-                    
-                    Text(colloquy.timestamp.timestampString())
-                        .font(.caption)
-                        .foregroundStyle(Color(.systemGray3))
-                    
-                }
+                CircularProfileImageView(user: colloquy.user, size: .small)
                 
-                HStack {
+                VStack(alignment: .leading, spacing: 4) {
                     
-                    if let name = colloquy.location?.name {
-                        NavigationLink {
-                            LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
-                        } label: {
-                            Text(name)
-                                .foregroundStyle(.blue)
-                        }
+                    HStack {
+                        
+                        Text(colloquy.user?.username ?? "")
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        Text(colloquy.timestamp.timestampString())
+                            .font(.caption)
+                            .foregroundStyle(Color(.systemGray3))
+                        
                     }
                     
-                    Text(colloquy.caption)
-                        .font(.footnote)
-                        .multilineTextAlignment(.leading)
+                    HStack {
+                        
+                        if let name = colloquy.location?.name {
+                            NavigationLink {
+                                LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
+                            } label: {
+                                Text(name)
+                                    .foregroundStyle(.blue)
+                            }
+                        }
+                        
+                        Text(colloquy.caption)
+                            .font(.footnote)
+                            .multilineTextAlignment(.leading)
+                    }
                 }
             }
+            
+            VerticalSeparatorView()
+            
         }
     }
 }

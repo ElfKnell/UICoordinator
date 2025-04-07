@@ -20,25 +20,13 @@ struct LocationColloquyView: View {
     var body: some View {
         
         Map(position: $mapCamera) {
+            
             Annotation("", coordinate: location.coordinate) {
                 NavigationLink {
-                    LocationColloquyDetailView(location: location)
+                    InfoView(activity: location)
                 } label: {
                     MarkerView(name: location.name)
                 }
-            }
-        }
-        .overlay {
-            VStack {
-                HStack {
-                    BackButtonView()
-                        .font(.largeTitle)
-                        .padding()
-                    
-                    Spacer()
-                }
-                
-                Spacer()
             }
             
         }
@@ -46,7 +34,16 @@ struct LocationColloquyView: View {
             MapCompass()
             MapPitchToggle()
         }
+        .navigationTitle("Location on  the map")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
+        .toolbar {
+            
+            ToolbarItem(placement: .topBarLeading) {
+                BackButtonView()
+            }
+            
+        }
     }
 }
 

@@ -12,12 +12,13 @@ import Firebase
 class ActivityEditViewModel: ObservableObject {
     
     @Published var locations = [Location]()
-    @Published var searchLoc = [Location]()
+    @Published var searchLocations = [Location]()
     @Published var selectedPlace: Location?
     @Published var searctText = ""
     @Published var isMark = false
     @Published var isSettings = false
     @Published var isSave = false
+    @Published var isUpdate = false
     
     @Published var coordinate: CLLocationCoordinate2D = .startLocation
     @Published var sheetConfig: MapSheetConfig?
@@ -26,27 +27,11 @@ class ActivityEditViewModel: ObservableObject {
     
     @Published var routes: [MKRoute] = []
     
-    @MainActor
-    func getResults(_ cameraPosition: MapCameraPosition, searchText: String) async throws {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        let results = await MapSearchViewModel.serchPlace(region: cameraPosition.region, searchText: searchText)
-        
-        
-        for result in results {
-            let loc: Location = .init(ownerUid: uid, name: result.placemark.name ?? "no name", description: "", address: result.placemark.title, timestamp: Timestamp(), latitude: result.placemark.coordinate.latitude, longitude: result.placemark.coordinate.longitude, isSearch: true, activityId: nil)
-            
-            searchLoc.append(loc)
-        }
-    }
+    private var fetchLocatins = FetchLocationsForActivity()
     
     @MainActor
     func clean() {
-        searchLoc = []
-    }
-    
-    @MainActor
-    func getLocations(activityId: String) async throws -> [Location] {
-        return try await LocationService.fetchActivityLocations(activityId: activityId)
+        searchLocations.removeAll()
     }
     
     func saveRegione(_ region: MKCoordinateRegion?, activityId: String) async throws {
@@ -74,17 +59,26 @@ class ActivityEditViewModel: ObservableObject {
     }
     
     @MainActor
-    func getRoutes(activity: Activity, first: Bool) async throws {
+    func getRoutes(activity: Activity) async throws {
 
         if activity.typeActivity == .track {
-            let locations = try await LocationService.fetchActivityLocations(activityId: activity.id)
+            let locations = await fetchLocatins.getLocations(activityId: activity.id)
             self.locations = locations
             let activityRouter = ActivityRouters()
-            self.routes = try await activityRouter.getRoutes(locations: locations, first: first)
+            self.routes = try await activityRouter.getRoutes(locations: locations)
         } else {
-            self.locations = try await LocationService.fetchActivityLocations(activityId: activity.id)
+            self.locations = await fetchLocatins.getLocations(activityId: activity.id)
         }
 
+    }
+    
+    func verifyLocation(selectedLocation: Location) -> Location {
+        let locationVerifyId = locations.firstIndex(where: { $0.longitude == selectedLocation.longitude && $0.latitude == $0.latitude })
+        if let id = locationVerifyId {
+            return locations[id]
+        } else {
+            return selectedLocation
+        }
     }
 }
 

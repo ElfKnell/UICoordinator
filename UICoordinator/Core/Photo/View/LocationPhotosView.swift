@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct LocationPhotosView<T: LocationAndActivity>: View {
+struct LocationPhotosView: View {
     
-    let activity: T
+    let activity: MapSelectionProtocol
     @StateObject var viewModel = LocationColloquyDetailViewModel()
     
     var body: some View {

@@ -9,7 +9,9 @@ import SwiftUI
 import PhotosUI
 
 struct EditProfileView: View {
+    
     let user: User
+    @State private var nickname = ""
     @State private var bio = ""
     @State private var link = ""
     @State private var isPrivateProfile = false
@@ -52,6 +54,18 @@ struct EditProfileView: View {
                     Divider()
                     
                     VStack(alignment: .leading) {
+                        Text("Nickname")
+                            .fontWeight(.bold)
+                        
+                        HStack {
+                            Text("@")
+                            TextField("nickname...", text: $nickname)
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    VStack(alignment: .leading) {
                         Text("Bio")
                             .fontWeight(.semibold)
                         
@@ -63,7 +77,9 @@ struct EditProfileView: View {
                     VStack(alignment: .leading) {
                         Text("Link")
                         
-                        TextField("Add link...", text: $link)
+                        HStack {
+                            TextField("Add link...", text: $link)
+                        }
                     }
                     
                     Divider()
@@ -79,6 +95,17 @@ struct EditProfileView: View {
             }
             .navigationTitle("Edit Profile")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                
+                nickname = user.username
+                
+                if let bio = user.bio {
+                    self.bio = bio
+                }
+                if let link = user.link {
+                    self.link = link
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
@@ -89,9 +116,10 @@ struct EditProfileView: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
+                    
                     Button("Save") {
                         Task {
-                            try await viewModel.updateUserData()
+                            try await viewModel.updateUserData(nickname: nickname, bio: bio, link: link)
                             dismiss()
                         }
                     }

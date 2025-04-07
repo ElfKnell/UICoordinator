@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct MainUsersView: View {
+    
+    @StateObject var viewModel = MainUsersViewModel()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ExploreView(users: viewModel.users)
     }
 }
 

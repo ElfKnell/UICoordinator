@@ -16,7 +16,8 @@ class EditProfileViewModel: ObservableObject {
     @Published var profileImage: Image?
     private var uiImage: UIImage?
     
-    func updateUserData() async throws {
+    func updateUserData(nickname: String, bio: String, link: String) async throws {
+        try await UserService.shared.updateUserProfile(nickname: nickname,  bio: bio, link: link)
         try await uploadeProfileImage()
     }
     
@@ -35,4 +36,5 @@ class EditProfileViewModel: ObservableObject {
         
         try await UserService.shared.updateUserProfileImage(withImageURL: imageURL)
     }
+    
 }

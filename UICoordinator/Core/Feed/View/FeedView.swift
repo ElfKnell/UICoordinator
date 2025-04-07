@@ -19,12 +19,25 @@ struct FeedView: View {
                     LazyVStack {
                         ForEach(viewModel.colloquies) { colloquy in
                             ColloquyCell(colloquy: colloquy)
+                                .onAppear {
+                                    // Load more data when the last post appears
+                                    if colloquy == viewModel.colloquies.last {
+                                        Task {
+                                            try await viewModel.fetchColloquiesNext()
+                                        }
+                                    }
+                                }
+                        }
+                        
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .padding()
                         }
                     }
-                }
-                .onAppear {
-                    Task {
-                        try await viewModel.fetchColloquies()
+                    .onAppear {
+                        Task {
+                            try await viewModel.fetchColloquies()
+                        }
                     }
                 }
                 .refreshable {
@@ -54,9 +67,9 @@ struct FeedView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showColloquyCreate, content: {
-                CreateColloquyView(location: nil, colloquy: nil)
-            })
+            .sheet(isPresented: $showColloquyCreate) {
+                CreateColloquyView()
+            }
         }
     }
 }

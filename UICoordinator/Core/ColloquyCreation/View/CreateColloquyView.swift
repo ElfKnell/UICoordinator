@@ -11,8 +11,9 @@ struct CreateColloquyView: View {
     @StateObject var viewModel = CreateColloquyViewModel()
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
-    let location: Location?
-    let colloquy: Colloquy?
+    var location: Location?
+    var colloquy: Colloquy?
+    var activityId: String?
     
     private var user: User? {
         return UserService.shared.currentUser
@@ -27,16 +28,6 @@ struct CreateColloquyView: View {
                 if let colloquy = colloquy {
                     
                     ReplyCreateView(colloquy: colloquy)
-                    
-                    HStack(alignment: .top) {
-                        
-                        Text("|")
-                            .font(.title)
-                            .padding(.horizontal)
-                            .opacity(0.5)
-                        
-                        Spacer()
-                    }
                     
                 }
                 
@@ -71,7 +62,7 @@ struct CreateColloquyView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("\(location?.name ?? "New") Colloquy")
+            .navigationTitle("\(location?.name ?? "Reply") Colloquy")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 
@@ -84,7 +75,7 @@ struct CreateColloquyView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Post") {
                         Task {
-                            try await viewModel.uploadColloquy(caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id)
+                            try await viewModel.uploadColloquy(caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id, activityId: activityId)
                             
                             dismiss()
                         }
@@ -101,5 +92,5 @@ struct CreateColloquyView: View {
 }
 
 #Preview {
-    CreateColloquyView(location: nil, colloquy: nil)
+    CreateColloquyView()
 }

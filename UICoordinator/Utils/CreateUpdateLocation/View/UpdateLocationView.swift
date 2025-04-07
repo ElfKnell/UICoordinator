@@ -10,10 +10,11 @@ import MapKit
 
 struct UpdateLocationView: View {
     
-    var location: Location
+    @Binding var location: Location?
+    @Binding var isSave: Bool
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel = UpdateLocationViewModel()
-    //@Binding var isUpdate: Bool
+    var activityId: String?
     
     var body: some View {
         
@@ -30,7 +31,9 @@ struct UpdateLocationView: View {
                     
                     Divider()
                     
-                    CoordinateInfoView(coordinate: location.coordinate)
+                    if let coordinate = location?.coordinate {
+                        CoordinateInfoView(coordinate: coordinate)
+                    }
                     
                 }
                 .padding()
@@ -50,22 +53,27 @@ struct UpdateLocationView: View {
                     HStack {
                         
                         Button {
+                            location = nil
                             dismiss()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                         }
                         .foregroundStyle(.black)
                         
-                        Button {
-                            
-                            Task {
-                                try await viewModel.deleteLocation(locationId: location.id)
-                                dismiss()
+                        if location?.locationId != nil {
+                            Button {
+                                
+                                Task {
+                                    try await viewModel.deleteLocation(locationId: location?.id, activityId: activityId)
+                                    location = nil
+                                    isSave.toggle()
+                                    dismiss()
+                                }
+                                
+                            } label: {
+                                Image(systemName: "trash.circle.fill")
+                                    .foregroundStyle(.red)
                             }
-                            
-                        } label: {
-                            Image(systemName: "trash.circle.fill")
-                                .foregroundStyle(.red)
                         }
                     }
                 }
@@ -74,8 +82,9 @@ struct UpdateLocationView: View {
                     Button {
                         Task {
                             
-                            //isUpdate.toggle()
-                            
+                            try await viewModel.saveLocation(location, activityId: activityId)
+                            location = nil
+                            isSave.toggle()
                             dismiss()
                         }
                     } label: {
@@ -89,5 +98,5 @@ struct UpdateLocationView: View {
 }
 
 #Preview {
-    UpdateLocationView(location: DeveloperPreview.location)
+    UpdateLocationView(location: .constant(DeveloperPreview.location), isSave: .constant(false))
 }

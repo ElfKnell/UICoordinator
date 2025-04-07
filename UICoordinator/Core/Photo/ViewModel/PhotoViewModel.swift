@@ -56,7 +56,9 @@ class PhotoViewModel : ObservableObject {
     }
     
     func fetchPhoto(_ locationId: String) async throws {
-        self.photos = try await PhotoService.fetchPhotoByLocation(locationId)
+        self.isLoading = true
+        self.photos = try await PhotoService.fetchPhotosByLocation(locationId)
+        self.isLoading = false
     }
     
     func updatePhotoName() async throws {

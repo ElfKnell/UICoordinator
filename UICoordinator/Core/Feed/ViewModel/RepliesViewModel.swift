@@ -12,6 +12,8 @@ class RepliesViewModel: ObservableObject {
     
     @Published var replies = [Colloquy]()
     
+    private var fetchLocation = FetchLocationFromFirebase()
+    
     func fitchReplies(cid: String) async throws {
         self.replies = try await ColloquyService.fetchReplies(with: cid)
         try await fetchUserDataForColloquies()
@@ -42,6 +44,6 @@ class RepliesViewModel: ObservableObject {
     }
     
     private func getLocation(lid: String) async throws -> Location {
-        return try await LocationService.fetchLocation(withLid: lid)
+        return try await fetchLocation.fetchLocation(withId: lid)
     }
 }

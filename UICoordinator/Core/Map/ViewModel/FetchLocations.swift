@@ -11,33 +11,27 @@ import SwiftUI
 
 class FetchLocations: ObservableObject {
     
-    private var fetchLocationByUser: UserLocationsProtocol
+    private var fetchLocationByUser: FetchLocationsProtocol
     private var pageSize = 25
     
     init() {
         
-        self.fetchLocationByUser = GetUserLocationFromFirebase()
+        self.fetchLocationByUser = FetchLocationsFromFirebase()
 
     }
     
-    func fetchLocation(_ userId: String?) async throws -> [Location] {
+    func fetchLocation(_ userId: String? = nil) async -> [Location] {
         
-        do {
-            
-            var id: String
-            if let userId = userId {
-                id = userId
-            } else {
-                guard let userId = AuthService.shared.userSession?.uid else { return [] }
-                id = userId
-            }
-            
-            return try await fetchLocationByUser.getLocation(userId: id, pageSize: pageSize)
-
-        } catch {
-            
-            print("ERROR: \(error.localizedDescription)")
-            return []
+        var id: String
+        
+        if let userId = userId {
+            id = userId
+        } else {
+            guard let userId = AuthService.shared.userSession?.uid else { return [] }
+            id = userId
         }
+        
+        return await fetchLocationByUser.getLocations(userId: id, pageSize: pageSize)
+
     }
 }
