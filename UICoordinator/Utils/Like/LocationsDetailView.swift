@@ -15,8 +15,8 @@ struct LocationsDetailView: View {
     @Binding var getDirections: Bool
     @Binding var isUpdate: MapSheetConfig?
     @Environment(\.dismiss) var dismiss
-    
-    @StateObject var viewModel = MapSearchViewModel()
+    @StateObject var viewModel = LocationDetailViewModel()
+    var activity: Activity?
     
     var body: some View {
         VStack {
@@ -68,25 +68,21 @@ struct LocationsDetailView: View {
                         .cornerRadius(12)
                 }
                 
-                if viewModel.currentUser?.id == mapSeliction?.ownerUid {
+                if viewModel.isCurrentUserUpdateLocation(mapSeliction: mapSeliction, activity: activity) {
                     
-                    if mapSeliction?.isSearch == true {
-                        
-                    } else {
-                        
-                        Button {
-                            isUpdate = .locationUpdate
-                        } label: {
-                            Text("Update")
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .frame(width: 110, height: 48)
-                                .background(.yellow)
-                                .cornerRadius(12)
-                        }
-                        
+                    Button {
+                        isUpdate = .locationUpdateOrSave
+                    } label: {
+                        Text(mapSeliction?.isSearch == true ? "Save" : "Update")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(width: 110, height: 48)
+                            .background(.yellow)
+                            .cornerRadius(12)
                     }
-                    
+                }
+                
+                if activity == nil {
                     Button {
                         getDirections = true
                         dismiss()
@@ -103,6 +99,11 @@ struct LocationsDetailView: View {
         }
         .onAppear {
             fetchLookAroundPreview()
+            if mapSeliction?.isSearch == true {
+                Task {
+                    mapSeliction = try await viewModel.notSave(mapSeliction: mapSeliction, activityId: activity?.id)
+                }
+            }
         }
         .onChange(of: mapSeliction) {
             fetchLookAroundPreview()
