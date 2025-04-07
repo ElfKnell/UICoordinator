@@ -23,7 +23,7 @@ class ConfirmationLocationViewModel: LocationService, ObservableObject {
             corectAddress = address
         }
         
-        let location = Location(ownerUid: userUid, name: self.name, description: self.description, address: corectAddress, timestamp: Timestamp(), latitude: coordinate.latitude, longitude: coordinate.longitude, activityId: activityId)
+        let location = Location(ownerUid: userUid, name: self.name, description: self.description, address: corectAddress, timestamp: Timestamp(), latitude: coordinate.latitude, longitude: coordinate.longitude, activityId: activityId ?? "")
         
         await uploadLocation(location)
     }

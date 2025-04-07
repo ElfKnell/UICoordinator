@@ -50,5 +50,4 @@ class LocationService: SaveLocationProtocol, UpdateLocationProtocol {
             print("ERROR update address location: \(error.localizedDescription)")
         }
     }
-    
 }

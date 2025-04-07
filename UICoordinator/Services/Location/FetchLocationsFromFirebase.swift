@@ -16,11 +16,14 @@ class FetchLocationsFromFirebase: FetchLocationsProtocol {
     func getLocations(userId: String, pageSize: Int) async -> [Location] {
         
         do {
+            print("start")
             if isDataLoaded { return [] }
+            print("done")
             var query = Firestore
                 .firestore()
                 .collection("locations")
                 .whereField("ownerUid", isEqualTo: userId)
+                .whereField("activityId", isEqualTo: "")
                 .order(by: "timestamp", descending: true)
                 .limit(to: pageSize)
             
@@ -37,18 +40,13 @@ class FetchLocationsFromFirebase: FetchLocationsProtocol {
             
             self.lastDocument = snapshot.documents.last
             
-            return snapshot.documents.compactMap { document in
-                let location = try? document.data(as: Location.self)
+            return snapshot.documents.compactMap({ try? $0.data(as: Location.self)})
                 
-                if location?.activityId == nil {
-                    return location
-                } else {
-                    return nil
-                }
-            }
         } catch {
+            
             print("ERROR with fetching locations \(error.localizedDescription)")
             return []
+            
         }
     }
 }

@@ -22,7 +22,7 @@ struct Location: Identifiable, Codable, Hashable, MapSelectionProtocol {
     let longitude: Double
     var isSearch: Bool?
     
-    let activityId: String?
+    let activityId: String
     
     var id: String {
         return locationId ?? NSUUID().uuidString

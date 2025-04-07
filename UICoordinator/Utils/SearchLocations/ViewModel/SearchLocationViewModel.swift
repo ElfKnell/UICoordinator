@@ -22,7 +22,7 @@ class SearchLocationViewModel: ObservableObject {
         let results = await serchPlace(region: cameraPosition.region, searchText: self.searctText)
         
         for result in results {
-            let location: Location = .init(ownerUid: uid, name: result.placemark.name ?? "no name", description: "", address: result.placemark.title, timestamp: Timestamp(), latitude: result.placemark.coordinate.latitude, longitude: result.placemark.coordinate.longitude, isSearch: true, activityId: nil)
+            let location: Location = .init(ownerUid: uid, name: result.placemark.name ?? "no name", description: "", address: result.placemark.title, timestamp: Timestamp(), latitude: result.placemark.coordinate.latitude, longitude: result.placemark.coordinate.longitude, isSearch: true, activityId: "")
             
             searchLocations.append(location)
         }

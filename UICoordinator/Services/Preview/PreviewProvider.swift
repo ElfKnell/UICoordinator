@@ -14,7 +14,7 @@ class DeveloperPreview {
     
     static let colloquy = Colloquy(ownerUid: user.id, caption: "", timestamp: Timestamp(), likes: 0, locationId: nil, ownerColloquy: nil)
     
-    static let location = Location(ownerUid: user.id, name: "", description: "", timestamp: Timestamp(), latitude: 51.5010, longitude: -0.1410, activityId: nil)
+    static let location = Location(ownerUid: user.id, name: "", description: "", timestamp: Timestamp(), latitude: 51.5010, longitude: -0.1410, activityId: "")
     
     static let photo = Photo(locationUid: NSUUID().uuidString, timestamp: Timestamp(), photoURL: "")
     
