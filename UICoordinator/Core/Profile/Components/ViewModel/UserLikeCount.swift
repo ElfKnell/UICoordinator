@@ -13,14 +13,14 @@ class UserLikeCount: ObservableObject {
     @Published var usersLike = [User]()
     
     @MainActor
-    func fetchLikes(userId: String) async throws {
+    func fetchLikes(userId: String) async {
         do {
             usersLike = []
             let likes = try await LikeService.fetchUsersLikes(userId: userId, collectionName: "Likes")
             self.countLikes = likes.count
             let usersIdLikes =  Set(likes.map { $0.ownerUid })
             for like in usersIdLikes {
-                let user = try await UserService.fetchUser(withUid: like)
+                let user = await UserService.fetchUser(withUid: like)
                 if user.id == userId { continue }
                 usersLike.append(user)
             }

@@ -15,6 +15,8 @@ struct CreateColloquyView: View {
     var colloquy: Colloquy?
     var activityId: String?
     
+    @State private var isUploadingError = false
+    
     private var user: User? {
         return UserService.shared.currentUser
     }
@@ -73,10 +75,16 @@ struct CreateColloquyView: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
+                    
                     Button("Post") {
+                        
                         Task {
-                            try await viewModel.uploadColloquy(caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id, activityId: activityId)
                             
+                            await viewModel.uploadColloquy(caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id, activityId: activityId)
+                            
+                            if viewModel.errorUpload != nil {
+                                self.isUploadingError = true
+                            }
                             dismiss()
                         }
                     }
@@ -87,6 +95,12 @@ struct CreateColloquyView: View {
             }
             .foregroundStyle(.primary)
             .font(.subheadline)
+            .alert("Update Error", isPresented: $isUploadingError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(viewModel.errorUpload ?? "")
+            }
+
         }
     }
 }

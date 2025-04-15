@@ -59,7 +59,7 @@ struct LocationEditView: View {
             locationViewModel.coordinatePosition = location.coordinate
         }
         .sheet(isPresented: $showCreatColloqy, content: {
-            CreateColloquyView(location: location, colloquy: nil)
+            CreateColloquyView(location: location)
         })
         .toolbar {
             

@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ColloquyCell: View {
     let colloquy: Colloquy
+    @EnvironmentObject var userFollow: UserFollowers
     @StateObject var viewModel = LikesViewModel(collectionName: "Likes")
     @State private var showReplieCreate = false
+    @State var isChange = false
     
     var body: some View {
         
@@ -23,7 +25,7 @@ struct ColloquyCell: View {
                     if UserService.shared.currentUser == colloquy.user {
                         CurrentUserProfileView()
                     } else {
-                        ProfileView(user: colloquy.user ?? DeveloperPreview.user)
+                        ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
                     }
                     
                 } label: {
@@ -39,7 +41,7 @@ struct ColloquyCell: View {
                             if UserService.shared.currentUser == colloquy.user {
                                 CurrentUserProfileView()
                             } else {
-                                ProfileView(user: colloquy.user ?? DeveloperPreview.user)
+                                ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
                             }
                             
                         } label: {
@@ -84,7 +86,7 @@ struct ColloquyCell: View {
                         
                         Button {
                             Task {
-                                try await viewModel.doLike(userId: colloquy.ownerUid, likeToObject: colloquy)
+                                await viewModel.doLike(userId: colloquy.ownerUid, likeToObject: colloquy)
                             }
                         } label: {
                             if viewModel.likeId == nil {
@@ -130,8 +132,17 @@ struct ColloquyCell: View {
         .padding([.horizontal, .top])
         .onAppear {
             Task {
-                try await viewModel.isLike(cid:colloquy.id)
+                await viewModel.isLike(cid:colloquy.id)
             }
+        }
+        .onChange(of: isChange) {
+            
+            Task {
+                
+                await userFollow.setFollowersCurrentUser(userId: UserService.shared.currentUser?.id)
+                
+            }
+            
         }
         .sheet(isPresented: $showReplieCreate, content: {
             CreateColloquyView(colloquy: colloquy)

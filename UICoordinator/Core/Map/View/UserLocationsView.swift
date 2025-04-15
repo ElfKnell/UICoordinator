@@ -50,30 +50,6 @@ struct UserLocationsView: View {
                     viewModel.fetchMoreLocationsByCurentUser(userId: userId)
                 }
                 
-                VStack {
-                    
-                    HStack {
-                        
-                        Button {
-                            Task {
-                                try await viewModel.fetchUserForLocations(userId: userId)
-                            }
-                        } label: {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                        }
-                        .padding()
-                        .font(.title2)
-                        
-                        Spacer()
-                    }
-                    
-                    Spacer()
-                    
-                    VStack {
-                        SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: viewModel.cameraPosition)
-                    }
-                    .padding(.bottom)
-                }
             }
             .navigationTitle("Map Locations")
             .navigationBarTitleDisplayMode(.inline)
@@ -94,6 +70,9 @@ struct UserLocationsView: View {
                     .presentationDetents([.height(340)])
                     .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
                     .presentationCornerRadius(12)
+            }
+            .safeAreaInset(edge: .bottom) {
+                SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: viewModel.cameraPosition)
             }
         }
     }

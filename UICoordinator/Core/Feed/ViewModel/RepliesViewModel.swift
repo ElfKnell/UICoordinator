@@ -16,34 +16,35 @@ class RepliesViewModel: ObservableObject {
     
     func fitchReplies(cid: String) async throws {
         self.replies = try await ColloquyService.fetchReplies(with: cid)
-        try await fetchUserDataForColloquies()
-        try await fetchLocationDataForColloquies()
+        await fetchUserDataForColloquies()
+        await fetchLocationDataForColloquies()
     }
     
-    private func fetchUserDataForColloquies() async throws {
+    private func fetchUserDataForColloquies() async {
         
         for i in 0 ..< replies.count
         {
             let colloquy = replies[i]
             let ownerUid = colloquy.ownerUid
-            let colloquyUser = try await UserService.fetchUser(withUid: ownerUid)
+            let colloquyUser = await UserService.fetchUser(withUid: ownerUid)
             
             replies[i].user = colloquyUser
         }
     }
     
-    private func fetchLocationDataForColloquies() async throws {
+    private func fetchLocationDataForColloquies() async {
+        
         for i in 0 ..< replies.count
         {
             let colloquy = replies[i]
             guard let lid = colloquy.locationId else { continue }
-            let colloquyLocation = try await getLocation(lid: lid)
+            let colloquyLocation = await getLocation(lid: lid)
             
             replies[i].location = colloquyLocation
         }
     }
     
-    private func getLocation(lid: String) async throws -> Location {
-        return try await fetchLocation.fetchLocation(withId: lid)
+    private func getLocation(lid: String) async -> Location {
+        return await fetchLocation.fetchLocation(withId: lid)
     }
 }

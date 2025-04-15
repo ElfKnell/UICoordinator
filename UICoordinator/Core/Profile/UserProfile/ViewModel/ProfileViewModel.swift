@@ -6,24 +6,44 @@
 //
 
 import Firebase
+import SwiftData
 
 class ProfileViewModel: ObservableObject {
     
-    func follow(user: User) async throws {
+    private var userActor: UserDataActor?
+    
+    private var subscription = SubscribeOrUnsubscribe()
+    
+    func follow(user: User) {
         
-        guard let currentUserId = UserService.shared.currentUser?.id else { return }
-        let follow = Follow(follower: currentUserId, following: user.id, updateTime: Timestamp())
-        
-        try await FollowService.uploadeFollow(follow)
+        Task {
+            await subscription.subscribed(with: user)
+            
+            try await ensureActorReady()
+            
+            let localUser = user.toLocalUser()
+            try await userActor?.save(user: localUser)
+        }
     }
     
-    func unfollow(uId: String, followers: [Follow]) async throws {
+    func unfollow(user: User, followers: [Follow]) {
         
-        for follower in followers {
-            if follower.following == uId {
-                try await FollowService.deleteFollow(followId: follower.id)
-                break
+        Task {
+            await subscription.unsubcribed(with: user, followersCurrentUsers: followers)
+            
+            try await ensureActorReady()
+            
+            if let user = try await userActor?.findUserById(user.id) {
+                try await userActor?.delete(user: user)
+                
             }
+        }
+    }
+    
+    private func ensureActorReady() async throws {
+        if userActor == nil {
+            let container = try ModelContainer(for: LocalUser.self)
+            userActor = UserDataActor(container: container)
         }
     }
 }

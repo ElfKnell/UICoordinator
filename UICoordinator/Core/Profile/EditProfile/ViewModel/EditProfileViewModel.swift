@@ -17,7 +17,7 @@ class EditProfileViewModel: ObservableObject {
     private var uiImage: UIImage?
     
     func updateUserData(nickname: String, bio: String, link: String) async throws {
-        try await UserService.shared.updateUserProfile(nickname: nickname,  bio: bio, link: link)
+        await UserService.updateUserProfile(nickname: nickname,  bio: bio, link: link)
         try await uploadeProfileImage()
     }
     
@@ -32,9 +32,9 @@ class EditProfileViewModel: ObservableObject {
     
     private func uploadeProfileImage() async throws {
         guard let image = self.uiImage else { return }
-        guard let imageURL = try? await ImageUploader.uploadeImage(image) else { return }
+        guard let imageURL = await ImageUploader.uploadeImage(image) else { return }
         
-        try await UserService.shared.updateUserProfileImage(withImageURL: imageURL)
+        try await UserService.updateUserProfileImage(withImageURL: imageURL)
     }
     
 }

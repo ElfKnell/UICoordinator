@@ -5,15 +5,12 @@
 //  Created by Andrii Kyrychenko on 24/02/2024.
 //
 
-import Foundation
+import SwiftUI
 
 class LoginViewModel: ObservableObject {
     
     @Published var email = ""
     @Published var password = ""
+    @Published var isLoginError = false
     
-    @MainActor
-    func loginUser() async throws {
-        try await AuthService.shared.login(withEmail: email, password: password)
-    }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 
-class ActivityUser {
+class ActivityCurrentUser {
     
     static func isCurrentUser(_ ownerUid: String) -> Bool {
         guard let uid = Auth.auth().currentUser?.uid else { return false }

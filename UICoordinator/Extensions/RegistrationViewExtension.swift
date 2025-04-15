@@ -14,7 +14,7 @@ extension RegistrationView: AuthenticationFormProtocol {
         && registrationModel.email.contains("@")
         && !registrationModel.password.isEmpty
         && registrationModel.password.count > 5
-        && cPassword == registrationModel.password
+        && registrationModel.cPassword == registrationModel.password
         && !registrationModel.name.isEmpty
         && !registrationModel.username.isEmpty
     }

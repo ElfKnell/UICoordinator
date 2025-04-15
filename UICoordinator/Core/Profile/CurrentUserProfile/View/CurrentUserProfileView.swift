@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct CurrentUserProfileView: View {
-    @EnvironmentObject var viewModel: CurrentUserProfileViewModel
+    
     @EnvironmentObject var userFollow: UserFollowers
     @State private var showEditProfile = false
     
     private var currentUser: User {
-        return viewModel.currentUser ?? DeveloperPreview.user
+        return UserService.shared.currentUser ?? DeveloperPreview.user
     }
     
     var body: some View {
@@ -35,16 +35,11 @@ struct CurrentUserProfileView: View {
                         .modifier(CornerRadiusModifier())
                 }
                 
-                if let user = viewModel.currentUser {
-                    UserContentListView(user: user)
-                }
+                UserContentListView(user: currentUser)
             }
         }
         .onAppear {
-            Task {
-                try await userFollow.fetchUserFollowers(uid: currentUser.id)
-                try await userFollow.fetchUserFollowing(uid: currentUser.id)
-            }
+            userFollow.fetchFollowCount(userId: currentUser.id)
         }
         .sheet(isPresented: $showEditProfile, content: {
             EditProfileView(user: currentUser)

@@ -28,7 +28,7 @@ struct ActivityCell: View {
                     
                     NavigationLink {
                         
-                        if ActivityUser.isCurrentUser(activity.ownerUid) {
+                        if ActivityCurrentUser.isCurrentUser(activity.ownerUid) {
                             
                             ActivityEditView(activity: activity)
                                 .onDisappear {
@@ -82,7 +82,7 @@ struct ActivityCell: View {
                         
                         Button {
                             Task {
-                                try await viewModelLike.doLike(userId: activity.ownerUid, likeToObject: activity)
+                                await viewModelLike.doLike(userId: activity.ownerUid, likeToObject: activity)
                                 
                                 isUpdate.toggle()
                             }
@@ -105,7 +105,7 @@ struct ActivityCell: View {
                             Text("\(count)")
                         }
                         
-                        if ActivityUser.isCurrentUser(activity.ownerUid) {
+                        if ActivityCurrentUser.isCurrentUser(activity.ownerUid) {
                             
                             Button {
                                 Task {
@@ -139,7 +139,7 @@ struct ActivityCell: View {
             }
             
             Task {
-                try await viewModelLike.isLike(cid: activity.id)
+                await viewModelLike.isLike(cid: activity.id)
             }
             
         }

@@ -6,45 +6,68 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ExploreView: View {
     
     var users: [User]
     @State private var searchText = ""
     @EnvironmentObject var userFollow: UserFollowers
+    @State var isChange = false
+    @State private var isLoading = false
     
     var body: some View {
+        
         NavigationStack {
             
             ScrollView {
                 
-                LazyVStack {
+                if !isLoading {
                     
-                    ForEach(filteredPeople) { user in
-
-                        NavigationLink {
+                    LazyVStack {
+                    
+                        ForEach(filteredPeople) { user in
                             
-                            ProfileView(user: user)
-                            
-                        } label: {
-                            
-                            VStack {
+                            NavigationLink {
                                 
-                                UserCellView(user: user)
+                                ProfileView(user: user, isChange: $isChange)
                                 
-                                Divider()
+                            } label: {
+                                
+                                VStack {
+                                    
+                                    UserCellView(user: user)
+                                    
+                                    Divider()
+                                }
+                                .padding(.vertical, 4)
                             }
-                            .padding(.vertical, 4)
                         }
                     }
+                } else {
+                    LoadingView(width: 300, height: 300)
+                }
+            }
+            .onChange(of: isChange) {
+                Task {
+                    isLoading = true
+                    await userFollow.setFollowersCurrentUser(userId: UserService.shared.currentUser?.id)
+                    isLoading = false
                 }
             }
             .navigationTitle("Users Search")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search")
-            .onAppear {
-                Task {
-                    try await userFollow.fetchFollowers()
+            .toolbar {
+                Button {
+                    Task {
+                        isLoading = true
+                        await userFollow.setFollowersCurrentUser(userId: UserService.shared.currentUser?.id)
+                        searchText = ""
+                        isLoading = false
+                    }
+                } label: {
+                    Image(systemName: "arrow.trianglehead.2.counterclockwise.rotate.90")
                 }
             }
         }

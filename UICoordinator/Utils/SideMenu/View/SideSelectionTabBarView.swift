@@ -12,6 +12,7 @@ struct SideSelectionTabBarView: View {
     @Binding var mainSelectedTab: Int
     @State private var showSideMenu = false
     @State private var selectedTab = 0
+    @Environment(\.horizontalSizeClass) var sizeClass
     var selectedTabIndex: Int
     
     var body: some View {
@@ -20,11 +21,19 @@ struct SideSelectionTabBarView: View {
                 TabView(selection: $selectedTab)  {
                     
                     LocationsView()
-                        .onAppear { mainSelectedTab = 0 }
+                        .onAppear {
+                            if sizeClass == .compact {
+                                mainSelectedTab = 0
+                            }
+                        }
                         .tag(0)
                     
                     CurrentUserProfileView()
-                        .onAppear { mainSelectedTab = 4 }
+                        .onAppear {
+                            if sizeClass == .compact {
+                                mainSelectedTab = 4
+                            }
+                        }
                         .tag(1)
                     
                     Text("Notifications")

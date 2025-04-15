@@ -24,10 +24,15 @@ class FetchLocationFromFirebase: FetchLocationProtocol {
         return location
     }
     
-    func fetchLocation(withId id: String) async throws -> Location {
+    func fetchLocation(withId id: String) async -> Location {
         
-        let snapshot = try await firebase.collection("locations").document(id).getDocument()
-        return try snapshot.data(as: Location.self)
+        do {
+            let snapshot = try await firebase.collection("locations").document(id).getDocument()
+            return try snapshot.data(as: Location.self)
+        } catch {
+            print("ERROR fetch location with id: \(error.localizedDescription)")
+            return DeveloperPreview.location
+        }
     }
     
     private func getAsyncLocation(userId: String, coordinate: CLLocationCoordinate2D) async -> Location? {
@@ -45,7 +50,7 @@ class FetchLocationFromFirebase: FetchLocationProtocol {
             return locations[0]
             
         } catch {
-            print("ERROR - problem with fetching location by user. \(error)")
+            print("ERROR - problem with fetching location by user. \(error.localizedDescription)")
             return nil
         }
     }

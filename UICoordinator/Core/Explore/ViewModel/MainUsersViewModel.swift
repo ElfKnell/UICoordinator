@@ -18,6 +18,6 @@ class MainUsersViewModel: ObservableObject {
     
     @MainActor
     private func featchUsers() async throws {
-        self.users = try await UserService.fetchUsers()
+        self.users = await UserService.fetchUsers()
     }
 }

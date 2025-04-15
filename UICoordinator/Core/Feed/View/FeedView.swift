@@ -23,7 +23,7 @@ struct FeedView: View {
                                     // Load more data when the last post appears
                                     if colloquy == viewModel.colloquies.last {
                                         Task {
-                                            try await viewModel.fetchColloquiesNext()
+                                            await viewModel.fetchColloquies()
                                         }
                                     }
                                 }
@@ -34,36 +34,33 @@ struct FeedView: View {
                                 .padding()
                         }
                     }
-                    .onAppear {
-                        Task {
-                            try await viewModel.fetchColloquies()
+                    
+                }
+                .onAppear {
+                    Task {
+                        if viewModel.colloquies.isEmpty {
+                            await viewModel.fetchColloquiesRefresh()
                         }
+                    }
+                }
+                .onChange(of: showColloquyCreate) {
+                    Task {
+                        await viewModel.fetchColloquiesRefresh()
                     }
                 }
                 .refreshable {
                     Task {
-                        try await viewModel.fetchColloquies()
+                        await viewModel.fetchColloquiesRefresh()
                     }
                 }
                 .navigationTitle("Colloquies")
                 .navigationBarTitleDisplayMode(.inline)
-                
-                VStack() {
-                    
-                    Spacer()
-                    
-                    HStack {
-                        
-                        Spacer()
-                        
-                        Button {
-                            showColloquyCreate.toggle()
-                        } label: {
-                            Image(systemName: "plus.message")
-                        }
-                        .font(.largeTitle)
-                        .padding()
-                        
+                .toolbar {
+                    Button {
+                        showColloquyCreate.toggle()
+                    } label: {
+                        Image(systemName: "plus.message")
+                            .font(.title2)
                     }
                 }
             }

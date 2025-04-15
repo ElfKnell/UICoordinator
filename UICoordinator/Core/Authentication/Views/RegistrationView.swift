@@ -10,14 +10,15 @@ import SwiftUI
 struct RegistrationView: View {
     
     @StateObject var registrationModel = RegistrationViewModel()
-    
-    
-    @State var cPassword = ""
+    @EnvironmentObject var viewModel: AuthService
+    @Environment(\.horizontalSizeClass) var sizeClass
    
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
+        
         NavigationStack {
+            
             ZStack {
                 
                 BackgroundView()
@@ -25,6 +26,9 @@ struct RegistrationView: View {
                 VStack {
                     
                     Spacer()
+                    if sizeClass != .compact {
+                        Spacer()
+                    }
                     
                     LogoView()
                     
@@ -39,15 +43,20 @@ struct RegistrationView: View {
                     InputView(text: $registrationModel.password, title: "Password", placeholder: "password", isSecureField: true)
                     
                     ZStack(alignment: .trailing) {
-                        InputView(text: $cPassword, title: "Confirm password", placeholder: "confirm password", isSecureField: true)
                         
-                        if !registrationModel.password.isEmpty && !cPassword.isEmpty {
-                            if registrationModel.password == cPassword {
+                        InputView(text: $registrationModel.cPassword, title: "Confirm password", placeholder: "confirm password", isSecureField: true)
+                        
+                        if !registrationModel.password.isEmpty && !registrationModel.cPassword.isEmpty {
+                            
+                            if registrationModel.password == registrationModel.cPassword {
+                                
                                 Image(systemName: "checkmark.circle.fill")
                                     .imageScale(.large)
                                     .fontWeight(.bold)
                                     .foregroundColor(Color(.systemGreen))
+                                
                             } else {
+                                
                                 Image(systemName: "xmark.circle.fill")
                                     .imageScale(.large)
                                     .fontWeight(.bold)
@@ -60,7 +69,11 @@ struct RegistrationView: View {
                     Button {
                         
                         Task {
-                            try await registrationModel.createUser()
+                            await viewModel.createUser(withEmail: registrationModel.email, passsword: registrationModel.password, fullname: registrationModel.name, username: registrationModel.username)
+                            
+                            if viewModel.errorMessage != nil {
+                                registrationModel.isCreateUserError = true
+                            }
                         }
                         
                     } label: {
@@ -72,7 +85,9 @@ struct RegistrationView: View {
                     .disabled(!formIsValid)
                     .opacity(formIsValid ? 1.0 : 0.5)
                     
-                    Spacer()
+                    if sizeClass != .compact {
+                        Spacer()
+                    }
                     
                     HStack {
                         Text("Already have an account?")
@@ -87,6 +102,15 @@ struct RegistrationView: View {
                                 .foregroundStyle(.black)
                         }
                     }
+                    .padding(.bottom)
+                    
+                    Spacer()
+
+                }
+                .alert("Login problems", isPresented: $registrationModel.isCreateUserError) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(viewModel.errorMessage ?? "no error")
                 }
             }
         }

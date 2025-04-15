@@ -35,37 +35,33 @@ class LocationViewModel: ObservableObject {
     private var createRouter = CreateRouter()
     private var fetchLocations = FetchLocations()
     
-    @AppStorage("styleMap") var styleMap: ActivityMapStyle = .standard
+    @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
-    func fetchLocationsByCurrentUser() async throws {
+    func fetchLocationsByCurrentUser(userId: String?) async {
         
-        do {
+        if self.locations.isEmpty {
             
-            clean()
+            self.locations = await fetchLocations.fetchLocation(userId)
             
-            self.locations = await fetchLocations.fetchLocation()
-            
-            try await getCameraPosition()
+            getCameraPosition()
             
             loadColor()
-            
-        } catch {
-            print("ERROR: \(error.localizedDescription)")
         }
+        
     }
     
-    func fetchMoreLocationsByCurentUser() {
+    func fetchMoreLocationsByCurentUser(userId: String?) {
         
         Task {
             
-            self.locations.append(contentsOf: await fetchLocations.fetchLocation())
+            self.locations.append(contentsOf: await fetchLocations.fetchLocation(userId))
             
         }
     }
     
     func addLocation() async {
         
-        guard let userId = AuthService.shared.userSession?.uid else { return }
+        guard let userId = UserService.shared.currentUser?.id else { return }
         
         let location = addLocation.getLocation(userId: userId, coordinate: coordinate)
         
@@ -79,7 +75,7 @@ class LocationViewModel: ObservableObject {
         }
     }
     
-    private func getCameraPosition() async throws {
+    private func getCameraPosition() {
         
         if !locations.isEmpty {
             
@@ -97,13 +93,13 @@ class LocationViewModel: ObservableObject {
         }
     }
     
-    private func clean() {
+    func clean() {
     
-        self.fetchLocations = FetchLocations()
-        self.locations.removeAll()
         self.mapSelection = nil
         self.getDirections = false
         self.route = nil
+        
+        getCameraPosition()
         
     }
     

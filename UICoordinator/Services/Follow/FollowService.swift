@@ -35,4 +35,15 @@ class FollowService {
             .document(followId)
             .delete()
     }
+    
+    static func fitchFollowCoutn(uid: String, follow: String) async throws -> Int {
+        
+        let query = Firestore
+            .firestore()
+            .collection(nameCollection)
+            .whereField(follow, isEqualTo: uid)
+        
+        let snapshot = try await query.count.getAggregation(source: .server)
+        return Int(truncating: snapshot.count)
+    }
 }

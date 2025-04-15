@@ -24,7 +24,7 @@ struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol {
     var latitudeDelta: Double?
     var longitudeDelta: Double?
     var likes: Int
-    var mapStyle: ActivityMapStyle?
+    var mapStyle: UserMapStyle?
     var repliesCount: Int?
     
     var locationsId: [String]

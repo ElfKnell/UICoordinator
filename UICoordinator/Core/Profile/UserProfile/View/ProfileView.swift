@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProfileView: View {
     
     let user: User
     @StateObject var viewModel = ProfileViewModel()
     @EnvironmentObject var userFollow: UserFollowers
+    @Environment(\.modelContext) private var modelContext
+    @Binding var isChange: Bool
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -28,23 +31,37 @@ struct ProfileView: View {
                         
                         Spacer()
                         
-                        Button {
-                            Task {
-                                if userFollow.checkFollow(uid: user.id) {
-                                    try await viewModel.unfollow(uId: user.id, followers: userFollow.followers)
+                        if user.id != UserService.shared.currentUser?.id {
+                            
+                            Button {
+                                
+                                if userFollow.isFollowingCurrentUser(uid: user.id) {
+                                    viewModel.unfollow(user: user,
+                                                       followers: userFollow.getFollowersCurrentUser())
                                 } else {
-                                    try await viewModel.follow(user: user)
+                                    viewModel.follow(user: user)
                                 }
+                                isChange.toggle()
                                 dismiss()
+//                                Task {
+//                                    if userFollow.isFollowingCurrentUser(uid: user.id) {
+//                                        await userFollow.removeFollowers(userId: user.id)
+//                                    } else {
+//                                        await userFollow.addFollowers(userId: user.id)
+//                                    }
+//                                    isChange.toggle()
+//                                    dismiss()
+//                                }
+                            } label: {
+                                
+                                Text(userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .frame(maxWidth: .infinity, minHeight: 32)
+                                    .background(.black)
+                                    .cornerRadius(11)
                             }
-                        } label: {
-                            Text(userFollow.checkFollow(uid: user.id) ? "Unfollow" : "Follow")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity, minHeight: 32)
-                                .background(.black)
-                                .cornerRadius(11)
                         }
                         
                         Spacer()
@@ -74,14 +91,14 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.inline)
             .padding(.horizontal)
             .onAppear {
-                Task {
-                    try await userFollow.fetchUserFollows(uid: user.id)
-                }
+                
+                userFollow.fetchFollowCount(userId: user.id)
+                
             }
         }
     }
 }
 
 #Preview {
-    ProfileView(user: DeveloperPreview.user)
+    ProfileView(user: DeveloperPreview.user, isChange: .constant(false))
 }

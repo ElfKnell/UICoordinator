@@ -10,9 +10,13 @@ import SwiftUI
 struct LoginView: View {
     
     @StateObject var loginModel = LoginViewModel()
+    @EnvironmentObject var viewModel: AuthService
+    @Environment(\.horizontalSizeClass) var sizeClass
     
     var body: some View {
+        
         NavigationStack {
+            
             ZStack {
                 
                 BackgroundView()
@@ -20,8 +24,12 @@ struct LoginView: View {
                 VStack {
                     
                     Spacer()
+                    if sizeClass != .compact {
+                        Spacer()
+                    }
                     
                     LogoView()
+                    
                     
                     InputView(text: $loginModel.email, title: "Email", placeholder: "name@example.com")
                         .textInputAutocapitalization(.never)
@@ -39,7 +47,12 @@ struct LoginView: View {
                     
                     Button {
                         Task {
-                            try await loginModel.loginUser()
+                            
+                            await viewModel.login(withEmail: loginModel.email, password: loginModel.password)
+                            
+                            if viewModel.errorMessage != nil {
+                                loginModel.isLoginError = true
+                            }
                         }
                     } label: {
                         
@@ -50,6 +63,9 @@ struct LoginView: View {
                     .opacity(formIsValid ? 1.0 : 0.5)
                     
                     Spacer()
+                    if sizeClass != .compact {
+                        Spacer()
+                    }
                     
                     HStack {
                         
@@ -66,8 +82,20 @@ struct LoginView: View {
                                 .foregroundStyle(.black)
                         }
                     }
+                    
+                    Spacer()
+                  
                 }
+                .alert("Login problems", isPresented: $loginModel.isLoginError) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(viewModel.errorMessage ?? "no error")
+                }
+
             }
+        }
+        .onAppear {
+            print("User not login \(AuthService.shared.userSession?.uid ?? "nil")")
         }
     }
 }

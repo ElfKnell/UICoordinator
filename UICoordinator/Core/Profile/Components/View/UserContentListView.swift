@@ -70,6 +70,7 @@ struct UserContentListView: View {
                                 }
                                 
                             }
+                            
                     }
                     
                     if viewModel.isLoading {
@@ -85,12 +86,11 @@ struct UserContentListView: View {
                             isLandscape = UIDevice.current.orientation.isLandscape
                         }
                         
-                        try await viewModel.fetchUserColloquies()
                     }
                 }
             } else {
                 LazyVStack {
-                    if !viewModel.replies.isEmpty {
+                    if !viewModel.replies.isEmpty || viewModel.isLoading {
                         ForEach(viewModel.replies) { colloquy in
                             RepliesView(colloquy: colloquy)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
@@ -99,7 +99,7 @@ struct UserContentListView: View {
                                     if colloquy == viewModel.colloquies.last {
                                         
                                         Task {
-                                            try await viewModel.fetchNextReplies()
+                                            await viewModel.fetchNextReplies()
                                         }
                                     }
                                 }
@@ -112,7 +112,7 @@ struct UserContentListView: View {
                         }
                     } else {
                         
-                        Text("  \(viewModel.user.fullname) has not yet responded, and we are still waiting for their reply.")
+                        Text("  \(viewModel.user.fullname), has not yet responded, and we are still waiting for their reply.")
                             .font(.title)
                             .padding()
                     }
@@ -125,12 +125,16 @@ struct UserContentListView: View {
                             isLandscape = UIDevice.current.orientation.isLandscape
                         }
                         
-                        try await viewModel.fetchUserReplies()
                     }
                 }
             }
         }
         .padding(.vertical, 8)
+        .onAppear {
+            Task {
+                await viewModel.loadDate()
+            }
+        }
     }
 }
 

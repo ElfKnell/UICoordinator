@@ -13,12 +13,14 @@ class SearchLocationViewModel: ObservableObject {
     
     @Published var searctText: String = ""
     
-    let currentUser = UserService.shared.currentUser
+    var currentUser: User {
+        UserService.shared.currentUser ?? DeveloperPreview.user
+    }
     
     func getLocations(_ cameraPosition: MapCameraPosition) async -> [Location] {
         
         var searchLocations: [Location] = []
-        guard let uid = currentUser?.id else { return [] }
+        let uid = currentUser.id
         let results = await serchPlace(region: cameraPosition.region, searchText: self.searctText)
         
         for result in results {

@@ -10,7 +10,7 @@ import Firebase
 import FirebaseStorage
 
 struct ImageUploader {
-    static func uploadeImage(_ image: UIImage) async throws -> String? {
+    static func uploadeImage(_ image: UIImage) async -> String? {
         guard let imageData = image.jpegData(compressionQuality: 0.25) else { return nil }
         let filename = NSUUID().uuidString
         let storegeRef = Storage.storage().reference(withPath: "profile_images/\(filename)")

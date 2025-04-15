@@ -8,9 +8,11 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-class AuthService {
+
+class AuthService: ObservableObject {
     
     @Published var userSession: FirebaseAuth.User?
+    @Published var errorMessage: String?
     
     static var shared = AuthService()
     
@@ -19,25 +21,28 @@ class AuthService {
     }
     
     @MainActor
-    func login(withEmail email: String, password: String) async throws {
+    func login(withEmail email: String, password: String) async {
+        
         do {
+            
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             self.userSession = result.user
-            try await UserService.shared.fetchCurrentUser()
+            await UserService.shared.fetchCurrentUser()
+           
         } catch {
-            print("DEBUG: Failed to login user with error \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
         }
     }
     
     @MainActor
-    func createUser(withEmail email: String, passsword: String, fullname: String, username: String) async throws {
+    func createUser(withEmail email: String, passsword: String, fullname: String, username: String) async {
         
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: passsword)
             self.userSession = result.user
-            try await uploadUserData(id: result.user.uid, withEmail: email, fullname: fullname, username: username)
+            await UserService.shared.uploadUserData(id: result.user.uid, withEmail: email, fullname: fullname, username: username)
         } catch {
-            print("DEBUGE: Failed to create user with error \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
         }
     }
     
@@ -45,15 +50,7 @@ class AuthService {
     func signOut() {
         try? Auth.auth().signOut()
         self.userSession = nil
-        UserService.shared.reset()
+        UserService.shared.currentUser = nil
     }
     
-    @MainActor
-    private func uploadUserData(id: String, withEmail email: String, fullname: String, username: String) async throws {
-        
-        let user = User(id: id, fullname: fullname, username: username, email: email)
-        guard let userData = try? Firestore.Encoder().encode(user) else { return }
-        try await Firestore.firestore().collection("users").document(id).setData(userData)
-        UserService.shared.currentUser = user
-    }
 }

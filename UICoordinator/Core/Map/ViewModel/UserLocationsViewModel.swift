@@ -25,22 +25,15 @@ class UserLocationsViewModel: ObservableObject {
     
     private var fetchLocations = FetchLocations()
     
-    @AppStorage("styleMap") var styleMap: ActivityMapStyle = .standard
+    @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
+    
     
     func fetchUserForLocations(userId: String) async throws {
         
-        do {
-            
-            fetchLocations = FetchLocations()
-            locations.removeAll()
-            
-            self.locations = await fetchLocations.fetchLocation(userId)
-            
-            try await getCameraPosition()
-            
-        } catch {
-            print("ERROR: \(error.localizedDescription)")
-        }
+        self.locations = await fetchLocations.fetchLocation(userId)
+        
+        getCameraPosition()
+
     }
     
     func fetchMoreLocationsByCurentUser(userId: String) {
@@ -49,7 +42,8 @@ class UserLocationsViewModel: ObservableObject {
         }
     }
     
-    private func getCameraPosition() async throws {
+    private func getCameraPosition() {
+        
         if !locations.isEmpty {
             self.cameraPosition = .region(locations[0].regionCoordinate)
         }

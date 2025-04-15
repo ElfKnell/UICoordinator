@@ -12,6 +12,7 @@ import Firebase
 struct LocationsView: View {
 
     @StateObject var viewModel = LocationViewModel()
+    @EnvironmentObject var authUser: AuthService
     
     var body: some View {
         
@@ -68,7 +69,8 @@ struct LocationsView: View {
                     viewModel.coordinate = mapCameraUpdateContext.camera.centerCoordinate
                     viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
                     
-                    viewModel.fetchMoreLocationsByCurentUser()
+                    viewModel.fetchMoreLocationsByCurentUser(userId: UserService.shared.currentUser?.id)
+                    
                 }
                 
                 SightView()
@@ -78,9 +80,7 @@ struct LocationsView: View {
                     HStack {
                         
                         Button {
-                            Task {
-                                try await viewModel.fetchLocationsByCurrentUser()
-                            }
+                            viewModel.clean()
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath")
                         }
@@ -126,8 +126,7 @@ struct LocationsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 Task {
-                    
-                    try await viewModel.fetchLocationsByCurrentUser()
+                    await viewModel.fetchLocationsByCurrentUser(userId: authUser.userSession?.uid)
                 }
             }
             .onChange(of: viewModel.isSave) {
@@ -168,6 +167,7 @@ struct LocationsView: View {
                     
                     UpdateLocationView(location: $viewModel.mapSelection, isSave: $viewModel.isSave)
                         .presentationDetents([.height(350), .medium])
+                        
                 }
             })
         }

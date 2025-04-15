@@ -12,6 +12,7 @@ struct ActivityRepliesView: View {
     @State private var showColloquyCreate = false
     @StateObject var viewModel = RepliesViewModel()
     @Environment(\.dismiss) var dismiss
+    @State var isChange = false
     
     var body: some View {
         

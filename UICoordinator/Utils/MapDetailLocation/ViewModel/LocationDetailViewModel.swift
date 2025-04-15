@@ -11,7 +11,6 @@ import SwiftUI
 @MainActor
 class LocationDetailViewModel: ObservableObject {
 
-    let currentUser = UserService.shared.currentUser
     private let fetchLocations = FetchLocationForActivity()
 
     func openMap(mapSeliction: Location?) {
@@ -23,7 +22,7 @@ class LocationDetailViewModel: ObservableObject {
     
     func isCurrentUserUpdateLocation(mapSeliction: Location?, activity: Activity?) -> Bool {
         
-        if  activity != nil && activity?.ownerUid != currentUser?.id {
+        if  activity != nil && activity?.ownerUid != UserService.shared.currentUser?.id {
             return false
         }
         return true

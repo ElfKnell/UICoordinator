@@ -24,17 +24,9 @@ class ActivityViewModel: ObservableObject {
         return act
     }
     
-    private func fetchFollowersActivity() async throws {
-        let followersData = UserFollowers()
-        try await followersData.fetchFollowers()
-        let followers = followersData.followers
-        var usersId = [String]()
+    private func fetchFollowersActivity(followersId: [String]) async throws {
         
-        for follower in followers {
-            usersId.append(follower.following)
-        }
-        
-        self.activities = try await ActivityService.fitchActivities(usersId: usersId)
+        self.activities = try await ActivityService.fitchActivities(usersId: followersId)
         
         try await fetchUserForActivity()
         
@@ -50,7 +42,7 @@ class ActivityViewModel: ObservableObject {
     private func fetchUserForActivity() async throws {
         for i in 0 ..< activities.count {
             let activity = activities[i]
-            let userActivity = try await UserService.fetchUser(withUid: activity.ownerUid)
+            let userActivity = await UserService.fetchUser(withUid: activity.ownerUid)
             activities[i].user = userActivity
         }
     }
@@ -68,7 +60,7 @@ class ActivityViewModel: ObservableObject {
         try await fetchUserForActivity()
     }
     
-    func fetchActivity(typeActivity: PropertyTypeActivity) async throws {
+    func fetchActivity(typeActivity: PropertyTypeActivity, followersId: [String]) async throws {
         
         switch typeActivity {
         case .myActivity:
@@ -81,7 +73,7 @@ class ActivityViewModel: ObservableObject {
             }
         case .followerActivity:
             Task {
-                try await fetchFollowersActivity()
+                try await fetchFollowersActivity(followersId: followersId)
             }
         }
     }

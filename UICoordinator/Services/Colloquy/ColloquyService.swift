@@ -5,7 +5,6 @@
 //  Created by Andrii Kyrychenko on 28/02/2024.
 //
 
-//import Firebase
 import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
@@ -17,63 +16,6 @@ struct ColloquyService {
     static func uploadeColloquy(_ colloquy: Colloquy) async throws {
         guard let colloquyData = try? Firestore.Encoder().encode(colloquy) else { return }
         try await Firestore.firestore().collection("colloquies").addDocument(data: colloquyData)
-    }
-    
-    static func fetchColloquies(usersId: [String], pageSize: Int) async throws -> [Colloquy] {
-        var query = Firestore
-            .firestore()
-            .collection("colloquies")
-            .order(by: "timestamp", descending: true)
-            .limit(to: pageSize)
-        
-        if !usersId.isEmpty {
-            query = query.whereField("ownerUid", in: usersId)
-        }
-        
-        if let lastDoc = lastDocument {
-            query = query.start(afterDocument: lastDoc)
-        }
-        
-        let snapshot = try await query.getDocuments()
-        
-        self.lastDocument = snapshot.documents.last
-        
-        return snapshot.documents.compactMap { document in
-            let colloquy = try? document.data(as: Colloquy.self)
-            
-            if colloquy?.ownerColloquy == nil {
-                return colloquy
-            } else {
-                return nil
-            }
-        }
-    }
-    
-    static func fetchUserColloquy(uid: String, pageSize: Int) async throws -> [Colloquy] {
-        var query = Firestore
-            .firestore()
-            .collection("colloquies")
-            .whereField("ownerUid", isEqualTo: uid)
-            .order(by: "timestamp", descending: true)
-            .limit(to: pageSize)
-            
-        if let lastDoc = lastDocument {
-            query = query.start(afterDocument: lastDoc)
-        }
-        
-        let snapshot = try await query.getDocuments()
-        
-        self.lastDocument = snapshot.documents.last
-        
-        return snapshot.documents.compactMap { document in
-            let colloquy = try? document.data(as: Colloquy.self)
-            
-            if colloquy?.ownerColloquy == nil {
-                return colloquy
-            } else {
-                return nil
-            }
-        }
     }
     
     static func fetchColloquy(withCid cid: String) async throws -> Colloquy {
@@ -115,32 +57,5 @@ struct ColloquyService {
             print(error.localizedDescription)
         }
     }
-    
-    static func fetchUserColloquyHasReplies(uid: String, pageSize: Int) async throws -> [Colloquy] {
-        var query = Firestore
-            .firestore()
-            .collection("colloquies")
-            .whereField("repliesCount", isGreaterThan: 0)
-            .whereField("ownerUid", isEqualTo: uid)
-            .order(by: "timestamp", descending: true)
-            .limit(to: pageSize)
-            
-        if let lastDoc = lastDocument {
-            query = query.start(afterDocument: lastDoc)
-        }
-        
-        let snapshot = try await query.getDocuments()
-        
-        self.lastDocument = snapshot.documents.last
-        
-        return snapshot.documents.compactMap { document in
-            let colloquy = try? document.data(as: Colloquy.self)
-            
-            if colloquy?.ownerColloquy == nil {
-                return colloquy
-            } else {
-                return nil
-            }
-        }
-    }
+
 }

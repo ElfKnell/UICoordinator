@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import MapKit
 
-enum ActivityMapStyle: Int, Codable, CaseIterable, Identifiable {
+enum UserMapStyle: Int, Codable, CaseIterable, Identifiable {
     case standard
     case hybrid
     case imagery

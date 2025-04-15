@@ -56,9 +56,9 @@ struct EditActivity: View {
                 Spacer()
                 
                 Picker("Style", selection: $activity.mapStyle) {
-                    Text("Default").tag(nil as ActivityMapStyle?)
-                    ForEach(ActivityMapStyle.allCases) { option in
-                        Text(option.description).tag(option as ActivityMapStyle?)
+                    Text("Default").tag(nil as UserMapStyle?)
+                    ForEach(UserMapStyle.allCases) { option in
+                        Text(option.description).tag(option as UserMapStyle?)
                     }
                 }
                 

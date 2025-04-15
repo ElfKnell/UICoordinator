@@ -8,16 +8,25 @@
 import SwiftUI
 
 struct UICoordinatorRootView: View {
-    @StateObject var viewModel = UICoordinatorRootViewModel()
+    
+    @EnvironmentObject var viewModel: AuthService
+    @EnvironmentObject var userFollow: UserFollowers
     
     var body: some View {
+        
         Group {
             if viewModel.userSession != nil {
                 CoordinatorTabView()
+                    .onAppear {
+                        Task {
+                            await userFollow.setFollowersCurrentUser(userId: viewModel.userSession?.uid)
+                        }
+                    }
             } else {
                 LoginView()
             }
         }
+        
     }
 }
 

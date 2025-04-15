@@ -28,17 +28,22 @@ struct UserCellView: View {
             
             Spacer()
             
-            Text(userFollow.checkFollow(uid: user.id) ? "Unfollow" : "Follow")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .frame(width: 100, height: 32)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color(.systemGray4), lineWidth: 1)
-                }
+            if user.id != UserService.shared.currentUser?.id {
+                
+                Text(userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(width: 100, height: 32)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(.systemGray4), lineWidth: 1)
+                    }
+                
+            }
 
         }
         .padding(.horizontal)
+        
     }
 }
 

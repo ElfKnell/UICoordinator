@@ -36,29 +36,45 @@ struct ProfileHeaderView: View {
                 
                 HStack(spacing: 16) {
                     
-                    if userFollow.userFollowing.count == followToUser.followingUsers.count &&
-                        userFollow.userFollowers.count == followToUser.followerUsers.count {
+                    if user.id == UserService.shared.currentUser?.id {
+                        NavigationLink {
+                            ExploreView(users: followToUser.followerUsers)
+                        } label: {
+                            BottomHeaderView(title: "Following",
+                                             counts: "\(userFollow.countFollowing)",
+                                             imageName: "person.3.fill")
+                        }
                         
                         NavigationLink {
                             ExploreView(users: followToUser.followingUsers)
                         } label: {
-                            BottomHeaderView(title: "Following",
-                                             counts: "\(userFollow.userFollowing.count)",
-                                             imageName: "person.3.fill")
-                        }
-                    
-                        NavigationLink {
-                            ExploreView(users: followToUser.followerUsers)
-                        } label: {
                             BottomHeaderView(title: "Followers",
-                                             counts: "\(userFollow.userFollowers.count)",
+                                             counts: "\(userFollow.countFollowers)",
                                              imageName: "person.crop.circle.fill.badge.checkmark")
                         }
+                    } else {
+                        
+                        BottomHeaderView(title: "Following",
+                                         counts: "\(userFollow.countFollowing)",
+                                         imageName: "person.3.fill")
+                        
+                        BottomHeaderView(title: "Followers",
+                                         counts: "\(userFollow.countFollowers)",
+                                         imageName: "person.crop.circle.fill.badge.checkmark")
                     }
                     
-                    NavigationLink {
-                        ExploreView(users: userLikes.usersLike)
-                    } label: {
+                    if user.id == UserService.shared.currentUser?.id {
+                        
+                        NavigationLink {
+                            ExploreView(users: userLikes.usersLike)
+                        } label: {
+                            BottomHeaderView(title: "Likes",
+                                             counts: "\(userLikes.countLikes)",
+                                             imageName: "heart.fill")
+                        }
+                        
+                    } else {
+                        
                         BottomHeaderView(title: "Likes",
                                          counts: "\(userLikes.countLikes)",
                                          imageName: "heart.fill")
@@ -68,9 +84,9 @@ struct ProfileHeaderView: View {
         }
         .onAppear {
             Task {
-                try await userLikes.fetchLikes(userId: user.id)
+                await userLikes.fetchLikes(userId: user.id)
                 
-                try await followToUser.fetchFollowsToUsers(usersFollowing: userFollow.userFollowing, usersFollower: userFollow.userFollowers)
+                await followToUser.fetchFollowsToUsers(usersFollowing: userFollow.getFollowingsCurrentUserId(), usersFollower: userFollow.getFollowersCurrentUserId())
             }
         }
     }

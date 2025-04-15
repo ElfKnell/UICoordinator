@@ -20,18 +20,12 @@ class FetchLocations: ObservableObject {
 
     }
     
-    func fetchLocation(_ userId: String? = nil) async -> [Location] {
+    func fetchLocation(_ userId: String?) async -> [Location] {
         
-        var id: String
+        guard let id = userId else { return [] }
         
-        if let userId = userId {
-            id = userId
-        } else {
-            guard let userId = AuthService.shared.userSession?.uid else { return [] }
-            id = userId
-        }
-        
-        return await fetchLocationByUser.getLocations(userId: id, pageSize: pageSize)
+        let locations = await fetchLocationByUser.getLocations(userId: id, pageSize: pageSize)
 
+        return locations
     }
 }

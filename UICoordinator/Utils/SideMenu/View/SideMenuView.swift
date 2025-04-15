@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct SideMenuView: View {
+    
     @Binding var isShowind: Bool
     @Binding var selectedTab: Int
-    @EnvironmentObject var viewModel: CurrentUserProfileViewModel
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @State private var selectedOption: OptionModel?
     
-    let widthSideMenu = UIScreen.main.bounds.width / 3 //* 2
-    private var user: User {
-        return viewModel.currentUser ?? DeveloperPreview.user
-    }
+    let widthSideMenu = UIScreen.main.bounds.width / 3
     
     var body: some View {
         ZStack {

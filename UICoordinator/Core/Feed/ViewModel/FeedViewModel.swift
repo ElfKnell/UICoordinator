@@ -6,89 +6,51 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
-import FirebaseFirestoreSwift
+import Firebase
+import SwiftData
 
 @MainActor
 class FeedViewModel: ObservableObject {
     
+    private var localUserServise = LocalUserService()
+    
     @Published var colloquies = [Colloquy]()
     @Published var isLoading = false
     
-    private var fetchLocation = FetchLocationFromFirebase()
-    private var followersId: [String] = []
+    private var fetchColloquiesFromFirebase = FetchColloquiesFirebase()
     private let pageSize = 15
     
-    func fetchColloquies() async throws {
+    func fetchColloquies() async {
         
-        colloquies.removeAll()
         self.isLoading = true
-        ColloquyService.lastDocument = nil
-        try await getFolowers()
-        try await fetchItems()
-        try await fetchUserDataForColloquies()
+        
+        await fetchColloquiesFirebase()
+        
         self.isLoading = false
-
     }
     
-    private func fetchUserDataForColloquies() async throws {
+    
+    func fetchColloquiesRefresh() async {
+        
+        self.isLoading = true
+        
+        fetchColloquiesFromFirebase = FetchColloquiesFirebase()
+        self.colloquies.removeAll()
+        await fetchColloquiesFirebase()
+        
+        self.isLoading = false
+        
+    }
+    
+    private func fetchColloquiesFirebase() async {
         
         do {
-            for i in 0 ..< colloquies.count
-            {
-                let colloquy = colloquies[i]
-                let ownerUid = colloquy.ownerUid
-                let colloquyUser = try await UserService.fetchUser(withUid: ownerUid)
-                
-                colloquies[i].user = colloquyUser
-                
-                guard let lid = colloquy.locationId else { continue }
-                let colloquyLocation = try await getLocation(lid: lid)
-                
-                colloquies[i].location = colloquyLocation
-            }
+            let users = try await localUserServise.fetchUsersbyLocalUsers()
+            let items = await fetchColloquiesFromFirebase.getColloquies(users: users, pageSize: pageSize)
+            self.colloquies.append(contentsOf: items)
         } catch {
-            print("ERROR: \(error.localizedDescription)")
+            print("ERROR fetch colloquies: \(error.localizedDescription)")
         }
-        
-    }
-    
-    private func getLocation(lid: String) async throws -> Location {
-        
-        return try await fetchLocation.fetchLocation(withId: lid)
-        
-    }
-    
-    private func getFolowers() async throws {
-        
-        let followersData = UserFollowers()
-        try await followersData.fetchFollowers()
-        self.followersId = followersData.followers.map { $0.following }
-        guard let currentUserId = UserService.shared.currentUser?.id else { return }
-        self.followersId.append(currentUserId)
-
-    }
-    
-    
-    func fetchColloquiesNext() async throws {
-        
-        do {
-        
-            self.isLoading = true
-            try await fetchItems()
-            try await fetchUserDataForColloquies()
-            self.isLoading = false
-            
-        } catch {
-            print(error.localizedDescription)
-        }
-        
-    }
-    
-    private func fetchItems() async throws {
-        
-        let items = try await ColloquyService.fetchColloquies(usersId: followersId, pageSize: pageSize)
-        self.colloquies.append(contentsOf: items)
 
     }
 }

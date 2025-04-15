@@ -52,7 +52,7 @@ class LikeService {
     }
     
     static func fetchColloquyUserLike(cid: String, collectionName: String) async throws -> String? {
-        guard let currentUserId = UserService.shared.currentUser?.id else { return nil}
+        guard let currentUserId = UserService.shared.currentUser?.id else { return nil }
         
         let snapshot = try await Firestore
             .firestore()

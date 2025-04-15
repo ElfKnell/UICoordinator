@@ -21,17 +21,18 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct UICoordinatorApp: App {
-    @StateObject var currentUserViewModel = CurrentUserProfileViewModel()
+    
     @StateObject var userFollowers = UserFollowers()
+    @StateObject var authUser = AuthService()
     
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-
+    
     var body: some Scene {
         WindowGroup {
             UICoordinatorRootView()
-                .environmentObject(currentUserViewModel)
                 .environmentObject(userFollowers)
+                .environmentObject(authUser)
         }
     }
 }

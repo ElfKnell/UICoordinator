@@ -16,9 +16,9 @@ class FetchLocationsFromFirebase: FetchLocationsProtocol {
     func getLocations(userId: String, pageSize: Int) async -> [Location] {
         
         do {
-            print("start")
+            
             if isDataLoaded { return [] }
-            print("done")
+            
             var query = Firestore
                 .firestore()
                 .collection("locations")

@@ -10,7 +10,7 @@ import SwiftUI
 struct Settings: View {
     
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
-    @AppStorage("styleMap") private var styleMap: ActivityMapStyle = .standard
+    @AppStorage("styleMap") private var styleMap: UserMapStyle = .standard
     @AppStorage("typeMap") private var typeMap: MapTransportType = .automobile
         
     @State private var selectedColorRoute: Color = .blue
@@ -21,7 +21,7 @@ struct Settings: View {
         Form {
             Section(header: Text("Map Style")) {
                 Picker("Style", selection: $styleMap) {
-                    ForEach(ActivityMapStyle.allCases, id: \.self) { style in
+                    ForEach(UserMapStyle.allCases, id: \.self) { style in
                         Text(style.description)
                     }
                 }

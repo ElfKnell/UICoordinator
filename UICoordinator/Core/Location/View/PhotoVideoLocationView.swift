@@ -14,7 +14,7 @@ struct PhotoVideoLocationView: View {
         Group {
             VStack {
                 
-                if ActivityUser.isCurrentUser(location.ownerUid) {
+                if ActivityCurrentUser.isCurrentUser(location.ownerUid) {
                     
                     NavigationLink(destination: PhotosWithChangingView(locationId: location.id)) {
                         Text("Choose Photo")
@@ -34,7 +34,7 @@ struct PhotoVideoLocationView: View {
             }
             
             VStack {
-                NavigationLink(destination: VideoView(locationId: location.id, isAccessible: ActivityUser.isCurrentUser(location.ownerUid))) {
+                NavigationLink(destination: VideoView(locationId: location.id, isAccessible: ActivityCurrentUser.isCurrentUser(location.ownerUid))) {
                     Text("Choose Video")
                 }
                 .navigationBarTitleDisplayMode(.inline)

@@ -19,4 +19,6 @@ class DeveloperPreview {
     static let photo = Photo(locationUid: NSUUID().uuidString, timestamp: Timestamp(), photoURL: "")
     
     static let activity = Activity(ownerUid: user.id, name: "No name", typeActivity: .track, description: "", time: Timestamp(), status: false, likes: 0, locationsId: [])
+    
+    static let userFollovers = UserFollowers()
 }
