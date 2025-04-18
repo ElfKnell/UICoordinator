@@ -8,7 +8,7 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-class UserService: ObservableObject {
+class UserService: ObservableObject, UserServiceProtocol {
     @Published var currentUser: User?
     
     static let shared = UserService()
@@ -73,7 +73,7 @@ class UserService: ObservableObject {
         }
     }
     
-    static func fetchUser(withUid uid: String) async -> User {
+    func fetchUser(withUid uid: String) async -> User {
         
         do {
             let snapshot = try await Firestore.firestore()

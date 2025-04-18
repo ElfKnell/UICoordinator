@@ -19,7 +19,9 @@ struct UICoordinatorRootView: View {
                 CoordinatorTabView()
                     .onAppear {
                         Task {
+                            
                             await userFollow.setFollowersCurrentUser(userId: viewModel.userSession?.uid)
+                            
                         }
                     }
             } else {

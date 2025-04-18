@@ -29,8 +29,13 @@ struct ActivityRepliesView: View {
                         .frame(width: 10)
                     
                     LazyVStack {
-                        ForEach(viewModel.replies) { colloquy in
-                            ColloquyCell(colloquy: colloquy)
+                        ForEach(viewModel.replies) { reply in
+                            ColloquyCell(colloquy: reply)
+                                .onAppear {
+                                    Task {
+                                        await viewModel.fetchReplies(activity.id)
+                                    }
+                                }
                         }
                     }
                 }
@@ -41,12 +46,12 @@ struct ActivityRepliesView: View {
             .padding(.horizontal)
             .onAppear {
                 Task {
-                    try await viewModel.fitchReplies(cid: activity.id)
+                    await viewModel.fetchRepliesRefresh(activity.id)
                 }
             }
             .refreshable {
                 Task {
-                    try await viewModel.fitchReplies(cid: activity.id)
+                    await viewModel.fetchRepliesRefresh(activity.id)
                 }
             }
             .navigationTitle("Replies")

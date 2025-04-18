@@ -43,15 +43,7 @@ struct ProfileView: View {
                                 }
                                 isChange.toggle()
                                 dismiss()
-//                                Task {
-//                                    if userFollow.isFollowingCurrentUser(uid: user.id) {
-//                                        await userFollow.removeFollowers(userId: user.id)
-//                                    } else {
-//                                        await userFollow.addFollowers(userId: user.id)
-//                                    }
-//                                    isChange.toggle()
-//                                    dismiss()
-//                                }
+
                             } label: {
                                 
                                 Text(userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")

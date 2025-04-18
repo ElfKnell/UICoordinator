@@ -11,12 +11,17 @@ class FollowsToUsers: ObservableObject {
     @Published var followingUsers = [User]()
     @Published var followerUsers = [User]()
     
+    private var localUserServise = LocalUserService()
+    
     @MainActor
-    func fetchFollowsToUsers(usersFollowing: [String], usersFollower: [String]) async {
+    func fetchFollowsToUsers(usersFollowing: [String]) async {
         self.followingUsers.removeAll()
         self.followerUsers.removeAll()
         
         self.followingUsers = await UserService.fetchUsersByIds(at: usersFollowing)
-        self.followerUsers = await UserService.fetchUsersByIds(at: usersFollower)
+        var users = await localUserServise.fetchUsersbyLocalUsers()
+        
+        users.removeAll(where: { $0.id == UserService.shared.currentUser?.id })
+        self.followerUsers = users
     }
 }

@@ -8,26 +8,51 @@
 import Foundation
 import SwiftData
 
-class LocalUserService {
+class LocalUserService: LocalUserServiceProtocol {
+    
+    func fetchLocalUsers() async -> [LocalUser] {
+        
+        do {
+            var users = [LocalUser]()
+            
+            try await ensureActorReady()
+            
+            let allUsers = try await userActor?.fetchAllUsers()
+            
+            if let allUsers = allUsers {
+                users = allUsers
+            }
+            return users
+            
+        } catch {
+            print("ERROR fetch users by localUsers: \(error.localizedDescription)")
+            return []
+        }
+    }
     
     private var userActor: UserDataActor?
     
-    func fetchUsersbyLocalUsers() async throws -> [User] {
+    func fetchUsersbyLocalUsers() async -> [User] {
         
-        var users = [User]()
-        guard let currentUser = UserService.shared.currentUser else { return [] }
-        users.append(currentUser)
-        
-        try await ensureActorReady()
-        
-        let allUsers = try await userActor?.fetchAllUsers()
-        
-        if let allUsers = allUsers {
-            for userLocat in allUsers {
-                users.append(userLocat.toFirebaseUser())
+        do {
+            var users = [User]()
+            guard let currentUser = UserService.shared.currentUser else { return [] }
+            users.append(currentUser)
+            
+            try await ensureActorReady()
+            
+            let allUsers = try await userActor?.fetchAllUsers()
+            
+            if let allUsers = allUsers {
+                for userLocat in allUsers {
+                    users.append(userLocat.toFirebaseUser())
+                }
             }
+            return users
+        } catch {
+            print("ERROR fetch users by localUsers: \(error.localizedDescription)")
+            return []
         }
-        return users
     }
     
     private func ensureActorReady() async throws {

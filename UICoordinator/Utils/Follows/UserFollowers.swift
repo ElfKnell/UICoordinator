@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import SwiftData
 
 class UserFollowers: ObservableObject {
     
@@ -17,6 +18,8 @@ class UserFollowers: ObservableObject {
     private var userCurentFollowersId: [String] = []
     private var followersCurrentUsers: [Follow] = []
     
+    private var checkedFollowing = CheckedLocalUsersByFollowing(localUserService: LocalUserService(), userService: UserService(), containerProvider: { try ModelContainer(for: LocalUser.self) } )
+    
     func setFollowersCurrentUser(userId: String?) async {
         
         do {
@@ -25,7 +28,9 @@ class UserFollowers: ObservableObject {
             let followers = try await FollowService.fitchFollow(uid: currentUserId, follow: "follower")
             self.userCurentFollowingId = followers.map({ $0.following })
             self.followersCurrentUsers = followers
+            
             await setFollowingCurrentUser(userId: currentUserId)
+            await checkedFollowing.addLocalUsersByFollowingToStore(follows: self.userCurentFollowingId)
             
         } catch {
             print(error.localizedDescription)
@@ -51,19 +56,6 @@ class UserFollowers: ObservableObject {
         } else {
             return false
         }
-    }
-    
-    func getFollowersCurrentUserId() -> [String] {
-        
-        return self.userCurentFollowingId
-    }
-    
-    func getFollowersIdsCurrentUserWithCurrentUserId() -> [String] {
-        
-        guard let curentUserId = UserService.shared.currentUser?.id else { return [] }
-        var ids = self.userCurentFollowingId
-        ids.append(curentUserId)
-        return ids
     }
     
     func getFollowingsCurrentUserId() -> [String] {

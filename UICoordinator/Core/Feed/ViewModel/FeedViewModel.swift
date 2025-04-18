@@ -44,13 +44,9 @@ class FeedViewModel: ObservableObject {
     
     private func fetchColloquiesFirebase() async {
         
-        do {
-            let users = try await localUserServise.fetchUsersbyLocalUsers()
-            let items = await fetchColloquiesFromFirebase.getColloquies(users: users, pageSize: pageSize)
-            self.colloquies.append(contentsOf: items)
-        } catch {
-            print("ERROR fetch colloquies: \(error.localizedDescription)")
-        }
+        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let items = await fetchColloquiesFromFirebase.getColloquies(users: users, pageSize: pageSize)
+        self.colloquies.append(contentsOf: items)
 
     }
 }

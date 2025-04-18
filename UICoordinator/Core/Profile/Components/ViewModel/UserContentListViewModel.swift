@@ -15,6 +15,7 @@ class UserContentListViewModel: ObservableObject {
     
     private var fetchColloquies = FetchColloquiesFirebase()
     private var fetchReplies = FetchRepliesFirebase()
+    private var localUserServise = LocalUserService()
     private var pageSize = 10
     
     let user: User
@@ -62,7 +63,8 @@ class UserContentListViewModel: ObservableObject {
     @MainActor
     private func fetchReplies() async {
         
-        let items = await fetchReplies.getReplies(userId: user.id, pageSize: pageSize)
+        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let items = await fetchReplies.getReplies(userId: user.id, localUsers: users, pageSize: pageSize)
         self.replies.append(contentsOf: items)
         
     }

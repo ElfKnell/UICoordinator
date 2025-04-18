@@ -14,8 +14,11 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
     private var lastDocument: DocumentSnapshot?
     private var isDataLoaded = false
     private var fetchLocation = FetchLocationFromFirebase()
+    private var lastDocumentColloquy: DocumentSnapshot?
+    private var isDataLoadedColloquy = false
+    private var userService = UserService()
     
-    func getReplies(userId: String, pageSize: Int) async -> [Colloquy] {
+    func getReplies(userId: String, localUsers: [User], pageSize: Int) async -> [Colloquy] {
         
         do {
             
@@ -52,18 +55,7 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
                 }
             }
             
-            for i in 0 ..< replies.count
-            {
-                let colloquy = replies[i]
-                let colloquyUser = await UserService.fetchUser(withUid: colloquy.ownerUid)
-                
-                replies[i].user = colloquyUser
-                
-                guard let locationId = colloquy.locationId else { continue }
-                let colloquyLocation = await fetchLocation.fetchLocation(withId: locationId)
-                
-                replies[i].location = colloquyLocation
-            }
+            replies = await addUserAndLocation(replies: replies, localUsers: localUsers)
             
             return replies
             
@@ -74,5 +66,63 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
         
     }
     
+    func getReplies(colloquyId: String, localUsers: [User], pageSize: Int) async -> [Colloquy] {
+        
+        do {
+            
+            if isDataLoadedColloquy { return [] }
+            
+            var query = Firestore
+                .firestore()
+                .collection("colloquies")
+                .whereField("ownerColloquy", isEqualTo: colloquyId)
+                .order(by: "timestamp", descending: true)
+                .limit(to: pageSize)
+                
+            if let lastDoc = lastDocumentColloquy {
+                query = query.start(afterDocument: lastDoc)
+            }
+            
+            let snapshot = try await query.getDocuments()
+            
+            if snapshot.documents.isEmpty {
+                isDataLoadedColloquy = true
+                return []
+            }
+            
+            self.lastDocumentColloquy = snapshot.documents.last
+            
+            var replies = snapshot.documents.compactMap({ try? $0.data(as: Colloquy.self)})
+            
+            replies = await addUserAndLocation(replies: replies, localUsers: localUsers)
+            
+            return replies
+            
+        } catch {
+            print("ERROR fetching replies: \(error.localizedDescription)")
+            return []
+        }
+    }
     
+    private func addUserAndLocation(replies: [Colloquy], localUsers: [User]) async -> [Colloquy] {
+        
+        var addReplies = replies
+        for i in 0 ..< replies.count
+        {
+            let colloquy = replies[i]
+            var colloquyUser = localUsers.first(where: { $0.id == colloquy.ownerUid })
+            if colloquyUser == nil {
+                colloquyUser = await userService.fetchUser(withUid: colloquy.ownerUid)
+            }
+            
+            addReplies[i].user = colloquyUser
+            
+            guard let locationId = colloquy.locationId else { continue }
+            let colloquyLocation = await fetchLocation.fetchLocation(withId: locationId)
+            
+            addReplies[i].location = colloquyLocation
+        }
+        
+        return addReplies
+    }
 }

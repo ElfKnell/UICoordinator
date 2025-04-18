@@ -11,6 +11,8 @@ import Firebase
 @MainActor
 class ActivityViewModel: ObservableObject {
     @Published var activities = [Activity]()
+    private var localUserServise = LocalUserService()
+    private var userService = UserService()
     
     func createActivity(name: String) async throws -> Activity? {
         guard let currentUserId = UserService.shared.currentUser?.id else { return nil }
@@ -24,26 +26,39 @@ class ActivityViewModel: ObservableObject {
         return act
     }
     
-    private func fetchFollowersActivity(followersId: [String]) async throws {
+    private func fetchFollowersActivity() async throws {
         
+        self.activities = []
+        let users = await localUserServise.fetchUsersbyLocalUsers()
+        var followersId = users.map({ $0.id })
+        followersId.removeAll(where: { $0 == UserService.shared.currentUser?.id })
         self.activities = try await ActivityService.fitchActivities(usersId: followersId)
         
-        try await fetchUserForActivity()
+        try await fetchUserForActivity(users: users)
         
     }
     
     private func fetchMyActivity() async throws {
+        
+        guard let currentUser = UserService.shared.currentUser else { return }
+        self.activities = []
         self.activities = try await ActivityService.fetchCurrentUserActivity()
         
-        try await fetchUserForActivity()
+        for i in activities.indices {
+            activities[i].user = currentUser
+        }
         
     }
     
-    private func fetchUserForActivity() async throws {
+    private func fetchUserForActivity(users: [User]) async throws {
+        
         for i in 0 ..< activities.count {
             let activity = activities[i]
-            let userActivity = await UserService.fetchUser(withUid: activity.ownerUid)
-            activities[i].user = userActivity
+            var activityUser = users.first(where: { $0.id == activity.ownerUid })
+            if activityUser == nil {
+                activityUser = await userService.fetchUser(withUid: activity.ownerUid)
+            }
+            activities[i].user = activityUser
         }
     }
     
@@ -51,16 +66,17 @@ class ActivityViewModel: ObservableObject {
         
         let likes = try await LikeService.fetchLikeCurrentUsers(collectionName: "ActivityLikes")
         self.activities = []
+        let users = await localUserServise.fetchUsersbyLocalUsers()
         
         for like in likes {
             let activity = try await ActivityService.fitchActivity(documentId: like.colloquyId)
             self.activities.append(activity)
         }
         
-        try await fetchUserForActivity()
+        try await fetchUserForActivity(users: users)
     }
     
-    func fetchActivity(typeActivity: PropertyTypeActivity, followersId: [String]) async throws {
+    func fetchActivity(typeActivity: PropertyTypeActivity) async throws {
         
         switch typeActivity {
         case .myActivity:
@@ -73,7 +89,7 @@ class ActivityViewModel: ObservableObject {
             }
         case .followerActivity:
             Task {
-                try await fetchFollowersActivity(followersId: followersId)
+                try await fetchFollowersActivity()
             }
         }
     }

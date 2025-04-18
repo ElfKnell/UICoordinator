@@ -86,7 +86,7 @@ struct ProfileHeaderView: View {
             Task {
                 await userLikes.fetchLikes(userId: user.id)
                 
-                await followToUser.fetchFollowsToUsers(usersFollowing: userFollow.getFollowingsCurrentUserId(), usersFollower: userFollow.getFollowersCurrentUserId())
+                await followToUser.fetchFollowsToUsers(usersFollowing: userFollow.getFollowingsCurrentUserId())
             }
         }
     }

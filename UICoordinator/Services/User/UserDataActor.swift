@@ -18,7 +18,7 @@ actor UserDataActor {
         self.modelContext = ModelContext(container)
     }
 
-    func save(user: LocalUser) throws {
+    private func internalSave(user: LocalUser) async throws {
         modelContext.insert(user)
         try modelContext.save()
     }
@@ -36,5 +36,11 @@ actor UserDataActor {
     func fetchAllUsers() throws -> [LocalUser] {
         let descriptor = FetchDescriptor<LocalUser>()
         return try modelContext.fetch(descriptor)
+    }
+}
+
+extension UserDataActor: UserDataActorProtocol {
+    nonisolated func save(user: LocalUser) async throws {
+        try await self.internalSave(user: user)
     }
 }

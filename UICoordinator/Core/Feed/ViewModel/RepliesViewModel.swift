@@ -11,40 +11,40 @@ import Foundation
 class RepliesViewModel: ObservableObject {
     
     @Published var replies = [Colloquy]()
+    @Published var isLoading = false
     
-    private var fetchLocation = FetchLocationFromFirebase()
+    private var pageSize = 20
+    private var fetchRepliesFirebase = FetchRepliesFirebase()
+    private var localUserServise = LocalUserService()
     
-    func fitchReplies(cid: String) async throws {
-        self.replies = try await ColloquyService.fetchReplies(with: cid)
-        await fetchUserDataForColloquies()
-        await fetchLocationDataForColloquies()
-    }
-    
-    private func fetchUserDataForColloquies() async {
+    func fetchReplies(_ cid: String) async {
         
-        for i in 0 ..< replies.count
-        {
-            let colloquy = replies[i]
-            let ownerUid = colloquy.ownerUid
-            let colloquyUser = await UserService.fetchUser(withUid: ownerUid)
-            
-            replies[i].user = colloquyUser
-        }
-    }
-    
-    private func fetchLocationDataForColloquies() async {
+        self.isLoading = true
         
-        for i in 0 ..< replies.count
-        {
-            let colloquy = replies[i]
-            guard let lid = colloquy.locationId else { continue }
-            let colloquyLocation = await getLocation(lid: lid)
-            
-            replies[i].location = colloquyLocation
-        }
+        await fetchRepliesData(cid: cid)
+        
+        self.isLoading = false
     }
     
-    private func getLocation(lid: String) async -> Location {
-        return await fetchLocation.fetchLocation(withId: lid)
+    
+    func fetchRepliesRefresh(_ cid: String) async {
+        
+        self.isLoading = true
+        
+        fetchRepliesFirebase = FetchRepliesFirebase()
+        self.replies.removeAll()
+        await fetchRepliesData(cid: cid)
+        
+        self.isLoading = false
+        
     }
+    
+    func fetchRepliesData(cid: String) async {
+        
+        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let items = await fetchRepliesFirebase.getReplies(colloquyId: cid, localUsers: users, pageSize: pageSize)
+        self.replies.append(contentsOf: items)
+
+    }
+
 }

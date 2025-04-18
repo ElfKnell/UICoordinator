@@ -59,7 +59,7 @@ struct ActivityContentListView: View {
                     }
                     .onAppear {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .followerActivity, followersId: followUser.getFollowersCurrentUserId())
+                            try await viewModel.fetchActivity(typeActivity: .followerActivity)
                         }
                     }
                     
@@ -76,12 +76,12 @@ struct ActivityContentListView: View {
                     }
                     .onAppear {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .myActivity, followersId: followUser.getFollowersCurrentUserId())
+                            try await viewModel.fetchActivity(typeActivity: .myActivity)
                         }
                     }
                     .onChange(of: isUpdate) {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .myActivity, followersId: followUser.getFollowersCurrentUserId())
+                            try await viewModel.fetchActivity(typeActivity: .myActivity)
                         }
                     }
                     
@@ -98,12 +98,12 @@ struct ActivityContentListView: View {
                     }
                     .onAppear {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .likeActivity, followersId: followUser.getFollowersCurrentUserId())
+                            try await viewModel.fetchActivity(typeActivity: .likeActivity)
                         }
                     }
                     .onChange(of: isUpdate) {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .likeActivity, followersId: followUser.getFollowersCurrentUserId())
+                            try await viewModel.fetchActivity(typeActivity: .likeActivity)
                         }
                     }
                 }

@@ -9,5 +9,7 @@ import Foundation
 
 protocol FetchRepliesProtocol {
     
-    func getReplies(userId: String, pageSize: Int) async -> [Colloquy]
+    func getReplies(userId: String, localUsers: [User], pageSize: Int) async -> [Colloquy]
+    
+    func getReplies(colloquyId: String, localUsers: [User], pageSize: Int) async -> [Colloquy]
 }
