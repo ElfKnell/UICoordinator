@@ -10,9 +10,14 @@ import SwiftUI
 struct ActivityRepliesView: View {
     let activity: Activity
     @State private var showColloquyCreate = false
-    @StateObject var viewModel = RepliesViewModel()
+    @StateObject var viewModel: RepliesViewModel
     @Environment(\.dismiss) var dismiss
     @State var isChange = false
+    
+    init(activity: Activity) {
+        self.activity = activity
+        _viewModel = StateObject(wrappedValue: RepliesViewModel(activity.id))
+    }
     
     var body: some View {
         
@@ -44,11 +49,6 @@ struct ActivityRepliesView: View {
                 
             }
             .padding(.horizontal)
-            .onAppear {
-                Task {
-                    await viewModel.fetchRepliesRefresh(activity.id)
-                }
-            }
             .refreshable {
                 Task {
                     await viewModel.fetchRepliesRefresh(activity.id)

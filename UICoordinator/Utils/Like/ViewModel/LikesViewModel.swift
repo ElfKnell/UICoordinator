@@ -32,7 +32,7 @@ class LikesViewModel: ObservableObject {
     private func createLike(userId: String, colloquyId: String) async {
         
         do {
-            guard let currentUserId = UserService.shared.currentUser?.id else { return }
+            guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
             
             let like = Like(ownerUid: currentUserId, userId: userId, colloquyId: colloquyId, time: Timestamp())
             

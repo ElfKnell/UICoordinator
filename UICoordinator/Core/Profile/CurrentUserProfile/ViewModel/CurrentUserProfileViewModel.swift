@@ -9,19 +9,17 @@ import Combine
 
 class CurrentUserProfileViewModel: ObservableObject {
     
-    @Published var currentUser: User?
+    @Published var isLoaded = false
+    @Published var isSaved = false
+    @Published var showEditProfile = false
     
-    private var cancellables = Set<AnyCancellable>()
-    
-    init() {
-        setupSubscribees()
-    }
-    
-    func setupSubscribees() {
+    func updateUser() async -> User {
         
-        UserService.shared.$currentUser.sink { [weak self] user in
-            self?.currentUser = user
-        }.store(in: &cancellables)
+        await CurrentUserService.sharedCurrent.updateCurrentUser()
+        guard let currentUser = CurrentUserService.sharedCurrent.currentUser else {
+            return DeveloperPreview.user
+        }
+        return currentUser
         
     }
 }

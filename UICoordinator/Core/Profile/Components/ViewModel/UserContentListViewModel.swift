@@ -66,7 +66,7 @@ class UserContentListViewModel: ObservableObject {
         let users = await localUserServise.fetchUsersbyLocalUsers()
         let items = await fetchReplies.getReplies(userId: user.id, localUsers: users, pageSize: pageSize)
         self.replies.append(contentsOf: items)
-        
+    
     }
 
     @MainActor

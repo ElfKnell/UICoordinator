@@ -37,6 +37,27 @@ actor UserDataActor {
         let descriptor = FetchDescriptor<LocalUser>()
         return try modelContext.fetch(descriptor)
     }
+    
+    func update(user updatedUser: LocalUser) {
+        
+        do {
+            
+            guard let existingUser = try findUserById(updatedUser.id) else {
+                throw NSError(domain: "UserDataActor", code: 404,
+                              userInfo: [NSLocalizedDescriptionKey: "User not found"])
+            }
+            
+            existingUser.username = updatedUser.username
+            existingUser.bio = updatedUser.bio
+            existingUser.link = updatedUser.link
+            existingUser.profileImageURL = updatedUser.profileImageURL
+            
+            try modelContext.save()
+            
+        } catch {
+            print("ERROR UPDATE LOCAL USER: \(error.localizedDescription)")
+        }
+    }
 }
 
 extension UserDataActor: UserDataActorProtocol {

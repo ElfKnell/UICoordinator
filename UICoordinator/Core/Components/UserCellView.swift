@@ -28,7 +28,7 @@ struct UserCellView: View {
             
             Spacer()
             
-            if user.id != UserService.shared.currentUser?.id {
+            if user.id != CurrentUserService.sharedCurrent.currentUser?.id {
                 
                 Text(userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
                     .font(.subheadline)

@@ -17,6 +17,7 @@ struct EditProfileView: View {
     @State private var isPrivateProfile = false
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel = EditProfileViewModel()
+    @Binding var isSaved: Bool
     
     var body: some View {
         NavigationStack {
@@ -119,7 +120,8 @@ struct EditProfileView: View {
                     
                     Button("Save") {
                         Task {
-                            try await viewModel.updateUserData(nickname: nickname, bio: bio, link: link)
+                            await viewModel.updateUserData(user: user, nickname: nickname, bio: bio, link: link)
+                            isSaved.toggle()
                             dismiss()
                         }
                     }
@@ -133,5 +135,5 @@ struct EditProfileView: View {
 }
 
 #Preview {
-    EditProfileView(user: DeveloperPreview.user)
+    EditProfileView(user: DeveloperPreview.user, isSaved: .constant(false))
 }

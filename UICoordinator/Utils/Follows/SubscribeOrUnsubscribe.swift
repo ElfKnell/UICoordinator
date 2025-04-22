@@ -14,7 +14,7 @@ class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtool {
         
         do {
             
-            guard let currentUserId = UserService.shared.currentUser?.id else { return }
+            guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
             let follow = Follow(follower: currentUserId, following: user.id, updateTime: Timestamp())
             
             try await FollowService.uploadeFollow(follow)

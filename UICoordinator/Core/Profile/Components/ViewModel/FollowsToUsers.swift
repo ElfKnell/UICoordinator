@@ -21,7 +21,7 @@ class FollowsToUsers: ObservableObject {
         self.followingUsers = await UserService.fetchUsersByIds(at: usersFollowing)
         var users = await localUserServise.fetchUsersbyLocalUsers()
         
-        users.removeAll(where: { $0.id == UserService.shared.currentUser?.id })
+        users.removeAll(where: { $0.id == CurrentUserService.sharedCurrent.currentUser?.id })
         self.followerUsers = users
     }
 }

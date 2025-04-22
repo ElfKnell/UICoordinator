@@ -13,4 +13,5 @@ class LoginViewModel: ObservableObject {
     @Published var password = ""
     @Published var isLoginError = false
     
+    @Published var isCreatedUser = false
 }

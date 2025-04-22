@@ -36,7 +36,7 @@ struct ProfileHeaderView: View {
                 
                 HStack(spacing: 16) {
                     
-                    if user.id == UserService.shared.currentUser?.id {
+                    if user.id == CurrentUserService.sharedCurrent.currentUser?.id {
                         NavigationLink {
                             ExploreView(users: followToUser.followerUsers)
                         } label: {
@@ -63,7 +63,7 @@ struct ProfileHeaderView: View {
                                          imageName: "person.crop.circle.fill.badge.checkmark")
                     }
                     
-                    if user.id == UserService.shared.currentUser?.id {
+                    if user.id == CurrentUserService.sharedCurrent.currentUser?.id {
                         
                         NavigationLink {
                             ExploreView(users: userLikes.usersLike)

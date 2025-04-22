@@ -14,7 +14,7 @@ class SearchLocationViewModel: ObservableObject {
     @Published var searctText: String = ""
     
     var currentUser: User {
-        UserService.shared.currentUser ?? DeveloperPreview.user
+        CurrentUserService.sharedCurrent.currentUser ?? DeveloperPreview.user
     }
     
     func getLocations(_ cameraPosition: MapCameraPosition) async -> [Location] {

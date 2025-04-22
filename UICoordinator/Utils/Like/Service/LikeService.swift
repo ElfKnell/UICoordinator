@@ -27,7 +27,7 @@ class LikeService {
     }
     
     static func fetchCurrentUsersLike(collectionName: String) async throws -> [Like] {
-        guard let currentUserId = UserService.shared.currentUser?.id else { return [] }
+        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return [] }
         
         let snapshot = try await Firestore
             .firestore()
@@ -52,7 +52,7 @@ class LikeService {
     }
     
     static func fetchColloquyUserLike(cid: String, collectionName: String) async throws -> String? {
-        guard let currentUserId = UserService.shared.currentUser?.id else { return nil }
+        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return nil }
         
         let snapshot = try await Firestore
             .firestore()
@@ -74,7 +74,7 @@ class LikeService {
     }
     
     static func fetchLikeCurrentUsers(collectionName: String) async throws -> [Like] {
-        guard let currentUserId = UserService.shared.currentUser?.id else { return [] }
+        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return [] }
         
         let snapshot = try await Firestore
             .firestore()

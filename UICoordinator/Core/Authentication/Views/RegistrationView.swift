@@ -12,7 +12,7 @@ struct RegistrationView: View {
     @StateObject var registrationModel = RegistrationViewModel()
     @EnvironmentObject var viewModel: AuthService
     @Environment(\.horizontalSizeClass) var sizeClass
-   
+    @Binding var isCreateUser: Bool
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -73,6 +73,9 @@ struct RegistrationView: View {
                             
                             if viewModel.errorMessage != nil {
                                 registrationModel.isCreateUserError = true
+                            } else {
+                                isCreateUser = true
+                                dismiss()
                             }
                         }
                         
@@ -118,5 +121,5 @@ struct RegistrationView: View {
 }
 
 #Preview {
-    RegistrationView()
+    RegistrationView(isCreateUser: .constant(false))
 }

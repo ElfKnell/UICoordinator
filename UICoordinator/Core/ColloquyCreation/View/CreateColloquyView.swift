@@ -18,7 +18,7 @@ struct CreateColloquyView: View {
     @State private var isUploadingError = false
     
     private var user: User? {
-        return UserService.shared.currentUser
+        return CurrentUserService.sharedCurrent.currentUser
     }
     
     var body: some View {

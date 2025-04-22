@@ -10,6 +10,8 @@ import SwiftData
 
 class LocalUserService: LocalUserServiceProtocol {
     
+    private var userActor: UserDataActor?
+    
     func fetchLocalUsers() async -> [LocalUser] {
         
         do {
@@ -30,13 +32,11 @@ class LocalUserService: LocalUserServiceProtocol {
         }
     }
     
-    private var userActor: UserDataActor?
-    
     func fetchUsersbyLocalUsers() async -> [User] {
         
         do {
             var users = [User]()
-            guard let currentUser = UserService.shared.currentUser else { return [] }
+            guard let currentUser = CurrentUserService.sharedCurrent.currentUser else { return [] }
             users.append(currentUser)
             
             try await ensureActorReady()

@@ -30,6 +30,14 @@ struct LoginView: View {
                     
                     LogoView()
                     
+                    if loginModel.isCreatedUser {
+                        HStack {
+                            Text("Please sign in")
+                                .foregroundColor(.green)
+                                .font(.title2)
+                        }
+                        .padding()
+                    }
                     
                     InputView(text: $loginModel.email, title: "Email", placeholder: "name@example.com")
                         .textInputAutocapitalization(.never)
@@ -49,6 +57,8 @@ struct LoginView: View {
                         Task {
                             
                             await viewModel.login(withEmail: loginModel.email, password: loginModel.password)
+                            
+                            loginModel.isCreatedUser = false
                             
                             if viewModel.errorMessage != nil {
                                 loginModel.isLoginError = true
@@ -73,7 +83,7 @@ struct LoginView: View {
                             .font(.system(size: 20, design: .serif))
                         
                         NavigationLink {
-                            RegistrationView()
+                            RegistrationView(isCreateUser: $loginModel.isCreatedUser)
                                 .navigationBarBackButtonHidden(true)
                         } label: {
                             Text("Sing up")
@@ -93,9 +103,6 @@ struct LoginView: View {
                 }
 
             }
-        }
-        .onAppear {
-            print("User not login \(AuthService.shared.userSession?.uid ?? "nil")")
         }
     }
 }

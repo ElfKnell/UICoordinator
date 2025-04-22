@@ -31,7 +31,7 @@ struct ProfileView: View {
                         
                         Spacer()
                         
-                        if user.id != UserService.shared.currentUser?.id {
+                        if user.id != CurrentUserService.sharedCurrent.currentUser?.id {
                             
                             Button {
                                 

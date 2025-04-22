@@ -15,7 +15,7 @@ class ActivityViewModel: ObservableObject {
     private var userService = UserService()
     
     func createActivity(name: String) async throws -> Activity? {
-        guard let currentUserId = UserService.shared.currentUser?.id else { return nil }
+        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return nil }
         
         let activityNew = Activity(ownerUid: currentUserId, name: name, typeActivity: .travel, description: "", time: Timestamp(), status: true, likes: 0, locationsId: [])
         
@@ -31,7 +31,7 @@ class ActivityViewModel: ObservableObject {
         self.activities = []
         let users = await localUserServise.fetchUsersbyLocalUsers()
         var followersId = users.map({ $0.id })
-        followersId.removeAll(where: { $0 == UserService.shared.currentUser?.id })
+        followersId.removeAll(where: { $0 == CurrentUserService.sharedCurrent.currentUser?.id })
         self.activities = try await ActivityService.fitchActivities(usersId: followersId)
         
         try await fetchUserForActivity(users: users)
@@ -40,7 +40,7 @@ class ActivityViewModel: ObservableObject {
     
     private func fetchMyActivity() async throws {
         
-        guard let currentUser = UserService.shared.currentUser else { return }
+        guard let currentUser = CurrentUserService.sharedCurrent.currentUser else { return }
         self.activities = []
         self.activities = try await ActivityService.fetchCurrentUserActivity()
         

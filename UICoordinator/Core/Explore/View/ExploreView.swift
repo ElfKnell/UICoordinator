@@ -51,7 +51,7 @@ struct ExploreView: View {
             .onChange(of: isChange) {
                 Task {
                     isLoading = true
-                    await userFollow.setFollowersCurrentUser(userId: UserService.shared.currentUser?.id)
+                    await userFollow.setFollowersCurrentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
                     isLoading = false
                 }
             }
@@ -62,7 +62,7 @@ struct ExploreView: View {
                 Button {
                     Task {
                         isLoading = true
-                        await userFollow.setFollowersCurrentUser(userId: UserService.shared.currentUser?.id)
+                        await userFollow.setFollowersCurrentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
                         searchText = ""
                         isLoading = false
                     }

@@ -10,9 +10,15 @@ import SwiftUI
 struct RepliesView: View {
     
     let colloquy: Colloquy
-    @StateObject var viewModel = RepliesViewModel()
+    @StateObject var viewModel: RepliesViewModel
+    
+    init(colloquy: Colloquy) {
+        self.colloquy = colloquy
+        _viewModel = StateObject(wrappedValue: RepliesViewModel(colloquy.id))
+    }
     
     var body: some View {
+        
         ScrollView(showsIndicators: false) {
             
             ReplyCreateView(colloquy: colloquy)
@@ -39,18 +45,11 @@ struct RepliesView: View {
             
         }
         .padding(.horizontal)
-        .onAppear {
-            Task {
-                await viewModel.fetchRepliesRefresh(colloquy.id)
-            }
-        }
         .refreshable {
             Task {
                 await viewModel.fetchRepliesRefresh(colloquy.id)
             }
         }
-        .navigationTitle("Replies")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

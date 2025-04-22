@@ -69,7 +69,7 @@ struct LocationsView: View {
                     viewModel.coordinate = mapCameraUpdateContext.camera.centerCoordinate
                     viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
                     
-                    viewModel.fetchMoreLocationsByCurentUser(userId: UserService.shared.currentUser?.id)
+                    viewModel.fetchMoreLocationsByCurentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
                     
                 }
                 

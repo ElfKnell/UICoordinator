@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SideMenuHeaderView: View {
     
-    private var user: User? = UserService.shared.currentUser
+    private var user: User? = CurrentUserService.sharedCurrent.currentUser
     
     var body: some View {
         HStack {

@@ -17,6 +17,12 @@ class RepliesViewModel: ObservableObject {
     private var fetchRepliesFirebase = FetchRepliesFirebase()
     private var localUserServise = LocalUserService()
     
+    init(_ cid: String) {
+        Task {
+            await fetchRepliesRefresh(cid)
+        }
+    }
+    
     func fetchReplies(_ cid: String) async {
         
         self.isLoading = true

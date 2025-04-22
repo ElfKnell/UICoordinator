@@ -22,7 +22,7 @@ struct ColloquyCell: View {
                 
                 NavigationLink {
                     
-                    if UserService.shared.currentUser == colloquy.user {
+                    if CurrentUserService.sharedCurrent.currentUser == colloquy.user {
                         CurrentUserProfileView()
                     } else {
                         ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
@@ -38,7 +38,7 @@ struct ColloquyCell: View {
                         
                         NavigationLink {
                             
-                            if UserService.shared.currentUser == colloquy.user {
+                            if CurrentUserService.sharedCurrent.currentUser == colloquy.user {
                                 CurrentUserProfileView()
                             } else {
                                 ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
@@ -139,7 +139,7 @@ struct ColloquyCell: View {
             
             Task {
                 
-                await userFollow.setFollowersCurrentUser(userId: UserService.shared.currentUser?.id)
+                await userFollow.setFollowersCurrentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
                 
             }
             

@@ -61,7 +61,7 @@ class LocationViewModel: ObservableObject {
     
     func addLocation() async {
         
-        guard let userId = UserService.shared.currentUser?.id else { return }
+        guard let userId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
         
         let location = addLocation.getLocation(userId: userId, coordinate: coordinate)
         

@@ -39,7 +39,7 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
             let snapshot = try await query.getDocuments()
             
             if snapshot.documents.isEmpty {
-                isDataLoaded = true  // Set flag to true if no data is returned
+                isDataLoaded = true
                 return []
             }
             
