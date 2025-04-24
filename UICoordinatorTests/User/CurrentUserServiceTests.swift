@@ -11,20 +11,18 @@ final class CurrentUserServiceTests: XCTestCase {
 
     func testFetchCurrentUser_setsCurrentUserSuccessfully() async throws {
             // Arrange
-        let mockUserData: [String: Any] = [
-                "id": "user_123",
-                "fullname": "Test Name",
-                "username": "TestUser",
-                "email": "exaple@example.com"
-        ]
+        let mockUserData: User = User(
+                id: "user_123",
+                fullname: "Test Name",
+                username: "TestUser",
+                email: "exaple@example.com"
+        )
             
-        let mockSnapshot = MockDocumentSnapshot(mockData: mockUserData)
-        
         let mockFirestore = MockFirestoreService()
-        mockFirestore.returnedSnapshot = mockSnapshot
+        mockFirestore.mockUser = mockUserData
 
-        let service = CurrentUserService.sharedCurrent
-        service.firestoreService = mockFirestore
+
+        let service = CurrentUserService(firestoreService: mockFirestore)
 
             // Act
         await service.fetchCurrentUser(userId: "user_123")
@@ -34,7 +32,7 @@ final class CurrentUserServiceTests: XCTestCase {
         XCTAssertEqual(service.currentUser?.fullname, "Test Name")
         XCTAssertEqual(service.currentUser?.username, "TestUser")
         XCTAssertEqual(service.currentUser?.email, "exaple@example.com")
-        XCTAssertNoThrow(try mockSnapshot.decodeData(as: User.self))
+        
     }
 
     func testFetchCurrentUser_whenNilUserId_doesNotCrash() async {

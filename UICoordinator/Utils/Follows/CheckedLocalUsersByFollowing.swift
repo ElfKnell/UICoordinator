@@ -34,8 +34,9 @@ class CheckedLocalUsersByFollowing: CheckedLocalUsersByFollowingProtocol {
             
             for follower in follows {
                 if !users.contains(where: { $0.id == follower }) {
+                    
                     let user = await userService.fetchUser(withUid: follower)
-                    print(user)
+                    
                     try await userActor?.save(user: user.toLocalUser())
                 }
             }

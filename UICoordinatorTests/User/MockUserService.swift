@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 
 final class MockUserService: UserServiceProtocol {
     
@@ -14,6 +15,8 @@ final class MockUserService: UserServiceProtocol {
     func fetchUser(withUid uid: String) async -> User {
         User(id: uid, fullname: "MockUser \(uid)", username: "MockUser \(uid)", email: "mock@user.com")
     }
+    
+    func deleteUser() async {}
 }
 
 final class MockCurrentUserService: CurrentUserServiceProtocol {

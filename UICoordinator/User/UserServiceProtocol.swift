@@ -8,7 +8,9 @@
 import Foundation
 
 protocol UserServiceProtocol {
-    //var currentUser: User? { get }
     
     func fetchUser(withUid uid: String) async -> User
+    
+    func deleteUser() async
+    
 }

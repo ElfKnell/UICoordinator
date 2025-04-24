@@ -5,32 +5,47 @@
 //  Created by Andrii Kyrychenko on 19/04/2025.
 //
 
+import Foundation
 import Firebase
 import Testing
 
 final class MockDocumentSnapshot: DocumentSnapshotProtocol {
-    let mockData: [String: Any]
-    
-    init(mockData: [String: Any]) {
-        self.mockData = mockData
+    private let user: User
+
+    init(user: User) {
+        self.user = user
     }
-    
-    func decodeData<T: Decodable>(as type: T.Type) throws -> T {
-        let data = try JSONSerialization.data(withJSONObject: mockData)
-        return try JSONDecoder().decode(T.self, from: data)
+
+    func decodeData<T>(as type: T.Type) throws -> T where T : Decodable {
+        guard let decoded = user as? T else {
+            throw NSError(domain: "DecodeError", code: -1)
+        }
+        return decoded
     }
 }
 
 // MARK: - Mock Firestore Service
 
 final class MockFirestoreService: FirestoreServiceProtocol {
-    var returnedSnapshot: DocumentSnapshotProtocol?
+    
+    var shouldThrowError = false
+    var mockUser: User?
+    
+    func deleteUserDocument() async throws {
+        
+        if shouldThrowError {
+            throw UserError.userNotFound
+        }
+    }
+    
+    
 
     func getUserDocument(uid: String) async throws -> DocumentSnapshotProtocol {
-        guard let snapshot = returnedSnapshot else {
-            throw NSError(domain: "MockFirestoreService", code: 0, userInfo: [NSLocalizedDescriptionKey: "No snapshot set"])
+            if shouldThrowError {
+                throw UserError.userNotFound
+            }
+
+            return MockDocumentSnapshot(user: mockUser ?? DeveloperPreview.user)
         }
-        return snapshot
-    }
 }
 

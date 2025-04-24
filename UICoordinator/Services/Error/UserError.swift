@@ -7,13 +7,16 @@
 
 import Foundation
 
-enum LikeError: Error {
+enum UserError: Error {
     case invalidType
+    case userNotFound
     
     var description: String {
         switch self {
         case .invalidType:
             return "Invalide type"
+        case .userNotFound:
+            return "Current user not found"
         }
     }
 }

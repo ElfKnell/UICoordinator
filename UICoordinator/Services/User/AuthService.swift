@@ -35,8 +35,11 @@ class AuthService: ObservableObject {
         
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: passsword)
-            self.userSession = result.user
-            await createUser.uploadUserData(id: result.user.uid, withEmail: email, fullname: fullname, username: username)
+            
+            await createUser.uploadUserData(id: result.user.uid,
+                                            withEmail: email,
+                                            fullname: fullname,
+                                            username: username)
         } catch {
             errorMessage = error.localizedDescription
         }

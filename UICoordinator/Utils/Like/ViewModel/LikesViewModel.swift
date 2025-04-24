@@ -75,10 +75,10 @@ class LikesViewModel: ObservableObject {
             } else if let activity = object as? Activity {
                 try await ActivityService.updateLikeCount(activityId: activity.id, countLikes: activity.likes + 1)
             } else {
-                throw LikeError.invalidType
+                throw UserError.invalidType
             }
-        } catch LikeError.invalidType {
-            print("ERROR: \(LikeError.invalidType.description)")
+        } catch UserError.invalidType {
+            print("ERROR: \(UserError.invalidType.description)")
         } catch {
             print("ERROR: \(error.localizedDescription)")
         }
@@ -93,10 +93,10 @@ class LikesViewModel: ObservableObject {
                 let countLike = activity.likes - 1 > 0 ? activity.likes - 1 : 0
                 try await ActivityService.updateLikeCount(activityId: activity.id, countLikes: countLike)
             } else {
-                throw LikeError.invalidType
+                throw UserError.invalidType
             }
-        } catch LikeError.invalidType {
-            print("ERROR: \(LikeError.invalidType.description)")
+        } catch UserError.invalidType {
+            print("ERROR: \(UserError.invalidType.description)")
         } catch {
             print("ERROR SUBTRACT LIKE: \(error.localizedDescription)")
         }
