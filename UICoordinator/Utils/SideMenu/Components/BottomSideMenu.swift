@@ -11,14 +11,18 @@ struct BottomSideMenu: View {
     
     let widthButton: CGFloat
     @State private var isLoggedOut = false
-    @EnvironmentObject var viewModel: AuthService
+    @EnvironmentObject var container: DIContainer
+    var userServise = UserService()
     
     var body: some View {
         NavigationStack {
             VStack {
                 
                 Button {
-                    viewModel.signOut()
+                    Task {
+                        await container.userFollow.clearLocalUsers()
+                        container.authService.signOut()
+                    }
                 } label: {
                     Label("Log Out", systemImage: "lock.shield.fill")
                         .foregroundStyle(.red)
@@ -30,17 +34,6 @@ struct BottomSideMenu: View {
                         .padding(.bottom)
                 }
                 
-                Button {
-                    
-                } label: {
-                    Label("Delete", systemImage: "trash.fill")
-                        .foregroundStyle(.white)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .frame(width: widthButton, height: 44)
-                        .background(.red)
-                        .modifier(CornerRadiusModifier())
-                }
             }
             .navigationDestination(isPresented: $isLoggedOut) {
                 LoginView()

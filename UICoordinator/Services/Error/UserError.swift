@@ -10,6 +10,7 @@ import Foundation
 enum UserError: Error {
     case invalidType
     case userNotFound
+    case userIdNil
     
     var description: String {
         switch self {
@@ -17,6 +18,8 @@ enum UserError: Error {
             return "Invalide type"
         case .userNotFound:
             return "Current user not found"
+        case .userIdNil:
+            return "Current user id is nil"
         }
     }
 }

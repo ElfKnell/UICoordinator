@@ -16,9 +16,9 @@ class ConfirmationLocationViewModel: LocationService, ObservableObject {
     @Published var address = ""
     
     @MainActor
-    func uploadLocationWithCoordinate(coordinate: CLLocationCoordinate2D, activityId: String?) async throws {
+    func uploadLocationWithCoordinate(coordinate: CLLocationCoordinate2D, activityId: String?, userUid: String?) async throws {
         var corectAddress: String?
-        guard let userUid = Auth.auth().currentUser?.uid else { return }
+        guard let userUid else { return }
         if self.address != "" {
             corectAddress = address
         }

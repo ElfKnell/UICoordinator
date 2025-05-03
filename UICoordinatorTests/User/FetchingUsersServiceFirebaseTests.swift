@@ -12,8 +12,8 @@ final class FetchingUsersServiceFirebaseTests: XCTestCase {
     func testFetchUsers_excludesCurrentUser() async {
         let mock = MockFirestoreUserRepository()
         mock.allUsers = [
-            User(id: "1", fullname: "John", username: "john", email: "john@test.com"),
-            User(id: "2", fullname: "Jane", username: "jane", email: "jane@test.com")
+            User(id: "1", fullname: "John", username: "john", email: "john@test.com", isDelete: false),
+            User(id: "2", fullname: "Jane", username: "jane", email: "jane@test.com", isDelete: false)
         ]
             
         let service = FetchingUsersServiceFirebase(repository: mock)
@@ -26,8 +26,8 @@ final class FetchingUsersServiceFirebaseTests: XCTestCase {
     func testFetchUsersByIds_returnsCorrectUsers() async {
         let mock = MockFirestoreUserRepository()
         mock.userIdsToReturn = [
-            "1": User(id: "1", fullname: "Alice", username: "alice", email: "alice@test.com"),
-            "2": User(id: "2", fullname: "Bob", username: "bob", email: "bob@test.com")
+            "1": User(id: "1", fullname: "Alice", username: "alice", email: "alice@test.com", isDelete: false),
+            "2": User(id: "2", fullname: "Bob", username: "bob", email: "bob@test.com", isDelete: false)
         ]
             
         let service = FetchingUsersServiceFirebase(repository: mock)

@@ -18,10 +18,11 @@ class LikesViewModel: ObservableObject {
         self.collectionName = collectionName
     }
     
-    func doLike<T: Identifiable>(userId: String, likeToObject:T) async {
+    func doLike<T: Identifiable>(userId: String, currentUserId: String?,  likeToObject:T) async {
         
         if self.likeId == nil {
-            await createLike( userId: userId, colloquyId: likeToObject.id as! String)
+            guard let currentUserId else { return }
+            await createLike( userId: userId, currentUserId: currentUserId, colloquyId: likeToObject.id as! String)
             await addLikeToObject(likeToObject)
         } else {
             await deleteLike()
@@ -29,15 +30,14 @@ class LikesViewModel: ObservableObject {
         }
     }
     
-    private func createLike(userId: String, colloquyId: String) async {
+    private func createLike(userId: String, currentUserId: String, colloquyId: String) async {
         
         do {
-            guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
             
             let like = Like(ownerUid: currentUserId, userId: userId, colloquyId: colloquyId, time: Timestamp())
             
             try await LikeService.uploadLike(like, collectionName: collectionName)
-            await isLike(cid: colloquyId)
+            await isLike(cid: colloquyId, currentUserId: currentUserId)
         } catch {
             print("ERROR CREATE LIKE: \(error.localizedDescription)")
         }
@@ -45,10 +45,10 @@ class LikesViewModel: ObservableObject {
     }
     
     @MainActor
-    func isLike(cid: String) async {
+    func isLike(cid: String, currentUserId: String?) async {
         
         do {
-            guard let id = try await LikeService.fetchColloquyUserLike(cid: cid, collectionName: collectionName) else { return }
+            guard let id = try await LikeService.fetchColloquyUserLike(cid: cid, collectionName: collectionName, currentUserId: currentUserId) else { return }
             self.likeId = id
         } catch {
             print("ERROR IS LIKE: \(error.localizedDescription)")

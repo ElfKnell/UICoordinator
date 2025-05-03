@@ -9,7 +9,7 @@ import SwiftUI
 
 struct UserCellView: View {
     let user: User
-    @EnvironmentObject var userFollow: UserFollowers
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         HStack {
@@ -28,9 +28,9 @@ struct UserCellView: View {
             
             Spacer()
             
-            if user.id != CurrentUserService.sharedCurrent.currentUser?.id {
+            if user.id != container.currentUserService.currentUser?.id {
                 
-                Text(userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
+                Text(container.userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .frame(width: 100, height: 32)

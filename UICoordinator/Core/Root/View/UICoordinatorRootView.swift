@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  UICoordinatorRootView.swift
 //  UICoordinator
 //
 //  Created by Andrii Kyrychenko on 17/02/2024.
@@ -9,8 +9,7 @@ import SwiftUI
 
 struct UICoordinatorRootView: View {
     
-    @EnvironmentObject var viewModel: AuthService
-    @EnvironmentObject var userFollow: UserFollowers
+    @EnvironmentObject var container: DIContainer
     @State private var isLoading = false
     
     var body: some View {
@@ -18,26 +17,23 @@ struct UICoordinatorRootView: View {
         Group {
             if isLoading {
                 LoadingView(width: 300, height: 300)
-            } else {
-                
-                if viewModel.userSession != nil {
-                    CoordinatorTabView()
-                        .onAppear {
-                            Task {
+            } else if let user = container.currentUserService.currentUser {
+                CoordinatorTabView()
+                    .onAppear {
+                        Task {
                                 
-                                await userFollow.setFollowersCurrentUser(userId: viewModel.userSession?.uid)
+                            await container.userFollow.loadFollowersCurrentUser(userId: user.id)
                                 
-                            }
                         }
-                } else {
-                    LoginView()
-                }
+                    }
+            } else {
+                LoginView()
             }
         }
         .onAppear {
             Task {
                 isLoading = true
-                await viewModel.checkUserSession()
+                await container.authService.checkUserSession()
                 isLoading = false
             }
         }

@@ -5,99 +5,74 @@
 //  Created by Andrii Kyrychenko on 20/04/2024.
 //
 
+import Observation
 import Foundation
-import Firebase
 import SwiftData
 
-class UserFollowers: ObservableObject {
+@Observable
+@MainActor
+class UserFollowers: UserFollowersProtocol {
     
-    @Published var countFollowers = 0
-    @Published var countFollowing = 0
+    var countFollowers: Int = 0
+    var countFollowing: Int = 0
     
-    private var userCurentFollowingId: [String] = []
-    private var userCurentFollowersId: [String] = []
-    private var followersCurrentUsers: [Follow] = []
+    var followingIdsForCurrentUser: [String] = []
     
-    private var checkedFollowing = CheckedLocalUsersByFollowing(localUserService: LocalUserService(), userService: UserService(), containerProvider: { try ModelContainer(for: LocalUser.self) } )
+    private var followersIdsForCurrentUser: [String] = []
+    var followersCurrentUsers: [Follow] = []
     
-    func setFollowersCurrentUser(userId: String?) async {
+    private let checkedFollowing: CheckedLocalUsersByFollowingProtocol
+    private let fetchingService: FetchingFollowAndFollowCountProtocol
+    
+    init(fetchingService: FetchingFollowAndFollowCountProtocol,
+         checkedFollowing: CheckedLocalUsersByFollowingProtocol) {
         
-        do {
-            
-            guard let currentUserId = userId else { return }
-            let followers = try await FollowService.fitchFollow(uid: currentUserId, follow: "follower")
-            self.userCurentFollowingId = followers.map({ $0.following })
+        self.fetchingService = fetchingService
+        self.checkedFollowing = checkedFollowing
+    }
+    
+    func loadFollowersCurrentUser(userId: String?) async {
+        
+        guard let currentUserId = userId else { return }
+        let followers = await fetchingService.fetchFollow(uid: currentUserId, byField: .followerField)
+        
+        if followers.isEmpty {
+            self.followersCurrentUsers = []
+            self.followingIdsForCurrentUser = []
+            await clearLocalUsers()
+        } else {
             self.followersCurrentUsers = followers
-            
-            await setFollowingCurrentUser(userId: currentUserId)
-            await checkedFollowing.addLocalUsersByFollowingToStore(follows: self.userCurentFollowingId)
-            
-        } catch {
-            print(error.localizedDescription)
+            self.followingIdsForCurrentUser = followers.map({ $0.following })
+            await loadFollowingCurrentUser(userId: currentUserId)
+            await checkedFollowing.addLocalUsersByFollowingToStore(follows: self.followingIdsForCurrentUser)
+            await checkedFollowing.removeUnfollowedLocalUsers(follows: self.followingIdsForCurrentUser)
         }
     }
     
-    private func setFollowingCurrentUser(userId: String) async {
+    func clearLocalUsers() async {
+        await checkedFollowing.clearAllLocalUsers()
+    }
+    
+    private func loadFollowingCurrentUser(userId: String) async {
         
-        do {
-            
-            let following = try await FollowService.fitchFollow(uid: userId, follow: "following")
-            self.userCurentFollowersId = following.map({ $0.follower })
-
-        } catch {
-            print(error.localizedDescription)
-        }
+        let following = await fetchingService.fetchFollow(uid: userId, byField: .followingField)
+        self.followersIdsForCurrentUser = following.map({ $0.follower })
     }
     
     func isFollowingCurrentUser(uid: String) -> Bool {
         
-        if userCurentFollowingId.contains(uid) {
-            return true
-        } else {
-            return false
-        }
+        return followingIdsForCurrentUser.contains(uid)
     }
     
-    func getFollowingsCurrentUserId() -> [String] {
-        
-        return self.userCurentFollowersId
-    }
-    
-    func getFollowersCurrentUser() -> [Follow] {
-        
-        return self.followersCurrentUsers
-    }
-    
-    func fetchFollowCount(userId: String) {
+    func updateFollowCounts(for userId: String) {
         
         Task {
-            await getFollowersCount(userId: userId)
-            await getFollowingCount(userId: userId)
+            async let followersCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followerField)
+            async let followingCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followingField)
+                    
+                    // Wait for both async tasks to finish
+            await self.countFollowers = followersCount
+            await self.countFollowing = followingCount
         }
-        
     }
-    
-    @MainActor
-    private func getFollowersCount(userId: String) async {
-        
-        do {
-            countFollowers = try await FollowService.fitchFollowCoutn(uid: userId, follow: "following")
-        } catch {
-            print("Error count followers: \(error.localizedDescription)")
-        }
-        
-    }
-    
-    @MainActor
-    private func getFollowingCount(userId: String) async {
-        
-        do {
-            countFollowing = try await FollowService.fitchFollowCoutn(uid: userId, follow: "follower")
-        } catch {
-            print("Error count followers: \(error.localizedDescription)")
-            countFollowing = 0
-        }
-        
-    }
-    
 }

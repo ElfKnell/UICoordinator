@@ -14,8 +14,8 @@ class ActivityViewModel: ObservableObject {
     private var localUserServise = LocalUserService()
     private var userService = UserService()
     
-    func createActivity(name: String) async throws -> Activity? {
-        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return nil }
+    func createActivity(name: String, currentUserId: String?) async throws -> Activity? {
+        guard let currentUserId else { return nil }
         
         let activityNew = Activity(ownerUid: currentUserId, name: name, typeActivity: .travel, description: "", time: Timestamp(), status: true, likes: 0, locationsId: [])
         
@@ -26,21 +26,21 @@ class ActivityViewModel: ObservableObject {
         return act
     }
     
-    private func fetchFollowersActivity() async throws {
+    private func fetchFollowersActivity(currentUser: User?) async throws {
         
         self.activities = []
-        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         var followersId = users.map({ $0.id })
-        followersId.removeAll(where: { $0 == CurrentUserService.sharedCurrent.currentUser?.id })
+        followersId.removeAll(where: { $0 == currentUser?.id })
         self.activities = try await ActivityService.fitchActivities(usersId: followersId)
         
         try await fetchUserForActivity(users: users)
         
     }
     
-    private func fetchMyActivity() async throws {
+    private func fetchMyActivity(currentUser: User?) async throws {
         
-        guard let currentUser = CurrentUserService.sharedCurrent.currentUser else { return }
+        guard let currentUser else { return }
         self.activities = []
         self.activities = try await ActivityService.fetchCurrentUserActivity()
         
@@ -62,11 +62,11 @@ class ActivityViewModel: ObservableObject {
         }
     }
     
-    private func fetchLikeActivity() async throws {
+    private func fetchLikeActivity(currentUser: User?) async throws {
         
-        let likes = try await LikeService.fetchLikeCurrentUsers(collectionName: "ActivityLikes")
+        let likes = try await LikeService.fetchLikeCurrentUsers(collectionName: "ActivityLikes", currentUserId: currentUser?.id)
         self.activities = []
-        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         
         for like in likes {
             let activity = try await ActivityService.fitchActivity(documentId: like.colloquyId)
@@ -76,20 +76,20 @@ class ActivityViewModel: ObservableObject {
         try await fetchUserForActivity(users: users)
     }
     
-    func fetchActivity(typeActivity: PropertyTypeActivity) async throws {
+    func fetchActivity(typeActivity: PropertyTypeActivity, currentUser: User?) async throws {
         
         switch typeActivity {
         case .myActivity:
             Task {
-                try await fetchMyActivity()
+                try await fetchMyActivity(currentUser: currentUser)
             }
         case .likeActivity:
             Task {
-                try await fetchLikeActivity()
+                try await fetchLikeActivity(currentUser: currentUser)
             }
         case .followerActivity:
             Task {
-                try await fetchFollowersActivity()
+                try await fetchFollowersActivity(currentUser: currentUser)
             }
         }
     }

@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import Observation
 
 struct LoginView: View {
     
-    @StateObject var loginModel = LoginViewModel()
-    @EnvironmentObject var viewModel: AuthService
+    @State var loginModel = LoginViewModel()
+    @EnvironmentObject var container: DIContainer
     @Environment(\.horizontalSizeClass) var sizeClass
     
     var body: some View {
@@ -31,12 +32,14 @@ struct LoginView: View {
                     LogoView()
                     
                     if loginModel.isCreatedUser {
+                        
                         HStack {
                             Text("Please sign in")
                                 .foregroundColor(.green)
                                 .font(.title2)
                         }
                         .padding()
+                        
                     }
                     
                     InputView(text: $loginModel.email, title: "Email", placeholder: "name@example.com")
@@ -56,11 +59,11 @@ struct LoginView: View {
                     Button {
                         Task {
                             
-                            await viewModel.login(withEmail: loginModel.email, password: loginModel.password)
+                            await container.authService.login(withEmail: loginModel.email, password: loginModel.password)
                             
                             loginModel.isCreatedUser = false
                             
-                            if viewModel.errorMessage != nil {
+                            if container.authService.errorMessage != nil {
                                 loginModel.isLoginError = true
                             }
                         }
@@ -83,7 +86,7 @@ struct LoginView: View {
                             .font(.system(size: 20, design: .serif))
                         
                         NavigationLink {
-                            RegistrationView(isCreateUser: $loginModel.isCreatedUser)
+                            RegistrationView(isNewUser: $loginModel.isCreatedUser)
                                 .navigationBarBackButtonHidden(true)
                         } label: {
                             Text("Sing up")
@@ -99,7 +102,7 @@ struct LoginView: View {
                 .alert("Login problems", isPresented: $loginModel.isLoginError) {
                     Button("OK", role: .cancel) {}
                 } message: {
-                    Text(viewModel.errorMessage ?? "no error")
+                    Text(container.authService.errorMessage ?? "no error")
                 }
 
             }

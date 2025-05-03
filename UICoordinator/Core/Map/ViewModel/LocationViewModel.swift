@@ -59,15 +59,17 @@ class LocationViewModel: ObservableObject {
         }
     }
     
-    func addLocation() async {
+    func addLocation(userId: String?) async {
         
-        guard let userId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
+        guard let userId = userId else { return }
         
         let location = addLocation.getLocation(userId: userId, coordinate: coordinate)
         
         if let location = location {
             
-            if !locations.contains(location) {
+            if locations.isEmpty {
+                locations.append(location)
+            } else if !locations.contains(location) {
                 locations.append(location)
             }
             cameraPosition = .region(location.regionCoordinate)

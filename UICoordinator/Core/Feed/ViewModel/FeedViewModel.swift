@@ -20,31 +20,31 @@ class FeedViewModel: ObservableObject {
     private var fetchColloquiesFromFirebase = FetchColloquiesFirebase()
     private let pageSize = 15
     
-    func fetchColloquies() async {
+    func fetchColloquies(currentUser: User?) async {
         
         self.isLoading = true
         
-        await fetchColloquiesFirebase()
+        await fetchColloquiesFirebase(currentUser: currentUser)
         
         self.isLoading = false
     }
     
     
-    func fetchColloquiesRefresh() async {
+    func fetchColloquiesRefresh(currentUser: User?) async {
         
         self.isLoading = true
         
         fetchColloquiesFromFirebase = FetchColloquiesFirebase()
         self.colloquies.removeAll()
-        await fetchColloquiesFirebase()
+        await fetchColloquiesFirebase(currentUser: currentUser)
         
         self.isLoading = false
         
     }
     
-    private func fetchColloquiesFirebase() async {
+    private func fetchColloquiesFirebase(currentUser: User?) async {
         
-        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         let items = await fetchColloquiesFromFirebase.getColloquies(users: users, pageSize: pageSize)
         self.colloquies.append(contentsOf: items)
 

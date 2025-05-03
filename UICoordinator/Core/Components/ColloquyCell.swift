@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ColloquyCell: View {
     let colloquy: Colloquy
-    @EnvironmentObject var userFollow: UserFollowers
+    @EnvironmentObject var container: DIContainer
     @StateObject var viewModel = LikesViewModel(collectionName: "Likes")
     @State private var showReplieCreate = false
     @State var isChange = false
@@ -22,7 +22,7 @@ struct ColloquyCell: View {
                 
                 NavigationLink {
                     
-                    if CurrentUserService.sharedCurrent.currentUser == colloquy.user {
+                    if container.currentUserService.currentUser == colloquy.user {
                         CurrentUserProfileView()
                     } else {
                         ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
@@ -38,7 +38,7 @@ struct ColloquyCell: View {
                         
                         NavigationLink {
                             
-                            if CurrentUserService.sharedCurrent.currentUser == colloquy.user {
+                            if container.currentUserService.currentUser == colloquy.user {
                                 CurrentUserProfileView()
                             } else {
                                 ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
@@ -57,7 +57,7 @@ struct ColloquyCell: View {
                             .foregroundStyle(Color(.systemGray3))
                         
                         NavigationLink {
-                            RepliesView(colloquy: colloquy)
+                            RepliesView(colloquy: colloquy, user: container.currentUserService.currentUser)
                         } label: {
                             Image(systemName: "ellipsis")
                                 .foregroundStyle(Color(.darkGray))
@@ -86,7 +86,7 @@ struct ColloquyCell: View {
                         
                         Button {
                             Task {
-                                await viewModel.doLike(userId: colloquy.ownerUid, likeToObject: colloquy)
+                                await viewModel.doLike(userId: colloquy.ownerUid, currentUserId: container.currentUserService.currentUser?.id, likeToObject: colloquy)
                             }
                         } label: {
                             if viewModel.likeId == nil {
@@ -132,14 +132,14 @@ struct ColloquyCell: View {
         .padding([.horizontal, .top])
         .onAppear {
             Task {
-                await viewModel.isLike(cid:colloquy.id)
+                await viewModel.isLike(cid:colloquy.id, currentUserId: container.currentUserService.currentUser?.id)
             }
         }
         .onChange(of: isChange) {
             
             Task {
                 
-                await userFollow.setFollowersCurrentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
+                await container.userFollow.loadFollowersCurrentUser(userId: container.currentUserService.currentUser?.id)
                 
             }
             

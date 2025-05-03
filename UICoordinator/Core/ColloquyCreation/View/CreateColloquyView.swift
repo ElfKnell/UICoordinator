@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CreateColloquyView: View {
     @StateObject var viewModel = CreateColloquyViewModel()
+    @EnvironmentObject var container: DIContainer
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
     var location: Location?
@@ -18,7 +19,7 @@ struct CreateColloquyView: View {
     @State private var isUploadingError = false
     
     private var user: User? {
-        return CurrentUserService.sharedCurrent.currentUser
+        return container.currentUserService.currentUser
     }
     
     var body: some View {
@@ -80,7 +81,7 @@ struct CreateColloquyView: View {
                         
                         Task {
                             
-                            await viewModel.uploadColloquy(caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id, activityId: activityId)
+                            await viewModel.uploadColloquy(userId: container.authService.userSession?.uid, caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id, activityId: activityId)
                             
                             if viewModel.errorUpload != nil {
                                 self.isUploadingError = true

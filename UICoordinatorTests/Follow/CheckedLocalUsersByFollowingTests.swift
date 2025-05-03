@@ -9,38 +9,60 @@ import SwiftData
 import XCTest
 
 final class CheckedLocalUsersByFollowingTests: XCTestCase {
-
+    
+    private var mockLocalUserService: MockLocalUserService!
+    private var mockUserService: MockUserService!
+    private var mockUserDataActor: MockUserDataActor!
+    private var sut: CheckedLocalUsersByFollowing!
+    
     @MainActor
-    func test_addLocalUsersByFollowingToStore_addsOnlyNewUsers() async throws {
-        // Arrange
-        let existingUser = LocalUser(id: "123", fullname: "Existing User", username: "user name", email: "user@test.com")
-        let mockLocalUserService = MockLocalUserService()
-        mockLocalUserService.existingUsers = [existingUser]
-
-        let mockUserService = MockUserService()
-        let mockActor = MockUserDataActor()
-
-        let containerProvider = {
-            try ModelContainer(for: LocalUser.self)
-        }
-
-        let sut = CheckedLocalUsersByFollowing(
+    override func setUp() {
+        super.setUp()
+            
+        mockLocalUserService = MockLocalUserService()
+        mockUserService = MockUserService()
+        mockUserDataActor = MockUserDataActor()
+            
+        sut = CheckedLocalUsersByFollowing(
             localUserService: mockLocalUserService,
             userService: mockUserService,
-            containerProvider: containerProvider
+            containerProvider: { throw NSError(domain: "Test", code: 0) }
         )
+        sut.setActorForTesting(mockUserDataActor)
+    }
 
-        sut.setActorForTesting(mockActor)
+    func test_addLocalUsersByFollowingToStore_savesMissingUsers() async {
 
-        // Act
-        await sut.addLocalUsersByFollowingToStore(follows: ["123", "456", "789"])
+        mockLocalUserService.localUsers = [
+            LocalUser(id: "user_1", fullname: "User One", username: "OneU", email: "user@user.one")
+        ]
+        let follows = ["user_1", "user_2", "user_3"]
 
-        // Assert
-        let saved = mockActor.savedUsers
-        XCTAssertEqual(saved.count, 2)
-        XCTAssertTrue(saved.contains(where: { $0.id == "456" }))
-        XCTAssertTrue(saved.contains(where: { $0.id == "789" }))
-        XCTAssertFalse(saved.contains(where: { $0.id == "123" }))
+        await sut.addLocalUsersByFollowingToStore(follows: follows)
+
+        XCTAssertEqual(mockUserDataActor.savedUsers.count, 2)
+        XCTAssertTrue(mockUserDataActor.savedUsers.contains { $0.id == "user_2" })
+        XCTAssertTrue(mockUserDataActor.savedUsers.contains { $0.id == "user_3" })
+    }
+    
+    func test_removeUnfollowedLocalUsers_deletesMissingFollows() async {
+
+        mockLocalUserService.localUsers = [
+            LocalUser(id: "user_1", fullname: "User One", username: "OneU", email: "user@user.one"),
+            LocalUser(id: "user_2", fullname: "User Second", username: "SecondU", email: "user2@user.one")
+        ]
+
+        await sut.removeUnfollowedLocalUsers(follows: ["user_1"])
+
+        XCTAssertEqual(mockUserDataActor.deletedUsers.count, 1)
+        XCTAssertEqual(mockUserDataActor.deletedUsers.first?.id, "user_2")
+    }
+    
+    func test_clearAllLocalUsers_callsDeleteAllUsers() async {
+
+        await sut.clearAllLocalUsers()
+
+        XCTAssertTrue(mockUserDataActor.didCallDeleteAll)
     }
 
 }

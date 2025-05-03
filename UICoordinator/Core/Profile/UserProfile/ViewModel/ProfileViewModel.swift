@@ -14,10 +14,11 @@ class ProfileViewModel: ObservableObject {
     
     private var subscription = SubscribeOrUnsubscribe()
     
-    func follow(user: User) {
+    func follow(user: User, currentUserId: String?) {
         
         Task {
-            await subscription.subscribed(with: user)
+            guard let currentUserId else { return }
+            await subscription.subscribed(with: user, currentUserId: currentUserId)
             
             try await ensureActorReady()
             

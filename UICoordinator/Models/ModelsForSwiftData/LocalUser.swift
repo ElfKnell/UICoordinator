@@ -17,8 +17,9 @@ class LocalUser {
     var profileImageURL: String?
     var bio: String?
     var link: String?
+    var isDelete: Bool
     
-    init(id: String, fullname: String, username: String, email: String, profileImageURL: String? = nil, bio: String? = nil, link: String? = nil) {
+    init(id: String, fullname: String, username: String, email: String, profileImageURL: String? = nil, bio: String? = nil, link: String? = nil, isDelete: Bool = false) {
         self.id = id
         self.fullname = fullname
         self.username = username
@@ -26,6 +27,7 @@ class LocalUser {
         self.profileImageURL = profileImageURL
         self.bio = bio
         self.link = link
+        self.isDelete = isDelete
     }
     
     var initials: String {

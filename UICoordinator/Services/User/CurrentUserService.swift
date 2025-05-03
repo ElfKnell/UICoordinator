@@ -5,43 +5,30 @@
 //  Created by Andrii Kyrychenko on 19/04/2025.
 //
 
-import Foundation
+import Observation
 import Firebase
 import FirebaseFirestoreSwift
 
-
+@Observable
 class CurrentUserService: CurrentUserServiceProtocol {
     
-    
-    var firestoreService: FirestoreServiceProtocol
     var currentUser: User?
-    
-    static let sharedCurrent = CurrentUserService(firestoreService: FirestoreService())
+    private let firestoreService: FirestoreServiceProtocol
     
     init(firestoreService: FirestoreServiceProtocol) {
         
         self.firestoreService = firestoreService
     }
     
-    func fetchCurrentUser(userId: String?) async {
+    func fetchCurrentUser(userId: String?) async throws {
         
-        do {
-            
-            if let uid = userId {
-                
-                let snapshot = try await firestoreService.getUserDocument(uid: uid)
-                
-                self.currentUser = try snapshot.decodeData(as: User.self)
-                
-            } else {
-                
-                self.currentUser = nil
-                
-            }
-
-        } catch {
-            print("DEBUG: ERROR \(error.localizedDescription)")
-        }
+        guard let userId else { throw UserError.userIdNil}
+        
+        let snapshot = try await firestoreService.getUserDocument(uid: userId)
+        
+        let user = try snapshot.decodeData(as: User.self)
+        
+        self.currentUser = user
     }
     
     func updateCurrentUser() async {
@@ -51,7 +38,9 @@ class CurrentUserService: CurrentUserServiceProtocol {
             
             let snapshot = try await firestoreService.getUserDocument(uid: uid)
             
-            self.currentUser = try snapshot.decodeData(as: User.self)
+            let updatedUser = try snapshot.decodeData(as: User.self)
+            
+            self.currentUser = updatedUser
             
         } catch {
             print("ERROR UPDATE Current User: \(error.localizedDescription)")

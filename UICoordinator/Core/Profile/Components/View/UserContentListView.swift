@@ -9,7 +9,7 @@ import SwiftUI
 
 struct UserContentListView: View {
     @StateObject var viewModel: UserContentListViewModel
-
+    @EnvironmentObject var container: DIContainer
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @State private var selectedFilter: ProfileColloquyFilter = .colloquies
     @Namespace var animation
@@ -92,14 +92,14 @@ struct UserContentListView: View {
                 LazyVStack {
                     if !viewModel.replies.isEmpty || viewModel.isLoading {
                         ForEach(viewModel.replies) { colloquy in
-                            RepliesView(colloquy: colloquy)
+                            RepliesView(colloquy: colloquy, user: container.currentUserService.currentUser)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
                                 .onAppear {
                                     
                                     if colloquy == viewModel.colloquies.last {
                                         
                                         Task {
-                                            await viewModel.fetchNextReplies()
+                                            await viewModel.fetchNextReplies(currentUser: container.currentUserService.currentUser)
                                         }
                                     }
                                 }
@@ -132,7 +132,7 @@ struct UserContentListView: View {
         .padding(.vertical, 8)
         .onAppear {
             Task {
-                await viewModel.loadDate()
+                await viewModel.loadDate(currentUser: container.currentUserService.currentUser)
             }
         }
     }

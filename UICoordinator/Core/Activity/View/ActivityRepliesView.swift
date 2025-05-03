@@ -9,14 +9,16 @@ import SwiftUI
 
 struct ActivityRepliesView: View {
     let activity: Activity
+    let user: User?
     @State private var showColloquyCreate = false
     @StateObject var viewModel: RepliesViewModel
     @Environment(\.dismiss) var dismiss
     @State var isChange = false
     
-    init(activity: Activity) {
+    init(activity: Activity, user: User?) {
         self.activity = activity
-        _viewModel = StateObject(wrappedValue: RepliesViewModel(activity.id))
+        self.user = user
+        _viewModel = StateObject(wrappedValue: RepliesViewModel(activity.id, currentUser: user))
     }
     
     var body: some View {
@@ -38,7 +40,7 @@ struct ActivityRepliesView: View {
                             ColloquyCell(colloquy: reply)
                                 .onAppear {
                                     Task {
-                                        await viewModel.fetchReplies(activity.id)
+                                        await viewModel.fetchReplies(activity.id, currentUser: user)
                                     }
                                 }
                         }
@@ -51,7 +53,7 @@ struct ActivityRepliesView: View {
             .padding(.horizontal)
             .refreshable {
                 Task {
-                    await viewModel.fetchRepliesRefresh(activity.id)
+                    await viewModel.fetchRepliesRefresh(activity.id, currentUser: user)
                 }
             }
             .navigationTitle("Replies")
@@ -86,5 +88,5 @@ struct ActivityRepliesView: View {
 }
 
 #Preview {
-    ActivityRepliesView(activity: DeveloperPreview.activity)
+    ActivityRepliesView(activity: DeveloperPreview.activity, user: DeveloperPreview.user)
 }

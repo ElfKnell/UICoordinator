@@ -17,37 +17,37 @@ class RepliesViewModel: ObservableObject {
     private var fetchRepliesFirebase = FetchRepliesFirebase()
     private var localUserServise = LocalUserService()
     
-    init(_ cid: String) {
+    init(_ cid: String, currentUser: User?) {
         Task {
-            await fetchRepliesRefresh(cid)
+            await fetchRepliesRefresh(cid, currentUser: currentUser)
         }
     }
     
-    func fetchReplies(_ cid: String) async {
+    func fetchReplies(_ cid: String, currentUser: User?) async {
         
         self.isLoading = true
         
-        await fetchRepliesData(cid: cid)
+        await fetchRepliesData(cid: cid, currentUser: currentUser)
         
         self.isLoading = false
     }
     
     
-    func fetchRepliesRefresh(_ cid: String) async {
+    func fetchRepliesRefresh(_ cid: String, currentUser: User?) async {
         
         self.isLoading = true
         
         fetchRepliesFirebase = FetchRepliesFirebase()
         self.replies.removeAll()
-        await fetchRepliesData(cid: cid)
+        await fetchRepliesData(cid: cid, currentUser: currentUser)
         
         self.isLoading = false
         
     }
     
-    func fetchRepliesData(cid: String) async {
+    func fetchRepliesData(cid: String, currentUser: User?) async {
         
-        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         let items = await fetchRepliesFirebase.getReplies(colloquyId: cid, localUsers: users, pageSize: pageSize)
         self.replies.append(contentsOf: items)
 

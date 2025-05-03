@@ -15,14 +15,14 @@ class FollowsToUsers: ObservableObject {
     private var fetchUsers = FetchingUsersServiceFirebase(repository: FirestoreUserRepository())
     
     @MainActor
-    func fetchFollowsToUsers(usersFollowing: [String]) async {
+    func fetchFollowsToUsers(usersFollowing: [String], curretnUser: User?) async {
         self.followingUsers.removeAll()
         self.followerUsers.removeAll()
         
         self.followingUsers = await fetchUsers.fetchUsersByIds(at: usersFollowing)
-        var users = await localUserServise.fetchUsersbyLocalUsers()
+        var users = await localUserServise.fetchUsersbyLocalUsers(currentUser: curretnUser)
         
-        users.removeAll(where: { $0.id == CurrentUserService.sharedCurrent.currentUser?.id })
+        users.removeAll(where: { $0.id == curretnUser?.id })
         self.followerUsers = users
     }
 }

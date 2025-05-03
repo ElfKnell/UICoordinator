@@ -22,8 +22,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct UICoordinatorApp: App {
     
-    @StateObject var userFollowers = UserFollowers()
-    @StateObject var authUser = AuthService()
+    @StateObject private var container = DIContainer()
     
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -31,8 +30,7 @@ struct UICoordinatorApp: App {
     var body: some Scene {
         WindowGroup {
             UICoordinatorRootView()
-                .environmentObject(userFollowers)
-                .environmentObject(authUser)
+                .environmentObject(container)
         }
     }
 }

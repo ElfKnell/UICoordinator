@@ -5,67 +5,58 @@
 //  Created by Andrii Kyrychenko on 24/02/2024.
 //
 
+import Observation
 import Firebase
 import FirebaseFirestoreSwift
 
-
-class AuthService: ObservableObject {
+@Observable
+@MainActor
+class AuthService: AuthServiceProtocol {
     
-    @Published var userSession: FirebaseAuth.User?
-    @Published var errorMessage: String?
+    var userSession: FirebaseUserProtocol?
+    var errorMessage: String?
     
-    private var createUser = CreateUserFirebase(firestoreService: FirestoreCreateUserService())
+    private var currentUserService: CurrentUserServiceProtocol
+    private var authProvider: FirebaseAuthProviderProtocol
     
-    @MainActor
+    init(currentUserService: CurrentUserServiceProtocol, authProvider: FirebaseAuthProviderProtocol) {
+        
+        self.currentUserService = currentUserService
+        self.authProvider = authProvider
+    }
+    
     func login(withEmail email: String, password: String) async {
         
         do {
             
-            let result = try await Auth.auth().signIn(withEmail: email, password: password)
-            self.userSession = result.user
-            await CurrentUserService.sharedCurrent.fetchCurrentUser(userId: self.userSession?.uid)
+            let user = try await authProvider.signIn(email: email, password: password)
+            self.userSession = user
+            try await self.currentUserService.fetchCurrentUser(userId: user.uid)
+            self.errorMessage = nil
            
         } catch {
             errorMessage = error.localizedDescription
         }
     }
     
-    @MainActor
-    func createUser(withEmail email: String, passsword: String, fullname: String, username: String) async {
-        
-        do {
-            let result = try await Auth.auth().createUser(withEmail: email, password: passsword)
-            
-            await createUser.uploadUserData(id: result.user.uid,
-                                            withEmail: email,
-                                            fullname: fullname,
-                                            username: username)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    @MainActor
     func signOut() {
+    
+        currentUserService.currentUser = nil
         try? Auth.auth().signOut()
-        self.userSession = nil
-        CurrentUserService.sharedCurrent.currentUser = nil
+        userSession = nil
     }
     
-    @MainActor
     func checkUserSession() async {
         
         if let user = Auth.auth().currentUser {
             do {
                 try await user.idTokenForcingRefresh(true)
                 self.userSession = user
-                await CurrentUserService.sharedCurrent.fetchCurrentUser(userId: self.userSession?.uid)
-                print("✅ User still logged in with token.")
+                try await currentUserService.fetchCurrentUser(userId: user.uid)
+                
             } catch {
                 print("❌ Token refresh failed: \(error.localizedDescription)")
             }
-        } else {
-            print("🚫 No user is currently logged in")
         }
     }
 }

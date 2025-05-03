@@ -12,16 +12,10 @@ class MainUsersViewModel: ObservableObject {
     
     private var fetchUsers = FetchingUsersServiceFirebase(repository: FirestoreUserRepository())
     
-    init() {
-        Task {
-            try await featchUsers()
-        }
-    }
-    
     @MainActor
-    private func featchUsers() async throws {
+    func featchUsers(userId: String?) async {
         
-        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
+        guard let currentUserId = userId else { return }
         self.users = await fetchUsers.fetchUsers(withId: currentUserId)
         
     }

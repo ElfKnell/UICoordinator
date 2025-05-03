@@ -16,7 +16,8 @@ extension User {
             email: email,
             profileImageURL: profileImageURL,
             bio: bio,
-            link: link
+            link: link,
+            isDelete: isDelete
         )
     }
 }
@@ -30,7 +31,8 @@ extension LocalUser {
             email: email,
             profileImageURL: profileImageURL,
             bio: bio,
-            link: link
+            link: link,
+            isDelete: isDelete
         )
     }
 }

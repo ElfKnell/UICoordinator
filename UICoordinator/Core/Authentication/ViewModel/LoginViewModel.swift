@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Observation
 
-class LoginViewModel: ObservableObject {
+@Observable
+class LoginViewModel{
     
-    @Published var email = ""
-    @Published var password = ""
-    @Published var isLoginError = false
-    
-    @Published var isCreatedUser = false
+    var email = ""
+    var password = ""
+    var isLoginError = false
+    var isCreatedUser = false
 }

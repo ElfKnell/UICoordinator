@@ -12,6 +12,4 @@ protocol FirestoreServiceProtocol {
     
     func getUserDocument(uid: String) async throws -> DocumentSnapshotProtocol
     
-    func deleteUserDocument() async throws
-    
 }

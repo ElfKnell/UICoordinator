@@ -15,6 +15,7 @@ struct EditProfileView: View {
     @State private var bio = ""
     @State private var link = ""
     @State private var isPrivateProfile = false
+    @EnvironmentObject var container: DIContainer
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel = EditProfileViewModel()
     @Binding var isSaved: Bool
@@ -107,6 +108,19 @@ struct EditProfileView: View {
                     self.link = link
                 }
             }
+            .alert("Delete User Account", isPresented: $viewModel.isDelete) {
+                Button("Cancel", role: .cancel) {}
+                
+                Button("Delete", role: .destructive) {
+                    Task {
+                        await viewModel.deleteCurrentUser(userId: user.id)
+                        container.authService.signOut()
+                    }
+                }
+            } message: {
+                Text("Are you sure you want to delete your account?")
+                    .foregroundStyle(.red)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
@@ -118,16 +132,28 @@ struct EditProfileView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     
-                    Button("Save") {
-                        Task {
-                            await viewModel.updateUserData(user: user, nickname: nickname, bio: bio, link: link)
-                            isSaved.toggle()
-                            dismiss()
+                    HStack {
+                        Button("Save") {
+                            Task {
+                                await viewModel.updateUserData(user: user,
+                                                               nickname: nickname,
+                                                               bio: bio, link: link)
+                                
+                                isSaved.toggle()
+                                dismiss()
+                            }
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        
+                        Button {
+                            viewModel.isDelete.toggle()
+                        } label: {
+                            Image(systemName: "trash.circle.fill")
+                                .foregroundStyle(.red)
                         }
                     }
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
                 }
             }
         }

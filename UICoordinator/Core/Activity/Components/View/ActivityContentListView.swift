@@ -10,7 +10,7 @@ import SwiftUI
 struct ActivityContentListView: View {
     
     @StateObject var viewModel = ActivityViewModel()
-    @EnvironmentObject var followUser : UserFollowers
+    @EnvironmentObject var container: DIContainer
     @State private var selectedFilter: ActivityOwner = .allUsersActivities
     @Namespace var animation
     @State var isDelete = false
@@ -59,7 +59,7 @@ struct ActivityContentListView: View {
                     }
                     .onAppear {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .followerActivity)
+                            try await viewModel.fetchActivity(typeActivity: .followerActivity, currentUser: container.currentUserService.currentUser)
                         }
                     }
                     
@@ -76,12 +76,12 @@ struct ActivityContentListView: View {
                     }
                     .onAppear {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .myActivity)
+                            try await viewModel.fetchActivity(typeActivity: .myActivity, currentUser: container.currentUserService.currentUser)
                         }
                     }
                     .onChange(of: isUpdate) {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .myActivity)
+                            try await viewModel.fetchActivity(typeActivity: .myActivity, currentUser: container.currentUserService.currentUser)
                         }
                     }
                     
@@ -98,12 +98,12 @@ struct ActivityContentListView: View {
                     }
                     .onAppear {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .likeActivity)
+                            try await viewModel.fetchActivity(typeActivity: .likeActivity, currentUser: container.currentUserService.currentUser)
                         }
                     }
                     .onChange(of: isUpdate) {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .likeActivity)
+                            try await viewModel.fetchActivity(typeActivity: .likeActivity, currentUser: container.currentUserService.currentUser)
                         }
                     }
                 }

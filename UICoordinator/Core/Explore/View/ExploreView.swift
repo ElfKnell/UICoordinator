@@ -12,7 +12,7 @@ struct ExploreView: View {
     
     var users: [User]
     @State private var searchText = ""
-    @EnvironmentObject var userFollow: UserFollowers
+    @EnvironmentObject var container: DIContainer
     @State var isChange = false
     @State private var isLoading = false
     
@@ -51,7 +51,7 @@ struct ExploreView: View {
             .onChange(of: isChange) {
                 Task {
                     isLoading = true
-                    await userFollow.setFollowersCurrentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
+                    await container.userFollow.loadFollowersCurrentUser(userId: container.currentUserService.currentUser?.id)
                     isLoading = false
                 }
             }
@@ -62,7 +62,7 @@ struct ExploreView: View {
                 Button {
                     Task {
                         isLoading = true
-                        await userFollow.setFollowersCurrentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
+                        await container.userFollow.loadFollowersCurrentUser(userId: container.currentUserService.currentUser?.id)
                         searchText = ""
                         isLoading = false
                     }

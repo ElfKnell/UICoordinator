@@ -12,7 +12,7 @@ struct ProfileView: View {
     
     let user: User
     @StateObject var viewModel = ProfileViewModel()
-    @EnvironmentObject var userFollow: UserFollowers
+    @EnvironmentObject var container: DIContainer
     @Environment(\.modelContext) private var modelContext
     @Binding var isChange: Bool
     @Environment(\.dismiss) var dismiss
@@ -31,22 +31,22 @@ struct ProfileView: View {
                         
                         Spacer()
                         
-                        if user.id != CurrentUserService.sharedCurrent.currentUser?.id {
+                        if user.id != container.currentUserService.currentUser?.id {
                             
                             Button {
                                 
-                                if userFollow.isFollowingCurrentUser(uid: user.id) {
+                                if container.userFollow.isFollowingCurrentUser(uid: user.id) {
                                     viewModel.unfollow(user: user,
-                                                       followers: userFollow.getFollowersCurrentUser())
+                                                       followers: container.userFollow.followersCurrentUsers)
                                 } else {
-                                    viewModel.follow(user: user)
+                                    viewModel.follow(user: user, currentUserId: container.currentUserService.currentUser?.id)
                                 }
                                 isChange.toggle()
                                 dismiss()
 
                             } label: {
                                 
-                                Text(userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
+                                Text(container.userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.white)
@@ -84,7 +84,7 @@ struct ProfileView: View {
             .padding(.horizontal)
             .onAppear {
                 
-                userFollow.fetchFollowCount(userId: user.id)
+                container.userFollow.updateFollowCounts(for: user.id)
                 
             }
         }

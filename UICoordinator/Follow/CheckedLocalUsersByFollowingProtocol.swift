@@ -9,4 +9,8 @@ import Foundation
 
 protocol CheckedLocalUsersByFollowingProtocol {
     func addLocalUsersByFollowingToStore(follows: [String]) async
+    
+    func removeUnfollowedLocalUsers(follows: [String]) async
+    
+    func clearAllLocalUsers() async
 }

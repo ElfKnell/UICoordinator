@@ -24,23 +24,9 @@ class UserService: UserServiceProtocol {
             return try snapshot.decodeData(as: User.self)
             
         } catch {
-            print("ERROR FETCH USER: \(error.localizedDescription)")
+            
             return DeveloperPreview.user
         }
         
     }
-    
-    func deleteUser() async {
-        
-        do {
-            
-            try await firestoreUserDocument.deleteUserDocument()
-            
-        } catch UserError.userNotFound {
-            print("ERROR DELETE USER: \(UserError.userNotFound.description)")
-        } catch {
-            print("ERROR DELETE USER: \(error.localizedDescription)")
-        }
-    }
-    
 }

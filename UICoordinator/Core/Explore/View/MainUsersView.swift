@@ -10,9 +10,15 @@ import SwiftUI
 struct MainUsersView: View {
     
     @StateObject var viewModel = MainUsersViewModel()
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         ExploreView(users: viewModel.users)
+            .onAppear {
+                Task {
+                    await viewModel.featchUsers(userId: container.authService.userSession?.uid)
+                }
+            }
     }
 }
 

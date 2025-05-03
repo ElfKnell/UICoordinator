@@ -11,6 +11,7 @@ struct SideMenuView: View {
     
     @Binding var isShowind: Bool
     @Binding var selectedTab: Int
+    @EnvironmentObject var container: DIContainer
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @State private var selectedOption: OptionModel?
     
@@ -32,7 +33,7 @@ struct SideMenuView: View {
                     VStack(alignment: .leading, spacing: 32) {
                         
                         ScrollView {
-                            SideMenuHeaderView()
+                            SideMenuHeaderView(user: container.currentUserService.currentUser)
                             
                             Divider()
                                 .padding()

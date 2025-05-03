@@ -16,6 +16,7 @@ struct LocationsDetailView: View {
     @Binding var isUpdate: MapSheetConfig?
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel = LocationDetailViewModel()
+    @EnvironmentObject var container: DIContainer
     var activity: Activity?
     
     var body: some View {
@@ -68,7 +69,7 @@ struct LocationsDetailView: View {
                         .cornerRadius(12)
                 }
                 
-                if isUpdate != nil && viewModel.isCurrentUserUpdateLocation(mapSeliction: mapSeliction, activity: activity) {
+                if isUpdate != nil && viewModel.isCurrentUserUpdateLocation(mapSeliction: mapSeliction, activity: activity, currentUserId: container.currentUserService.currentUser?.id) {
                     
                     Button {
                         isUpdate = .locationUpdateOrSave

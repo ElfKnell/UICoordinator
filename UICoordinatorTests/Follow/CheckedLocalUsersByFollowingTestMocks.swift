@@ -9,19 +9,28 @@ import Testing
 import Foundation
 import SwiftData
 
+final class MockLocalUserService: LocalUserServiceProtocol {
+    var localUsers: [LocalUser] = []
+    func fetchLocalUsers() async -> [LocalUser] {
+        return localUsers
+    }
+}
+
 final class MockUserDataActor: UserDataActorProtocol {
-    private(set) var savedUsers: [LocalUser] = []
+    var savedUsers: [LocalUser] = []
+    var deletedUsers: [LocalUser] = []
+    var didCallDeleteAll = false
 
     func save(user: LocalUser) async throws {
         savedUsers.append(user)
     }
-}
 
-final class MockLocalUserService: LocalUserServiceProtocol {
-    var existingUsers: [LocalUser] = []
+    func delete(user: LocalUser) async throws {
+        deletedUsers.append(user)
+    }
 
-    func fetchLocalUsers() async -> [LocalUser] {
-        existingUsers
+    func deleteAllUsers() async throws {
+        didCallDeleteAll = true
     }
 }
 

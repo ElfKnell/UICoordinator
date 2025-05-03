@@ -10,7 +10,7 @@ import SwiftUI
 struct ProfileHeaderView: View {
     
     let user: User
-    @EnvironmentObject var userFollow: UserFollowers
+    @EnvironmentObject var container: DIContainer
     @StateObject var userLikes = UserLikeCount()
     @StateObject var followToUser = FollowsToUsers()
     
@@ -36,12 +36,12 @@ struct ProfileHeaderView: View {
                 
                 HStack(spacing: 16) {
                     
-                    if user.id == CurrentUserService.sharedCurrent.currentUser?.id {
+                    if user.id == container.currentUserService.currentUser?.id {
                         NavigationLink {
                             ExploreView(users: followToUser.followerUsers)
                         } label: {
                             BottomHeaderView(title: "Following",
-                                             counts: "\(userFollow.countFollowing)",
+                                             counts: "\(container.userFollow.countFollowers)",
                                              imageName: "person.3.fill")
                         }
                         
@@ -49,21 +49,21 @@ struct ProfileHeaderView: View {
                             ExploreView(users: followToUser.followingUsers)
                         } label: {
                             BottomHeaderView(title: "Followers",
-                                             counts: "\(userFollow.countFollowers)",
+                                             counts: "\(container.userFollow.countFollowing)",
                                              imageName: "person.crop.circle.fill.badge.checkmark")
                         }
                     } else {
                         
                         BottomHeaderView(title: "Following",
-                                         counts: "\(userFollow.countFollowing)",
+                                         counts: "\(container.userFollow.countFollowers)",
                                          imageName: "person.3.fill")
                         
                         BottomHeaderView(title: "Followers",
-                                         counts: "\(userFollow.countFollowers)",
+                                         counts: "\(container.userFollow.countFollowing)",
                                          imageName: "person.crop.circle.fill.badge.checkmark")
                     }
                     
-                    if user.id == CurrentUserService.sharedCurrent.currentUser?.id {
+                    if user.id == container.currentUserService.currentUser?.id {
                         
                         NavigationLink {
                             ExploreView(users: userLikes.usersLike)
@@ -86,7 +86,7 @@ struct ProfileHeaderView: View {
             Task {
                 await userLikes.fetchLikes(userId: user.id)
                 
-                await followToUser.fetchFollowsToUsers(usersFollowing: userFollow.getFollowingsCurrentUserId())
+                await followToUser.fetchFollowsToUsers(usersFollowing: container.userFollow.followingIdsForCurrentUser, curretnUser: container.currentUserService.currentUser)
             }
         }
     }

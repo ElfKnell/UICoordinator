@@ -9,7 +9,7 @@ import SwiftData
 
 protocol SubscribeOrUnsubscribeProtool {
     
-    func subscribed(with user: User) async
+    func subscribed(with user: User, currentUserId: String?) async
     
     func unsubcribed(with user: User, followersCurrentUsers: [Follow]) async
 }

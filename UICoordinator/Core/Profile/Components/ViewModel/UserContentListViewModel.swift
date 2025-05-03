@@ -25,7 +25,7 @@ class UserContentListViewModel: ObservableObject {
     }
     
     @MainActor
-    func loadDate() async {
+    func loadDate(currentUser: User?) async {
         
         self.isLoading = true
         
@@ -35,7 +35,7 @@ class UserContentListViewModel: ObservableObject {
         self.replies.removeAll()
         
         await fetchColloquies()
-        await fetchReplies()
+        await fetchReplies(currentUser: currentUser)
         
         self.isLoading = false
         
@@ -61,20 +61,20 @@ class UserContentListViewModel: ObservableObject {
     }
     
     @MainActor
-    private func fetchReplies() async {
+    private func fetchReplies(currentUser: User?) async {
         
-        let users = await localUserServise.fetchUsersbyLocalUsers()
+        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         let items = await fetchReplies.getReplies(userId: user.id, localUsers: users, pageSize: pageSize)
         self.replies.append(contentsOf: items)
     
     }
 
     @MainActor
-    func fetchNextReplies() async {
+    func fetchNextReplies(currentUser: User?) async {
         
         self.isLoading = true
         
-        await fetchReplies()
+        await fetchReplies(currentUser: currentUser)
         
         self.isLoading = false
         

@@ -26,3 +26,5 @@ extension DocumentSnapshot: DocumentSnapshotProtocol {
         try self.data(as: type)
     }
 }
+
+extension FirebaseAuth.User: FirebaseUserProtocol {}

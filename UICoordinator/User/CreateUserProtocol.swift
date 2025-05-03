@@ -8,5 +8,5 @@
 import Foundation
 
 protocol CreateUserProtocol {
-    func uploadUserData(id: String, withEmail email: String, fullname: String, username: String) async
+    func uploadUserData(id: String, withEmail email: String, fullname: String, username: String) async throws
 }

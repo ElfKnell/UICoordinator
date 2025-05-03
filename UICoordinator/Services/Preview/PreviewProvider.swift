@@ -10,7 +10,7 @@ import Firebase
 
 class DeveloperPreview {
     
-    static let user = User(id: NSUUID().uuidString, fullname: "Anri Kyr", username: "anky", email: "test@gmail.com")
+    static let user = User(id: NSUUID().uuidString, fullname: "Anri Kyr", username: "anky", email: "test@gmail.com", isDelete: false)
     
     static let colloquy = Colloquy(ownerUid: user.id, caption: "", timestamp: Timestamp(), likes: 0, locationId: "", ownerColloquy: "")
     
@@ -19,6 +19,4 @@ class DeveloperPreview {
     static let photo = Photo(locationUid: NSUUID().uuidString, timestamp: Timestamp(), photoURL: "")
     
     static let activity = Activity(ownerUid: user.id, name: "No name", typeActivity: .track, description: "", time: Timestamp(), status: false, likes: 0, locationsId: [])
-    
-    static let userFollovers = UserFollowers()
 }

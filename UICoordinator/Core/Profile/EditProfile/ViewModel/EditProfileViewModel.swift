@@ -14,6 +14,7 @@ class EditProfileViewModel: ObservableObject {
         didSet { Task { await loadPhoto() } }
     }
     @Published var profileImage: Image?
+    @Published var isDelete = false
     private var uiImage: UIImage?
     private var userServiseUpdate = UserServiceUpdate()
     
@@ -22,6 +23,10 @@ class EditProfileViewModel: ObservableObject {
         await userServiseUpdate.updateUserProfile(userId: user.id, nickname: nickname,  bio: bio, link: link)
         await uploadeProfileImage(userId: user.id)
         
+    }
+    
+    func deleteCurrentUser(userId: String?) async {
+        await userServiseUpdate.deleteUser(userId: userId)
     }
     
     @MainActor

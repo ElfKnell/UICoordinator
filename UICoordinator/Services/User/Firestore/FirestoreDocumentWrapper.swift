@@ -11,6 +11,7 @@ import FirebaseFirestoreSwift
 
 
 final class FirestoreDocumentWrapper: FirestoreDocumentProtocol {
+    
     private let ref: DocumentReference
 
     init(ref: DocumentReference) {
@@ -19,5 +20,14 @@ final class FirestoreDocumentWrapper: FirestoreDocumentProtocol {
 
     func updateData(_ data: [String: Any]) async throws {
         try await ref.updateData(data)
+    }
+    
+    func delete() async throws {
+        do {
+            try await ref.delete()
+        } catch {
+            print("Error deleting document: \(error.localizedDescription)")
+            throw error
+        }
     }
 }

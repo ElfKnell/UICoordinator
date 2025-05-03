@@ -11,6 +11,7 @@ import MapKit
 struct SearchLocationView: View {
     
     @StateObject private var viewModel = SearchLocationViewModel()
+    @EnvironmentObject var container: DIContainer
     @FocusState private var isSearch: Bool
     @Binding var searchLocations: [Location]
     
@@ -46,7 +47,7 @@ struct SearchLocationView: View {
                         
                         Task {
                             
-                            searchLocations = await viewModel.getLocations(cameraPosition)
+                            searchLocations = await viewModel.getLocations(cameraPosition, currentUserId: container.currentUserService.currentUser?.id)
                             viewModel.searctText = ""
                             
                         }

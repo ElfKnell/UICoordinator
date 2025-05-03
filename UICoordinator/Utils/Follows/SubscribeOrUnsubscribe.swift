@@ -10,35 +10,24 @@ import SwiftData
 
 class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtool {
     
-    func subscribed(with user: User) async {
+    private let followServise = FollowService()
+    
+    func subscribed(with user: User, currentUserId: String?) async {
         
-        do {
-            
-            guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return }
-            let follow = Follow(follower: currentUserId, following: user.id, updateTime: Timestamp())
-            
-            try await FollowService.uploadeFollow(follow)
-            
-        } catch {
-            print("ERROR FOLLOE: \(error.localizedDescription)")
-        }
+        guard let currentUserId = currentUserId else { return }
+        let follow = Follow(follower: currentUserId, following: user.id, updateTime: Timestamp())
+        
+        await followServise.uploadeFollow(follow)
         
     }
     
     func unsubcribed(with user: User, followersCurrentUsers: [Follow]) async {
         
-        do {
-            
-            for follower in followersCurrentUsers {
-                if follower.following == user.id {
-                    try await FollowService.deleteFollow(followId: follower.id)
-                    return
-                }
+        for follower in followersCurrentUsers {
+            if follower.following == user.id {
+                await followServise.deleteFollow(followId: follower.id)
+                return
             }
-        } catch {
-            print("ERROR DELETE FOLLOW: \(error.localizedDescription)")
         }
     }
-    
-    
 }

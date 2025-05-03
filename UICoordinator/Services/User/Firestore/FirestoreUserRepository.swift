@@ -15,9 +15,11 @@ class FirestoreUserRepository: FirestoreUserRepositoryProtocol {
         let snapshot = try await Firestore.firestore()
             .collection("users")
             .whereField("id", isNotEqualTo: currentUserId)
+            .whereField("isDelete", isEqualTo: false)
             .getDocuments()
 
         return snapshot.documents.compactMap { try? $0.data(as: User.self) }
+        
     }
     
     func fetchUsersByIds(_ ids: [String]) async throws -> [User] {
@@ -26,6 +28,7 @@ class FirestoreUserRepository: FirestoreUserRepositoryProtocol {
 
         let snapshot = try await Firestore.firestore()
             .collection("users")
+            .whereField("isDelete", isNotEqualTo: true)
             .whereField("id", in: ids)
             .getDocuments()
 

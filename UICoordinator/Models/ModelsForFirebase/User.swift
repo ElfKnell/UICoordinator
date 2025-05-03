@@ -16,8 +16,10 @@ struct User: Identifiable, Codable, Hashable {
     var profileImageURL: String?
     var bio: String?
     var link: String?
+    var isDelete: Bool
     
     var initials: String {
+        
         let formatter = PersonNameComponentsFormatter()
         if let components = formatter.personNameComponents(from: fullname) {
             formatter.style = .abbreviated

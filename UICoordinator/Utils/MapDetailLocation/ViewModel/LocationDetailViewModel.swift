@@ -20,9 +20,9 @@ class LocationDetailViewModel: ObservableObject {
         }
     }
     
-    func isCurrentUserUpdateLocation(mapSeliction: Location?, activity: Activity?) -> Bool {
+    func isCurrentUserUpdateLocation(mapSeliction: Location?, activity: Activity?, currentUserId: String?) -> Bool {
         
-        if  activity != nil && activity?.ownerUid != CurrentUserService.sharedCurrent.currentUser?.id {
+        if  activity != nil && activity?.ownerUid != currentUserId {
             return false
         }
         return true

@@ -12,11 +12,11 @@ class CreateColloquyViewModel: ObservableObject {
     @Published var errorUpload: String?
     
     @MainActor
-    func uploadColloquy(caption: String, locatioId: String?, ownerColloquy: String?, activityId: String?) async {
+    func uploadColloquy(userId: String?, caption: String, locatioId: String?, ownerColloquy: String?, activityId: String?) async {
         
         do {
             
-            guard let uid = Auth.auth().currentUser?.uid else { return }
+            guard let uid = userId else { return }
             
             let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: ownerColloquy ?? activityId)
             

@@ -24,28 +24,17 @@ final class MockDocumentSnapshot: DocumentSnapshotProtocol {
     }
 }
 
-// MARK: - Mock Firestore Service
-
 final class MockFirestoreService: FirestoreServiceProtocol {
     
     var shouldThrowError = false
     var mockUser: User?
-    
-    func deleteUserDocument() async throws {
-        
+
+    func getUserDocument(uid: String) async throws -> DocumentSnapshotProtocol {
         if shouldThrowError {
             throw UserError.userNotFound
         }
+
+        return MockDocumentSnapshot(user: mockUser ?? DeveloperPreview.user)
     }
-    
-    
-
-    func getUserDocument(uid: String) async throws -> DocumentSnapshotProtocol {
-            if shouldThrowError {
-                throw UserError.userNotFound
-            }
-
-            return MockDocumentSnapshot(user: mockUser ?? DeveloperPreview.user)
-        }
 }
 

@@ -12,6 +12,7 @@ struct ActivityCell: View {
     let activity: Activity
     @StateObject var viewModelLike = LikesViewModel(collectionName: "ActivityLikes")
     @StateObject var viewModel = ActivityCellViewModel()
+    @EnvironmentObject var container: DIContainer
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @Binding var isDelete: Bool
     @Binding var isUpdate: Bool
@@ -82,7 +83,7 @@ struct ActivityCell: View {
                         
                         Button {
                             Task {
-                                await viewModelLike.doLike(userId: activity.ownerUid, likeToObject: activity)
+                                await viewModelLike.doLike(userId: activity.ownerUid, currentUserId: container.currentUserService.currentUser?.id, likeToObject: activity)
                                 
                                 isUpdate.toggle()
                             }
@@ -139,12 +140,12 @@ struct ActivityCell: View {
             }
             
             Task {
-                await viewModelLike.isLike(cid: activity.id)
+                await viewModelLike.isLike(cid: activity.id, currentUserId: container.currentUserService.currentUser?.id)
             }
             
         }
         .sheet(isPresented: $showReplies, content: {
-            ActivityRepliesView(activity: activity)
+            ActivityRepliesView(activity: activity, user: container.currentUserService.currentUser)
         })
     }
 }

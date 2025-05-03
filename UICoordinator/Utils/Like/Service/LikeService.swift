@@ -26,8 +26,9 @@ class LikeService {
         return activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
     }
     
-    static func fetchCurrentUsersLike(collectionName: String) async throws -> [Like] {
-        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return [] }
+    static func fetchCurrentUsersLike(collectionName: String, currentUserId: String?) async throws -> [Like] {
+        
+        guard let currentUserId else { return [] }
         
         let snapshot = try await Firestore
             .firestore()
@@ -51,8 +52,8 @@ class LikeService {
         return activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
     }
     
-    static func fetchColloquyUserLike(cid: String, collectionName: String) async throws -> String? {
-        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return nil }
+    static func fetchColloquyUserLike(cid: String, collectionName: String, currentUserId: String?) async throws -> String? {
+        guard let currentUserId else { return nil }
         
         let snapshot = try await Firestore
             .firestore()
@@ -73,8 +74,8 @@ class LikeService {
             .delete()
     }
     
-    static func fetchLikeCurrentUsers(collectionName: String) async throws -> [Like] {
-        guard let currentUserId = CurrentUserService.sharedCurrent.currentUser?.id else { return [] }
+    static func fetchLikeCurrentUsers(collectionName: String, currentUserId: String?) async throws -> [Like] {
+        guard let currentUserId else { return [] }
         
         let snapshot = try await Firestore
             .firestore()

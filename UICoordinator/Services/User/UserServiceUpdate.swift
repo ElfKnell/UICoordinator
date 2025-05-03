@@ -45,4 +45,21 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
         }
     }
     
+    func deleteUser(userId: String?) async {
+        
+        do {
+            
+            guard let userId else { throw UserError.userNotFound }
+            
+            try await firestore
+                .collection("users")
+                .document(userId)
+                .updateData(["isDelete": true])
+           
+        } catch UserError.userNotFound {
+            print("ERROR DELETE USER: \(UserError.userNotFound.description)")
+        } catch {
+            print("ERROR DELETE USER: \(error.localizedDescription)")
+        }
+    }
 }

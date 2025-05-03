@@ -12,7 +12,7 @@ import Firebase
 struct LocationsView: View {
 
     @StateObject var viewModel = LocationViewModel()
-    @EnvironmentObject var authUser: AuthService
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         
@@ -69,7 +69,7 @@ struct LocationsView: View {
                     viewModel.coordinate = mapCameraUpdateContext.camera.centerCoordinate
                     viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
                     
-                    viewModel.fetchMoreLocationsByCurentUser(userId: CurrentUserService.sharedCurrent.currentUser?.id)
+                    viewModel.fetchMoreLocationsByCurentUser(userId: container.currentUserService.currentUser?.id)
                     
                 }
                 
@@ -126,12 +126,12 @@ struct LocationsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 Task {
-                    await viewModel.fetchLocationsByCurrentUser(userId: authUser.userSession?.uid)
+                    await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
                 }
             }
             .onChange(of: viewModel.isSave) {
                 Task {
-                    await viewModel.addLocation()
+                    await viewModel.addLocation(userId: container.authService.userSession?.uid)
                 }
             }
             .onChange(of: viewModel.getDirections, { oldValue, newValue in

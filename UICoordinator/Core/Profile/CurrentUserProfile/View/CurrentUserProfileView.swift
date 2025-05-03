@@ -9,18 +9,8 @@ import SwiftUI
 
 struct CurrentUserProfileView: View {
     
-    @EnvironmentObject var userFollow: UserFollowers
-    
+    @EnvironmentObject var container: DIContainer
     @StateObject var viewModel = CurrentUserProfileViewModel()
-    @State var currentUser: User
-    
-    init() {
-        if let user = CurrentUserService.sharedCurrent.currentUser {
-            _currentUser = .init(wrappedValue: user)
-        } else {
-            _currentUser = .init(wrappedValue: DeveloperPreview.user)
-        }
-    }
     
     var body: some View {
         
@@ -28,43 +18,52 @@ struct CurrentUserProfileView: View {
             if viewModel.isLoaded {
                 LoadingView(width: 300, height: 300)
             } else {
-                VStack(spacing: 20) {
-                    
-                    ProfileHeaderView(user: currentUser)
-                    
-                    Button {
-                        viewModel.showEditProfile.toggle()
-                    } label: {
-                        Text("Edit profile")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.black)
-                            .frame(width: 352, height: 32)
-                            .background(.white)
-                            .modifier(CornerRadiusModifier())
+                if let currentUser = container.currentUserService.currentUser {
+                    VStack(spacing: 20) {
+                        
+                        ProfileHeaderView(user: currentUser)
+                        
+                        Button {
+                            viewModel.showEditProfile.toggle()
+                        } label: {
+                            Text("Edit profile")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.black)
+                                .frame(width: 352, height: 32)
+                                .background(.white)
+                                .modifier(CornerRadiusModifier())
+                        }
+                        
+                        UserContentListView(user: currentUser)
                     }
-                    
-                    UserContentListView(user: currentUser)
+                } else {
+                    Text("User not found")
+                        .font(.title)
                 }
             }
         }
         .onAppear {
             
-            userFollow.fetchFollowCount(userId: currentUser.id)
+            if let user = container.currentUserService.currentUser {
+                container.userFollow.updateFollowCounts(for: user.id)
+            }
             
         }
         .onChange(of: viewModel.isSaved) {
             
             Task {
                 viewModel.isLoaded = true
-                currentUser = await viewModel.updateUser()
+                await container.currentUserService.updateCurrentUser()
                 viewModel.isLoaded = false
             }
             
         }
-        .sheet(isPresented: $viewModel.showEditProfile, content: {
-            EditProfileView(user: currentUser, isSaved: $viewModel.isSaved)
-        })
+        .sheet(isPresented: $viewModel.showEditProfile) {
+            if let currentUser = container.currentUserService.currentUser {
+                EditProfileView(user: currentUser, isSaved: $viewModel.isSaved)
+            }
+        }
     }
 }
 

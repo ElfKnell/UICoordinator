@@ -10,9 +10,9 @@ import SwiftUI
 struct RegistrationView: View {
     
     @StateObject var registrationModel = RegistrationViewModel()
-    @EnvironmentObject var viewModel: AuthService
+    @Binding var isNewUser: Bool
+    
     @Environment(\.horizontalSizeClass) var sizeClass
-    @Binding var isCreateUser: Bool
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -69,12 +69,10 @@ struct RegistrationView: View {
                     Button {
                         
                         Task {
-                            await viewModel.createUser(withEmail: registrationModel.email, passsword: registrationModel.password, fullname: registrationModel.name, username: registrationModel.username)
                             
-                            if viewModel.errorMessage != nil {
-                                registrationModel.isCreateUserError = true
-                            } else {
-                                isCreateUser = true
+                            self.isNewUser = await registrationModel.createUser()
+                            
+                            if self.isNewUser {
                                 dismiss()
                             }
                         }
@@ -113,7 +111,7 @@ struct RegistrationView: View {
                 .alert("Login problems", isPresented: $registrationModel.isCreateUserError) {
                     Button("OK", role: .cancel) {}
                 } message: {
-                    Text(viewModel.errorMessage ?? "no error")
+                    Text(registrationModel.errorCreated ?? "no error")
                 }
             }
         }
@@ -121,5 +119,5 @@ struct RegistrationView: View {
 }
 
 #Preview {
-    RegistrationView(isCreateUser: .constant(false))
+    RegistrationView(isNewUser: .constant(false))
 }

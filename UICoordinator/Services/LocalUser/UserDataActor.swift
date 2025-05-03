@@ -38,6 +38,14 @@ actor UserDataActor {
         return try modelContext.fetch(descriptor)
     }
     
+    func deleteAllUsers() throws {
+        let allUsers = try fetchAllUsers()
+        for user in allUsers {
+            modelContext.delete(user)
+        }
+        try modelContext.save()
+    }
+    
     func update(user updatedUser: LocalUser) {
         
         do {

@@ -9,9 +9,9 @@ import Foundation
 
 protocol CurrentUserServiceProtocol {
     
-    var currentUser: User? { get }
+    var currentUser: User? { get set }
     
-    func fetchCurrentUser(userId: String?) async
+    func fetchCurrentUser(userId: String?) async throws
     
     func updateCurrentUser() async
 }

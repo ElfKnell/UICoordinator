@@ -45,6 +45,30 @@ class CheckedLocalUsersByFollowing: CheckedLocalUsersByFollowingProtocol {
         }
     }
     
+    func removeUnfollowedLocalUsers(follows: [String]) async {
+        do {
+            let users = await localUserService.fetchLocalUsers()
+            try await ensureActorReady()
+
+            for localUser in users {
+                if !follows.contains(localUser.id) {
+                    try await userActor?.delete(user: localUser)
+                }
+            }
+        } catch {
+            print("ERROR removing unfollowed users: \(error.localizedDescription)")
+        }
+    }
+    
+    func clearAllLocalUsers() async {
+        do {
+            try await ensureActorReady()
+            try await userActor?.deleteAllUsers()
+        } catch {
+            print("ERROR clearing local users: \(error.localizedDescription)")
+        }
+    }
+    
     private func ensureActorReady() async throws {
         if userActor == nil {
             let container = try containerProvider()

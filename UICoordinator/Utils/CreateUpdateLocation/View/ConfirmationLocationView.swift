@@ -12,6 +12,8 @@ struct ConfirmationLocationView: View {
     let coordinate: CLLocationCoordinate2D
     var activityId: String?
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var container: DIContainer
+    
     @StateObject var viewModel = ConfirmationLocationViewModel()
     @Binding var isSave: Bool
     
@@ -50,7 +52,7 @@ struct ConfirmationLocationView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         Task {
-                            try await viewModel.uploadLocationWithCoordinate(coordinate: coordinate, activityId: activityId)
+                            try await viewModel.uploadLocationWithCoordinate(coordinate: coordinate, activityId: activityId, userUid: container.currentUserService.currentUser?.id)
                             isSave.toggle()
                             
                             dismiss()

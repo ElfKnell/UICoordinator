@@ -11,6 +11,4 @@ protocol UserServiceProtocol {
     
     func fetchUser(withUid uid: String) async -> User
     
-    func deleteUser() async
-    
 }

@@ -20,3 +20,13 @@ class MockCreateFirestoreService: FirestoreCreateUserProtocol {
     }
 
 }
+
+class MockFirebaseAuthProvider : FirebaseAuthProviderProtocol {
+    
+    var mockUser: FirebaseUserProtocol = MockFirebaseUser(uid: "135", email: "test@gtest.com")
+    
+    func signIn(email: String, password: String) async throws -> any FirebaseUserProtocol {
+        return mockUser
+    }
+    
+}

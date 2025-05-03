@@ -10,11 +10,13 @@ import SwiftUI
 struct RepliesView: View {
     
     let colloquy: Colloquy
+    let user: User?
     @StateObject var viewModel: RepliesViewModel
     
-    init(colloquy: Colloquy) {
+    init(colloquy: Colloquy, user: User?) {
         self.colloquy = colloquy
-        _viewModel = StateObject(wrappedValue: RepliesViewModel(colloquy.id))
+        self.user = user
+        _viewModel = StateObject(wrappedValue: RepliesViewModel(colloquy.id, currentUser: user))
     }
     
     var body: some View {
@@ -34,7 +36,7 @@ struct RepliesView: View {
                         ColloquyCell(colloquy: reply)
                             .onAppear {
                                 Task {
-                                    await viewModel.fetchReplies(colloquy.id)
+                                    await viewModel.fetchReplies(colloquy.id, currentUser: user)
                                 }
                             }
                     }
@@ -47,12 +49,12 @@ struct RepliesView: View {
         .padding(.horizontal)
         .refreshable {
             Task {
-                await viewModel.fetchRepliesRefresh(colloquy.id)
+                await viewModel.fetchRepliesRefresh(colloquy.id, currentUser: user)
             }
         }
     }
 }
 
 #Preview {
-    RepliesView(colloquy: DeveloperPreview.colloquy)
+    RepliesView(colloquy: DeveloperPreview.colloquy, user: DeveloperPreview.user)
 }

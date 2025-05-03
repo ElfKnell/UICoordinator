@@ -32,11 +32,11 @@ class LocalUserService: LocalUserServiceProtocol {
         }
     }
     
-    func fetchUsersbyLocalUsers() async -> [User] {
+    func fetchUsersbyLocalUsers(currentUser: User?) async -> [User] {
         
         do {
             var users = [User]()
-            guard let currentUser = CurrentUserService.sharedCurrent.currentUser else { return [] }
+            guard let currentUser else { return [] }
             users.append(currentUser)
             
             try await ensureActorReady()

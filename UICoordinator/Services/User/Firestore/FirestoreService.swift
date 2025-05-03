@@ -16,20 +16,7 @@ class FirestoreService: FirestoreServiceProtocol {
             .collection("users")
             .document(uid)
             .getDocument()
+        
         return snapshot
     }
-    
-    func deleteUserDocument() async throws {
-        
-        let user = Auth.auth().currentUser
-        guard let uid = user?.uid else { throw UserError.userNotFound }
-        
-        try await Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .delete()
-        
-        try await user?.delete()
-    }
-    
 }

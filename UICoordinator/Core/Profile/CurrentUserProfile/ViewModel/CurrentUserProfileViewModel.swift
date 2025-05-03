@@ -13,13 +13,6 @@ class CurrentUserProfileViewModel: ObservableObject {
     @Published var isSaved = false
     @Published var showEditProfile = false
     
-    func updateUser() async -> User {
-        
-        await CurrentUserService.sharedCurrent.updateCurrentUser()
-        guard let currentUser = CurrentUserService.sharedCurrent.currentUser else {
-            return DeveloperPreview.user
-        }
-        return currentUser
-        
-    }
+    
 }
+

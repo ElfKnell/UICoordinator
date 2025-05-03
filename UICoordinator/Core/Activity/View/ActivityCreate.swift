@@ -12,6 +12,7 @@ struct ActivityCreate: View {
     
     @State private var activity: Activity?
     @StateObject var viewModel = ActivityViewModel()
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         Group {
@@ -23,7 +24,7 @@ struct ActivityCreate: View {
         }
         .onAppear {
             Task {
-                activity = try await viewModel.createActivity(name: nameActivyty)
+                activity = try await viewModel.createActivity(name: nameActivyty, currentUserId: container.currentUserService.currentUser?.id)
             }
         }
     }

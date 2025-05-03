@@ -8,5 +8,8 @@
 import Foundation
 
 protocol FirestoreDocumentProtocol {
+    
     func updateData(_ data: [String: Any]) async throws
+    
+    func delete() async throws
 }

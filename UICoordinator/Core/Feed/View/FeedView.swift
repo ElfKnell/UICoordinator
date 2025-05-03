@@ -11,6 +11,7 @@ struct FeedView: View {
     
     @StateObject var viewModel = FeedViewModel()
     @State private var showColloquyCreate = false
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         NavigationStack {
@@ -23,7 +24,7 @@ struct FeedView: View {
                                     // Load more data when the last post appears
                                     if colloquy == viewModel.colloquies.last {
                                         Task {
-                                            await viewModel.fetchColloquies()
+                                            await viewModel.fetchColloquies(currentUser: container.currentUserService.currentUser)
                                         }
                                     }
                                 }
@@ -39,18 +40,18 @@ struct FeedView: View {
                 .onAppear {
                     Task {
                         if viewModel.colloquies.isEmpty {
-                            await viewModel.fetchColloquiesRefresh()
+                            await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                         }
                     }
                 }
                 .onChange(of: showColloquyCreate) {
                     Task {
-                        await viewModel.fetchColloquiesRefresh()
+                        await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                     }
                 }
                 .refreshable {
                     Task {
-                        await viewModel.fetchColloquiesRefresh()
+                        await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                     }
                 }
                 .navigationTitle("Colloquies")
