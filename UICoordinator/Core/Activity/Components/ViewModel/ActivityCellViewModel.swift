@@ -10,14 +10,17 @@ import Foundation
 class ActivityCellViewModel: ObservableObject {
     
     private var deleteLocation = DeleteLocation()
+    private var serviceLike = LikeService(serviceCreate: FirestoreLikeCreateServise(),
+                                          serviceDetete: FirestoreGeneralDeleteService())
+    private var fetchingLikes = FetchLikesService(likeRepository: FirestoreLikeRepository())
     
     func deleteActivity(activity: Activity) async throws {
         
-        let likes = try await LikeService.fetchUsersLikes(userId: activity.ownerUid, collectionName: "ActivityLikes")
+        let likes = await fetchingLikes.getLikes(collectionName: .activityLikes, byField: .userIdField, userId: activity.ownerUid)
         
         if !likes.isEmpty {
             for i in 0 ..< likes.count {
-                try await LikeService.deleteLike(likeId: likes[i].id, collectionName: "ActivityLikes")
+                await serviceLike.deleteLike(likeId: likes[i].id, collectionName: .activityLikes)
             }
         }
         

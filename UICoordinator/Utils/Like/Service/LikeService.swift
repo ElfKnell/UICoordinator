@@ -8,82 +8,46 @@
 import Foundation
 import Firebase
 
-class LikeService {
+class LikeService: LikeServiceProtocol {
     
-    static func uploadLike(_ like: Like, collectionName: String) async throws {
-        guard let likeDate = try? Firestore.Encoder().encode(like) else { return }
-        try await Firestore.firestore().collection(collectionName).addDocument(data: likeDate)
+    private let serviceCreate: FirestoreLikeCreateServiseProtocol
+    private let serviceDetete: FirestoreGeneralDeleteProtocol
+    
+    init(serviceCreate: FirestoreLikeCreateServiseProtocol,
+         serviceDetete: FirestoreGeneralDeleteProtocol) {
+        
+        self.serviceCreate = serviceCreate
+        self.serviceDetete = serviceDetete
+        
     }
     
-    static func fetchColloquyLike(cid: String, collectionName: String) async throws -> [Like] {
-        let snapshot = try await Firestore
-            .firestore()
-            .collection(collectionName)
-            .whereField("colloquyId", isEqualTo: cid)
-            .getDocuments()
+    func uploadLike(_ like: Like, collectionName: CollectionNameForLike) async {
         
-        let activities = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-        return activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
+        do {
+            
+            guard let likeDate = try? Firestore
+                .Encoder()
+                .encode(like) else { return }
+            
+            try await serviceCreate.addDocument(collectionName: collectionName,
+                                                data: likeDate)
+            
+        } catch {
+            print("ERROR Create like in collection \(collectionName.value): \(error.localizedDescription)")
+        }
+        
     }
     
-    static func fetchCurrentUsersLike(collectionName: String, currentUserId: String?) async throws -> [Like] {
+    func deleteLike(likeId: String, collectionName: CollectionNameForLike) async {
         
-        guard let currentUserId else { return [] }
+        do {
+            
+            try await serviceDetete.deleteDocument(from: collectionName.value,
+                                                   documentId: likeId)
+            
+        } catch {
+            print("ERROR Delete like in collection \(collectionName.value): \(error.localizedDescription)")
+        }
         
-        let snapshot = try await Firestore
-            .firestore()
-            .collection(collectionName)
-            .whereField("userId", isEqualTo: currentUserId)
-            .getDocuments()
-        
-        let activities = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-        return activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
-    }
-    
-    static func fetchUsersLikes(userId: String, collectionName: String) async throws -> [Like] {
-        
-        let snapshot = try await Firestore
-            .firestore()
-            .collection(collectionName)
-            .whereField("userId", isEqualTo: userId)
-            .getDocuments()
-        
-        let activities = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-        return activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
-    }
-    
-    static func fetchColloquyUserLike(cid: String, collectionName: String, currentUserId: String?) async throws -> String? {
-        guard let currentUserId else { return nil }
-        
-        let snapshot = try await Firestore
-            .firestore()
-            .collection(collectionName)
-            .whereField("colloquyId", isEqualTo: cid)
-            .whereField("ownerUid", isEqualTo: currentUserId)
-            .getDocuments()
-        
-        let like = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-        return like.isEmpty ? nil : like[0].id
-    }
-    
-    static func deleteLike(likeId: String, collectionName: String) async throws {
-        try await Firestore
-            .firestore()
-            .collection(collectionName)
-            .document(likeId)
-            .delete()
-    }
-    
-    static func fetchLikeCurrentUsers(collectionName: String, currentUserId: String?) async throws -> [Like] {
-        guard let currentUserId else { return [] }
-        
-        let snapshot = try await Firestore
-            .firestore()
-            .collection(collectionName)
-            .whereField("ownerUid", isEqualTo: currentUserId)
-            .getDocuments()
-        
-        let activities = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-        return activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
     }
 }

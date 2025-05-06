@@ -10,7 +10,7 @@ import SwiftUI
 struct ColloquyCell: View {
     let colloquy: Colloquy
     @EnvironmentObject var container: DIContainer
-    @StateObject var viewModel = LikesViewModel(collectionName: "Likes")
+    @StateObject var viewModel = LikesViewModel(collectionName: .likes)
     @State private var showReplieCreate = false
     @State var isChange = false
     

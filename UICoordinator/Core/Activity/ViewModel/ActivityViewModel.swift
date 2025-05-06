@@ -13,6 +13,7 @@ class ActivityViewModel: ObservableObject {
     @Published var activities = [Activity]()
     private var localUserServise = LocalUserService()
     private var userService = UserService()
+    private let fetchingLikes = FetchLikesService(likeRepository: FirestoreLikeRepository())
     
     func createActivity(name: String, currentUserId: String?) async throws -> Activity? {
         guard let currentUserId else { return nil }
@@ -64,7 +65,8 @@ class ActivityViewModel: ObservableObject {
     
     private func fetchLikeActivity(currentUser: User?) async throws {
         
-        let likes = try await LikeService.fetchLikeCurrentUsers(collectionName: "ActivityLikes", currentUserId: currentUser?.id)
+        let likes = await fetchingLikes.getLikes(collectionName: .activityLikes, byField: .ownerUidField, userId: currentUser?.id)
+        
         self.activities = []
         let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         

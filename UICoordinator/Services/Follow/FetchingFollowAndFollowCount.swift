@@ -15,7 +15,7 @@ class FetchingFollowAndFollowCount: FetchingFollowAndFollowCountProtocol {
         self.firestoreService = firestoreService
     }
     
-    func fetchFollow(uid: String, byField: FieldToFetching) async -> [Follow] {
+    func fetchFollow(uid: String, byField: FieldToFetchingFollow) async -> [Follow] {
         
         do {
             
@@ -30,7 +30,7 @@ class FetchingFollowAndFollowCount: FetchingFollowAndFollowCountProtocol {
         }
     }
     
-    func fetchFollowCount(uid: String, byField: FieldToFetching) async -> Int {
+    func fetchFollowCount(uid: String, byField: FieldToFetchingFollow) async -> Int {
         
         do {
             return try await firestoreService.getFollowCount(uid: uid, followField: byField)

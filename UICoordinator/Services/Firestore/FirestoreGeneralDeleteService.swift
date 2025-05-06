@@ -10,15 +10,15 @@ import Firebase
 
 class FirestoreGeneralDeleteService: FirestoreGeneralDeleteProtocol {
     
-//    private let db: FirestoreProtocol
-//
-//    init(db: FirestoreProtocol = Firestore.firestore()) {
-//        self.db = db
-//    }
+    private let db: FirestoreProtocol
+
+    init(db: FirestoreProtocol = Firestore.firestore()) {
+        self.db = db
+    }
 
     func deleteDocument(from collection: String, documentId: String) async throws {
         
-        try await Firestore.firestore()
+        try await db
             .collection(collection)
             .document(documentId)
             .delete()

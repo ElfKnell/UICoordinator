@@ -12,11 +12,11 @@ final class MockFetchingService: FetchingFollowAndFollowCountProtocol {
     var followsToReturn: [Follow] = []
     var followCountToReturn: Int = 0
     
-    func fetchFollow(uid: String, byField: FieldToFetching) async -> [Follow] {
+    func fetchFollow(uid: String, byField: FieldToFetchingFollow) async -> [Follow] {
         return followsToReturn
     }
     
-    func fetchFollowCount(uid: String, byField: FieldToFetching) async -> Int {
+    func fetchFollowCount(uid: String, byField: FieldToFetchingFollow) async -> Int {
         return followCountToReturn
     }
 }

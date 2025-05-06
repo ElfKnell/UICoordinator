@@ -69,8 +69,7 @@ class UserFollowers: UserFollowersProtocol {
         Task {
             async let followersCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followerField)
             async let followingCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followingField)
-                    
-                    // Wait for both async tasks to finish
+
             await self.countFollowers = followersCount
             await self.countFollowing = followingCount
         }

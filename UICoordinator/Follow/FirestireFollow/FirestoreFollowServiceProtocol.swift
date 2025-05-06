@@ -9,7 +9,7 @@ import Foundation
 
 protocol FirestoreFollowServiceProtocol {
     
-    func getFollows(uid: String, followField: FieldToFetching) async throws -> [Follow]
-    func getFollowCount(uid: String, followField: FieldToFetching) async throws -> Int
+    func getFollows(uid: String, followField: FieldToFetchingFollow) async throws -> [Follow]
+    func getFollowCount(uid: String, followField: FieldToFetchingFollow) async throws -> Int
     
 }

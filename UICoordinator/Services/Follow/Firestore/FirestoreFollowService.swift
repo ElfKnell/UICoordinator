@@ -10,9 +10,7 @@ import Firebase
 
 class FirestoreFollowService: FirestoreFollowServiceProtocol {
     
-    //var db = Firestore.firestore()
-    
-    func getFollows(uid: String, followField: FieldToFetching) async throws -> [Follow] {
+    func getFollows(uid: String, followField: FieldToFetchingFollow) async throws -> [Follow] {
         
         guard !uid.isEmpty else {
             throw FollowError.invalidInput
@@ -29,7 +27,7 @@ class FirestoreFollowService: FirestoreFollowServiceProtocol {
         return followers.sorted(by: { $0.updateTime.dateValue() < $1.updateTime.dateValue() })
     }
     
-    func getFollowCount(uid: String, followField: FieldToFetching) async throws -> Int {
+    func getFollowCount(uid: String, followField: FieldToFetchingFollow) async throws -> Int {
         
         guard !uid.isEmpty else {
             throw FollowError.invalidInput

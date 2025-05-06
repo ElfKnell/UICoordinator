@@ -13,14 +13,14 @@ final class MockFirestoreFollowService: FirestoreFollowServiceProtocol {
     var mockFollowCount: Int = 0
     var shouldThrowError = false
     
-    func getFollows(uid: String, followField: FieldToFetching) async throws -> [Follow] {
+    func getFollows(uid: String, followField: FieldToFetchingFollow) async throws -> [Follow] {
         if shouldThrowError || uid.isEmpty {
             throw FollowError.invalidInput
         }
         return mockFollows.sorted(by: { $0.updateTime.dateValue() < $1.updateTime.dateValue() })
     }
     
-    func getFollowCount(uid: String, followField: FieldToFetching) async throws -> Int {
+    func getFollowCount(uid: String, followField: FieldToFetchingFollow) async throws -> Int {
         if shouldThrowError || uid.isEmpty {
             throw FollowError.invalidInput
         }

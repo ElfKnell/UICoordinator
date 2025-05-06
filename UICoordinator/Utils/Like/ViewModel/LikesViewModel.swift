@@ -10,12 +10,18 @@ import Firebase
 import Swift
 
 class LikesViewModel: ObservableObject {
-    @Published var collectionName: String
+    @Published var collectionName: CollectionNameForLike
     @Published var likeId: String?
     
-    init(likeId: String? = nil, collectionName: String) {
+    private let likeService = LikeService(serviceCreate: FirestoreLikeCreateServise(),
+                                          serviceDetete: FirestoreGeneralDeleteService())
+    private let fethingLike = FetchLikesService(likeRepository: FirestoreLikeRepository())
+    
+    init(likeId: String? = nil, collectionName: CollectionNameForLike) {
+        
         self.likeId = likeId
         self.collectionName = collectionName
+        
     }
     
     func doLike<T: Identifiable>(userId: String, currentUserId: String?,  likeToObject:T) async {
@@ -32,43 +38,33 @@ class LikesViewModel: ObservableObject {
     
     private func createLike(userId: String, currentUserId: String, colloquyId: String) async {
         
-        do {
-            
-            let like = Like(ownerUid: currentUserId, userId: userId, colloquyId: colloquyId, time: Timestamp())
-            
-            try await LikeService.uploadLike(like, collectionName: collectionName)
-            await isLike(cid: colloquyId, currentUserId: currentUserId)
-        } catch {
-            print("ERROR CREATE LIKE: \(error.localizedDescription)")
-        }
+        let like = Like(ownerUid: currentUserId, userId: userId, colloquyId: colloquyId, time: Timestamp())
+        
+        await likeService.uploadLike(like, collectionName: collectionName)
+        await isLike(cid: colloquyId, currentUserId: currentUserId)
         
     }
     
     @MainActor
     func isLike(cid: String, currentUserId: String?) async {
         
-        do {
-            guard let id = try await LikeService.fetchColloquyUserLike(cid: cid, collectionName: collectionName, currentUserId: currentUserId) else { return }
-            self.likeId = id
-        } catch {
-            print("ERROR IS LIKE: \(error.localizedDescription)")
-        }
+        let id = await fethingLike.getLikeByColloquyAndUser(collectionName: collectionName, colloquyId: cid, userId: currentUserId)
+        self.likeId = id
+        
     }
     
     @MainActor
     private func deleteLike() async {
         
-        do {
-            if let likeId = self.likeId {
-                try await LikeService.deleteLike(likeId: likeId, collectionName: collectionName)
-                self.likeId = nil
-            }
-        } catch {
-            print("ERROR DELETE LIKE: \(error.localizedDescription)")
+        if let likeId = self.likeId {
+            await likeService.deleteLike(likeId: likeId, collectionName: collectionName)
+            self.likeId = nil
         }
+        
     }
     
     private func addLikeToObject<T>(_ object: T) async {
+        
         do {
             if let colloquy = object as? Colloquy {
                 try await ColloquyService.updateLikeCount(colloquyId: colloquy.id, countLikes: colloquy.likes + 1)
@@ -85,6 +81,7 @@ class LikesViewModel: ObservableObject {
     }
     
     private func subtractLikeToObject<T>(_ object: T) async {
+        
         do {
             if let colloquy = object as? Colloquy {
                 let countLike = colloquy.likes - 1 > 0 ? colloquy.likes - 1 : 0

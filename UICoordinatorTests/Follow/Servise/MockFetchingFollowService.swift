@@ -15,13 +15,13 @@ final class MockFetchingFollowService: FirestoreFollowServiceProtocol {
     var shouldThrowInvalidInput = false
     var shouldThrowGenericError = false
 
-    func getFollows(uid: String, followField: FieldToFetching) async throws -> [Follow] {
+    func getFollows(uid: String, followField: FieldToFetchingFollow) async throws -> [Follow] {
         if shouldThrowInvalidInput { throw FollowError.invalidInput }
         if shouldThrowGenericError { throw NSError(domain: "Test", code: 0) }
         return mockFollows
     }
 
-    func getFollowCount(uid: String, followField: FieldToFetching) async throws -> Int {
+    func getFollowCount(uid: String, followField: FieldToFetchingFollow) async throws -> Int {
         if shouldThrowInvalidInput { throw FollowError.invalidInput }
         if shouldThrowGenericError { throw NSError(domain: "Test", code: 1) }
         return mockCount

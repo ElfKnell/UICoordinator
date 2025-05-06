@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FieldToFetching {
+enum FieldToFetchingFollow {
     case followerField
     case followingField
     

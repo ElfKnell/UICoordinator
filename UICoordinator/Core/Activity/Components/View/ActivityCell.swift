@@ -10,7 +10,7 @@ import SwiftUI
 struct ActivityCell: View {
     
     let activity: Activity
-    @StateObject var viewModelLike = LikesViewModel(collectionName: "ActivityLikes")
+    @StateObject var viewModelLike = LikesViewModel(collectionName: .activityLikes)
     @StateObject var viewModel = ActivityCellViewModel()
     @EnvironmentObject var container: DIContainer
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape

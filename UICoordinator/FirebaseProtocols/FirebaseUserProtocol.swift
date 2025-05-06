@@ -8,6 +8,8 @@
 import Foundation
 
 protocol FirebaseUserProtocol {
+    
     var uid: String { get }
     var email: String? { get }
+    
 }
