@@ -17,7 +17,8 @@ extension User {
             profileImageURL: profileImageURL,
             bio: bio,
             link: link,
-            isDelete: isDelete
+            isDelete: isDelete,
+            isPrivateProfile: isPrivateProfile
         )
     }
 }
@@ -32,7 +33,8 @@ extension LocalUser {
             profileImageURL: profileImageURL,
             bio: bio,
             link: link,
-            isDelete: isDelete
+            isDelete: isDelete,
+            isPrivateProfile: isPrivateProfile
         )
     }
 }

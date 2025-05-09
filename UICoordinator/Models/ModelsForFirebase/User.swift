@@ -17,6 +17,7 @@ struct User: Identifiable, Codable, Hashable {
     var bio: String?
     var link: String?
     var isDelete: Bool
+    var isPrivateProfile: Bool?
     
     var initials: String {
         

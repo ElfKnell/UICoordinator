@@ -137,7 +137,9 @@ struct EditProfileView: View {
                             Task {
                                 await viewModel.updateUserData(user: user,
                                                                nickname: nickname,
-                                                               bio: bio, link: link)
+                                                               bio: bio,
+                                                               link: link,
+                                                               isPrivateProfile: isPrivateProfile)
                                 
                                 isSaved.toggle()
                                 dismiss()

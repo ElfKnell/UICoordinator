@@ -15,4 +15,6 @@ protocol UserServiceUpdateProtocol {
     
     func deleteUser(userId: String?) async
     
+    func updateUserPrivate(isPrivateProfile: Bool, userId: String) async
+    
 }

@@ -62,4 +62,17 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
             print("ERROR DELETE USER: \(error.localizedDescription)")
         }
     }
+    
+    func updateUserPrivate(isPrivateProfile: Bool, userId: String) async {
+        
+        do {
+            try await firestore
+                .collection("users")
+                .document(userId)
+                .updateData(["isPrivateProfile": isPrivateProfile])
+            
+        } catch {
+            print("ERROR UPDATE USER PROFILE PHOTO: \(error.localizedDescription)")
+        }
+    }
 }

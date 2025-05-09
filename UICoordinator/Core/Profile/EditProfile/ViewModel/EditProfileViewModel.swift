@@ -18,8 +18,10 @@ class EditProfileViewModel: ObservableObject {
     private var uiImage: UIImage?
     private var userServiseUpdate = UserServiceUpdate()
     
-    func updateUserData(user: User, nickname: String, bio: String, link: String) async {
-        
+    func updateUserData(user: User, nickname: String, bio: String, link: String, isPrivateProfile: Bool) async {
+        if user.isPrivateProfile != isPrivateProfile && (isPrivateProfile || user.isPrivateProfile != nil) {
+            await userServiseUpdate.updateUserPrivate(isPrivateProfile: isPrivateProfile, userId: user.id)
+        }
         await userServiseUpdate.updateUserProfile(userId: user.id, nickname: nickname,  bio: bio, link: link)
         await uploadeProfileImage(userId: user.id)
         

@@ -58,16 +58,30 @@ struct ProfileView: View {
                         
                         Spacer()
                         
-                        NavigationLink {
-                            UserLocationsView(userId: user.id)
-                        } label: {
-                            Text("Map")
+                        if let isPrivate = user.isPrivateProfile, isPrivate {
+                            
+                            Text("Private Profile")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity, minHeight: 32)
                                 .background(.black)
                                 .cornerRadius(11)
+                            
+                        } else {
+                            
+                            NavigationLink {
+                                UserLocationsView(userId: user.id)
+                            } label: {
+                                Text("Map")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .frame(maxWidth: .infinity, minHeight: 32)
+                                    .background(.black)
+                                    .cornerRadius(11)
+                            }
+                            
                         }
                         
                         Spacer()
