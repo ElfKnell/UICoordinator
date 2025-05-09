@@ -20,7 +20,7 @@ struct LoginView: View {
             
             ZStack {
                 
-                BackgroundView()
+                BackgroundView(backgroundHeight: .large)
                 
                 VStack {
                     

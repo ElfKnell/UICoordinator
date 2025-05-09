@@ -21,7 +21,7 @@ struct RegistrationView: View {
             
             ZStack {
                 
-                BackgroundView()
+                BackgroundView(backgroundHeight: .large)
                 
                 VStack {
                     

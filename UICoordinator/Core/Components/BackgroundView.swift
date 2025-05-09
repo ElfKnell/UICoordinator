@@ -9,15 +9,17 @@ import SwiftUI
 
 struct BackgroundView: View {
     
-    private var backgroundHeight: CGFloat {
-        return UIScreen.main.bounds.height * 1.3
-    }
+    var backgroundHeight: BackgroundSize?
     
     var body: some View {
         RoundedRectangle(cornerRadius: 30, style: .continuous)
             .foregroundStyle(.linearGradient(colors: [.blue, .red], startPoint: .topLeading, endPoint: .bottomTrailing))
             .rotationEffect(.degrees(137))
-            .frame(height: backgroundHeight)
+            .frame(height: backgroundHeight?.value ?? .none)
             .ignoresSafeArea()
     }
+}
+
+#Preview {
+    BackgroundView()
 }
