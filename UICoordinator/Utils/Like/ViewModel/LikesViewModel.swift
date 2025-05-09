@@ -13,6 +13,7 @@ class LikesViewModel: ObservableObject {
     @Published var collectionName: CollectionNameForLike
     @Published var likeId: String?
     
+    private let likeCount = ColloquyInteractionCounterService()
     private let likeService = LikeService(serviceCreate: FirestoreLikeCreateServise(),
                                           serviceDetete: FirestoreGeneralDeleteService())
     private let fethingLike = FetchLikesService(likeRepository: FirestoreLikeRepository())
@@ -67,7 +68,7 @@ class LikesViewModel: ObservableObject {
         
         do {
             if let colloquy = object as? Colloquy {
-                try await ColloquyService.updateLikeCount(colloquyId: colloquy.id, countLikes: colloquy.likes + 1)
+                await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: colloquy.likes + 1)
             } else if let activity = object as? Activity {
                 try await ActivityService.updateLikeCount(activityId: activity.id, countLikes: activity.likes + 1)
             } else {
@@ -85,7 +86,7 @@ class LikesViewModel: ObservableObject {
         do {
             if let colloquy = object as? Colloquy {
                 let countLike = colloquy.likes - 1 > 0 ? colloquy.likes - 1 : 0
-                try await ColloquyService.updateLikeCount(colloquyId: colloquy.id, countLikes: countLike)
+                await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: countLike)
             } else if let activity = object as? Activity {
                 let countLike = activity.likes - 1 > 0 ? activity.likes - 1 : 0
                 try await ActivityService.updateLikeCount(activityId: activity.id, countLikes: countLike)

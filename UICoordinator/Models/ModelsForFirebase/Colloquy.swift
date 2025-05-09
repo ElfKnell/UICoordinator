@@ -17,8 +17,9 @@ struct Colloquy: Identifiable, Codable, Hashable, Equatable {
     let timestamp: Timestamp
     var likes: Int
     let locationId: String?
-    let ownerColloquy: String?
+    let ownerColloquy: String
     var repliesCount: Int?
+    var isDelete: Bool
     
     var id: String {
         return threadId ?? NSUUID().uuidString
@@ -35,7 +36,8 @@ struct Colloquy: Identifiable, Codable, Hashable, Equatable {
         lhs.likes == rhs.likes &&
         lhs.locationId == rhs.locationId &&
         lhs.ownerColloquy == rhs.ownerColloquy &&
-        lhs.repliesCount == rhs.repliesCount
+        lhs.repliesCount == rhs.repliesCount &&
+        lhs.isDelete == rhs.isDelete
     }
     
     func hash(into hasher: inout Hasher) {
@@ -47,5 +49,6 @@ struct Colloquy: Identifiable, Codable, Hashable, Equatable {
         hasher.combine(locationId)
         hasher.combine(ownerColloquy)
         hasher.combine(repliesCount)
+        hasher.combine(isDelete)
     }
 }

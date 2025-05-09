@@ -10,20 +10,21 @@ import Firebase
 class CreateColloquyViewModel: ObservableObject {
     
     @Published var errorUpload: String?
+    private let likeCount = ColloquyInteractionCounterService()
+    private let colloquyService = ColloquyService(serviceDetete: FirestoreGeneralDeleteService(), repliesFetchingService: FetchRepliesFirebase())
     
     @MainActor
-    func uploadColloquy(userId: String?, caption: String, locatioId: String?, ownerColloquy: String?, activityId: String?) async {
+    func uploadColloquy(userId: String?, caption: String, locatioId: String?, activityId: String?) async {
         
         do {
             
             guard let uid = userId else { return }
             
-            let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: ownerColloquy ?? activityId)
+            let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
             
-            try await ColloquyService.uploadeColloquy(colloquy)
-            if let ownerColloquy = ownerColloquy {
-                try await ColloquyService.incrementRepliesCount(colloquyId: ownerColloquy)
-            } else if let activityId = activityId {
+            await colloquyService.uploadeColloquy(colloquy)
+            
+            if let activityId = activityId {
                 try await ActivityService.incrementRepliesCount(activityId: activityId)
             }
             

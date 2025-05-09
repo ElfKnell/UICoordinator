@@ -45,15 +45,7 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
             
             self.lastDocument = snapshot.documents.last
             
-            var replies = snapshot.documents.compactMap { document in
-                let colloquy = try? document.data(as: Colloquy.self)
-                
-                if colloquy?.ownerColloquy == nil {
-                    return colloquy
-                } else {
-                    return nil
-                }
-            }
+            var replies = snapshot.documents.compactMap({ try? $0.data(as: Colloquy.self) })
             
             replies = await addUserAndLocation(replies: replies, localUsers: localUsers)
             
@@ -76,6 +68,7 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
                 .firestore()
                 .collection("colloquies")
                 .whereField("ownerColloquy", isEqualTo: colloquyId)
+                .whereField("isDelete", isEqualTo: false)
                 .order(by: "timestamp", descending: true)
                 .limit(to: pageSize)
                 
@@ -102,6 +95,18 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
             print("ERROR fetching replies: \(error.localizedDescription)")
             return []
         }
+    }
+    
+    func getRepliesByColloquy(colloquyId: String) async throws -> [Colloquy] {
+        
+        let snapshot = try await Firestore
+            .firestore()
+            .collection("colloquies")
+            .whereField("ownerColloquy", isEqualTo: colloquyId)
+            .whereField("isDelete", isEqualTo: false)
+            .getDocuments()
+        
+        return snapshot.documents.compactMap({ try? $0.data(as: Colloquy.self)})
     }
     
     private func addUserAndLocation(replies: [Colloquy], localUsers: [User]) async -> [Colloquy] {

@@ -15,6 +15,9 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
     private var isDataLoaded = false
     private var lastDocumentForUser: DocumentSnapshot?
     private var isUserDataLoaded = false
+    private var lastDocumentForDeleted: DocumentSnapshot?
+    private var isUserDataDeleted = false
+    
     private var fetchLocation = FetchLocationFromFirebase()
     
     func getColloquies(users: [User], pageSize: Int) async -> [Colloquy] {
@@ -25,6 +28,8 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
             var query = Firestore
                 .firestore()
                 .collection("colloquies")
+                .whereField("ownerColloquy", isEqualTo: "")
+                .whereField("isDelete", isEqualTo: false)
                 .order(by: "timestamp", descending: true)
                 .limit(to: pageSize)
             
@@ -40,21 +45,13 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
             let snapshot = try await query.getDocuments()
             
             if snapshot.documents.isEmpty {
-                isDataLoaded = true  // Set flag to true if no data is returned
+                isDataLoaded = true
                 return []
             }
             
             self.lastDocument = snapshot.documents.last
             
-            var colloquies = snapshot.documents.compactMap { document in
-                let colloquy = try? document.data(as: Colloquy.self)
-                
-                if colloquy?.ownerColloquy == nil {
-                    return colloquy
-                } else {
-                    return nil
-                }
-            }
+            var colloquies = snapshot.documents.compactMap({ try? $0.data(as: Colloquy.self) })
             
             for i in 0 ..< colloquies.count
             {
@@ -84,6 +81,8 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
                 .firestore()
                 .collection("colloquies")
                 .whereField("ownerUid", isEqualTo: user.id)
+                .whereField("ownerColloquy", isEqualTo: "")
+                .whereField("isDelete", isEqualTo: false)
                 .order(by: "timestamp", descending: true)
                 .limit(to: pageSize)
             
@@ -94,21 +93,60 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
             let snapshot = try await query.getDocuments()
             
             if snapshot.documents.isEmpty {
-                isUserDataLoaded = true  // Set flag to true if no data is returned
+                isUserDataLoaded = true
                 return []
             }
             
             self.lastDocumentForUser = snapshot.documents.last
             
-            var colloquies = snapshot.documents.compactMap { document in
-                let colloquy = try? document.data(as: Colloquy.self)
+            var colloquies = snapshot.documents.compactMap({ try? $0.data(as: Colloquy.self) })
+            
+            for i in 0 ..< colloquies.count
+            {
+                let colloquy = colloquies[i]
                 
-                if colloquy?.ownerColloquy == nil {
-                    return colloquy
-                } else {
-                    return nil
-                }
+                colloquies[i].user = user
+                
+                guard let locationId = colloquy.locationId else { continue }
+                let colloquyLocation = await fetchLocation.fetchLocation(withId: locationId)
+                colloquies[i].location = colloquyLocation
             }
+            
+            return colloquies
+        } catch {
+            print("Fetch for user failed: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    func getDeletedColloquies(user: User, pageSize: Int) async -> [Colloquy] {
+        
+        do {
+            if isUserDataDeleted { return [] }
+            
+            var query = Firestore
+                .firestore()
+                .collection("colloquies")
+                .whereField("ownerUid", isEqualTo: user.id)
+                .whereField("ownerColloquy", isEqualTo: "")
+                .whereField("isDelete", isEqualTo: true)
+                .order(by: "timestamp", descending: true)
+                .limit(to: pageSize)
+            
+            if let lastDoc = lastDocumentForDeleted {
+                query = query.start(afterDocument: lastDoc)
+            }
+            
+            let snapshot = try await query.getDocuments()
+            
+            if snapshot.documents.isEmpty {
+                isUserDataDeleted = true
+                return []
+            }
+            
+            self.lastDocumentForDeleted = snapshot.documents.last
+            
+            var colloquies = snapshot.documents.compactMap({ try? $0.data(as: Colloquy.self) })
             
             for i in 0 ..< colloquies.count
             {

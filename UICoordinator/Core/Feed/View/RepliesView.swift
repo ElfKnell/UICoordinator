@@ -11,7 +11,10 @@ struct RepliesView: View {
     
     let colloquy: Colloquy
     let user: User?
+    
+    @State var isCreate = false
     @StateObject var viewModel: RepliesViewModel
+    @Environment(\.dismiss) var dismiss
     
     init(colloquy: Colloquy, user: User?) {
         self.colloquy = colloquy
@@ -20,36 +23,54 @@ struct RepliesView: View {
     }
     
     var body: some View {
-        
-        ScrollView(showsIndicators: false) {
-            
-            ReplyCreateView(colloquy: colloquy)
-            
-            Divider()
-            
-            HStack {
-                Divider()
-                    .frame(width: 10)
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
                 
-                LazyVStack {
-                    ForEach(viewModel.replies) { reply in
-                        ColloquyCell(colloquy: reply)
-                            .onAppear {
-                                Task {
-                                    await viewModel.fetchReplies(colloquy.id, currentUser: user)
+                ReplyCreateView(colloquy: colloquy)
+                
+                Divider()
+                
+                HStack {
+                    Divider()
+                        .frame(width: 10)
+                    
+                    LazyVStack {
+                        ForEach(viewModel.replies) { reply in
+                            ColloquyCell(colloquy: reply)
+                                .onAppear {
+                                    Task {
+                                        await viewModel.fetchReplies(colloquy.id, currentUser: user)
+                                    }
                                 }
-                            }
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                .onChange(of: isCreate) {
+                    Task {
+                        await viewModel.fetchRepliesRefresh(colloquy.id, currentUser: user)
+                    }
+                }
+                
+            }
+            .padding(.horizontal)
+            .navigationTitle("Replies")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "arrow.left.to.line")
+                            .fontWeight(.semibold)
                     }
                 }
             }
-            .padding(.horizontal)
-            
-            
-        }
-        .padding(.horizontal)
-        .refreshable {
-            Task {
-                await viewModel.fetchRepliesRefresh(colloquy.id, currentUser: user)
+            .safeAreaInset(edge: .bottom) {
+                
+                CreateReplyView(isCreate: $isCreate, colloquyId: colloquy.id, user: user)
+                
             }
         }
     }

@@ -82,6 +82,7 @@ struct ActivityRepliesView: View {
             .font(.subheadline)
             .sheet(isPresented: $showColloquyCreate, content: {
                 CreateColloquyView(activityId: activity.id)
+                    .presentationDetents([.height(340), .medium])
             })
         }
     }

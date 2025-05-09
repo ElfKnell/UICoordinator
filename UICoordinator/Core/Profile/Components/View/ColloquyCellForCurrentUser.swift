@@ -1,18 +1,20 @@
 //
-//  TreadCell.swift
+//  ColloquyCellForCurrentUser.swift
 //  UICoordinator
 //
-//  Created by Andrii Kyrychenko on 21/02/2024.
+//  Created by Andrii Kyrychenko on 07/05/2025.
 //
 
 import SwiftUI
 
-struct ColloquyCell: View {
+struct ColloquyCellForCurrentUser: View {
+    
     let colloquy: Colloquy
-    @EnvironmentObject var container: DIContainer
+    let user: User
+    let colloquyService = ColloquyService(serviceDetete: FirestoreGeneralDeleteService(), repliesFetchingService: FetchRepliesFirebase())
+    @Binding var isDeleted: Bool
     @StateObject var viewModel = LikesViewModel(collectionName: .likes)
-    @State private var showReplieCreate = false
-    @State var isChange = false
+    @State private var sheetStatus: SheetStatus? = nil
     
     var body: some View {
         
@@ -20,35 +22,15 @@ struct ColloquyCell: View {
             
             HStack(alignment: .top, spacing: 12) {
                 
-                NavigationLink {
-                    
-                    if container.currentUserService.currentUser == colloquy.user {
-                        CurrentUserProfileView()
-                    } else {
-                        ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
-                    }
-                    
-                } label: {
-                    CircularProfileImageView(user: colloquy.user, size: .small)
-                }
+                CircularProfileImageView(user: user, size: .small)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     
                     HStack {
                         
-                        NavigationLink {
-                            
-                            if container.currentUserService.currentUser == colloquy.user {
-                                CurrentUserProfileView()
-                            } else {
-                                ProfileView(user: colloquy.user ?? DeveloperPreview.user, isChange: $isChange)
-                            }
-                            
-                        } label: {
-                            Text(colloquy.user?.username ?? "")
-                                .font(.footnote)
-                                .fontWeight(.semibold)
-                        }
+                        Text(user.username)
+                            .font(.footnote)
+                            .fontWeight(.semibold)
                         
                         Spacer()
                         
@@ -56,12 +38,23 @@ struct ColloquyCell: View {
                             .font(.caption)
                             .foregroundStyle(Color(.systemGray3))
                         
+                        Button {
+                            Task {
+                                await colloquyService.markForDelete(colloquy.id)
+                                isDeleted.toggle()
+                            }
+                        } label: {
+                            Image(systemName: "trash.circle")
+                                .foregroundStyle(.red)
+                                .font(.title2)
+                        }
+                        
                     }
                     
                     HStack {
                         if let name = colloquy.location?.name {
-                            NavigationLink {
-                                LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
+                            Button {
+                                sheetStatus = .location
                             } label: {
                                 Text(name)
                                     .foregroundStyle(.blue)
@@ -79,7 +72,7 @@ struct ColloquyCell: View {
                         
                         Button {
                             Task {
-                                await viewModel.doLike(userId: colloquy.ownerUid, currentUserId: container.currentUserService.currentUser?.id, likeToObject: colloquy)
+                                await viewModel.doLike(userId: colloquy.ownerUid, currentUserId: user.id, likeToObject: colloquy)
                             }
                         } label: {
                             if viewModel.likeId == nil {
@@ -97,7 +90,7 @@ struct ColloquyCell: View {
                         Spacer()
                         
                         Button {
-                            showReplieCreate.toggle()
+                            sheetStatus = .reply
                         } label: {
                             Image(systemName: "bubble.right")
                         }
@@ -125,24 +118,22 @@ struct ColloquyCell: View {
         .padding([.horizontal, .top])
         .onAppear {
             Task {
-                await viewModel.isLike(cid:colloquy.id, currentUserId: container.currentUserService.currentUser?.id)
+                await viewModel.isLike(cid: colloquy.id, currentUserId: user.id)
             }
         }
-        .onChange(of: isChange) {
-            
-            Task {
-                
-                await container.userFollow.loadFollowersCurrentUser(userId: container.currentUserService.currentUser?.id)
-                
+        .sheet(item: $sheetStatus) { status in
+            switch status {
+            case .reply:
+                RepliesView(colloquy: colloquy, user: user)
+            case .location:
+                LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
             }
-            
-        }
-        .sheet(isPresented: $showReplieCreate) {
-            RepliesView(colloquy: colloquy, user: container.currentUserService.currentUser)
         }
     }
 }
 
 #Preview {
-    ColloquyCell(colloquy: DeveloperPreview.colloquy)
+    ColloquyCellForCurrentUser(colloquy: DeveloperPreview.colloquy,
+                               user: DeveloperPreview.user,
+                               isDeleted: .constant(false))
 }

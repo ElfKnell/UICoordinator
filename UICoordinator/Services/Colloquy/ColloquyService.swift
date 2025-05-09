@@ -6,43 +6,77 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
+import Firebase
 import FirebaseFirestoreSwift
 
-struct ColloquyService {
+class ColloquyService: ColloquyServiceProtocol {
     
-    static func uploadeColloquy(_ colloquy: Colloquy) async throws {
-        guard let colloquyData = try? Firestore.Encoder().encode(colloquy) else { return }
-        try await Firestore.firestore().collection("colloquies").addDocument(data: colloquyData)
+    private let serviceDetete: FirestoreGeneralDeleteProtocol
+    private let repliesFetchingService: FetchRepliesProtocol
+    
+    init(serviceDetete: FirestoreGeneralDeleteProtocol,
+         repliesFetchingService: FetchRepliesProtocol) {
+        self.serviceDetete = serviceDetete
+        self.repliesFetchingService = repliesFetchingService
     }
     
-    static func fetchColloquy(withCid cid: String) async throws -> Colloquy {
-        let snapshot = try await Firestore.firestore().collection("colloquies").document(cid).getDocument()
-        return try snapshot.data(as: Colloquy.self)
-    }
-    
-    static func updateLikeCount(colloquyId: String, countLikes: Int) async throws {
+    func uploadeColloquy(_ colloquy: Colloquy) async {
+        
         do {
+            guard let colloquyData = try? Firestore.Encoder()
+                .encode(colloquy) else { return }
+            
             try await Firestore.firestore()
                 .collection("colloquies")
-                .document(colloquyId)
-                .updateData(["likes": countLikes])
-
+                .addDocument(data: colloquyData)
         } catch {
-            print(error.localizedDescription)
+            print("ERROR \(error.localizedDescription)")
         }
     }
     
-    static func incrementRepliesCount(colloquyId: String) async throws {
+    func markForDelete(_ colloquyId: String) async {
+        
         do {
+                
             try await Firestore.firestore()
                 .collection("colloquies")
                 .document(colloquyId)
-                .updateData(["repliesCount": FieldValue.increment(Int64(1)) ])
-
+                .updateData(["isDelete": true])
+            
         } catch {
-            print(error.localizedDescription)
+            print("ERROR Mark for Delete colloquy \(error.localizedDescription)")
         }
     }
-
+    
+    func unmarkForDelete(_ colloquyId: String) async {
+        
+        do {
+            
+            try await Firestore.firestore()
+                .collection("colloquies")
+                .document(colloquyId)
+                .updateData(["isDelete": false])
+            
+        } catch {
+            print("ERROR Mark for Delete colloquy \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteColloquy(_ colloquy: Colloquy) async {
+        
+        do {
+            if colloquy.repliesCount ?? 0 > 0 {
+                let replies = try await repliesFetchingService.getRepliesByColloquy(colloquyId: colloquy.id)
+                
+                for reply in replies {
+                    try await serviceDetete.deleteDocument(from: "colloquies", documentId: reply.id)
+                }
+            }
+            
+            try await serviceDetete.deleteDocument(from: "colloquies", documentId: colloquy.id)
+            
+        } catch {
+            print("ERROR Delete colloquy \(error.localizedDescription)")
+        }
+    }
 }

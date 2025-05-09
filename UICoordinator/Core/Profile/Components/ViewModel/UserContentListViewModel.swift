@@ -22,6 +22,9 @@ class UserContentListViewModel: ObservableObject {
     
     init(user: User) {
         self.user = user
+        Task {
+            await loadDate(currentUser: user)
+        }
     }
     
     @MainActor

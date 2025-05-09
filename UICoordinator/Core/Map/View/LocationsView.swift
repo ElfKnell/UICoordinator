@@ -149,7 +149,7 @@ struct LocationsView: View {
                     viewModel.sheetConfig = nil
                 }
             })
-            .sheet(item: $viewModel.sheetConfig, content: { config in
+            .sheet(item: $viewModel.sheetConfig) { config in
                 switch config {
                 case .confirmationLocation:
                     
@@ -169,7 +169,7 @@ struct LocationsView: View {
                         .presentationDetents([.height(350), .medium])
                         
                 }
-            })
+            }
         }
     }
 }

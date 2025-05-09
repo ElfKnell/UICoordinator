@@ -10,9 +10,12 @@ import FirebaseStorage
 
 class VideoService {
     
-    static func uploadVideoStorage(withData videoData: Data, locationId: String) async throws -> String? {
+    static func uploadVideoStorage(withData videoData: Data, locationId: String) async -> String? {
+        
         let filename = NSUUID().uuidString
-        let ref = Storage.storage().reference().child("videos/\(locationId)/\(filename)")
+        let ref = Storage.storage()
+            .reference()
+            .child("videos/\(locationId)/\(filename)")
         
         let metadata = StorageMetadata()
         metadata.contentType = "video/quicktime"
@@ -27,11 +30,17 @@ class VideoService {
     }
     
     static func uploadVideo(_ video: Video) async throws {
-        guard let videoData = try? Firestore.Encoder().encode(video) else { return }
-        try await Firestore.firestore().collection("Video").addDocument(data: videoData)
+        
+        guard let videoData = try? Firestore.Encoder()
+            .encode(video) else { return }
+        
+        try await Firestore.firestore()
+            .collection("Video")
+            .addDocument(data: videoData)
     }
     
     static func fetchVideosByLocation(_ locationId: String) async throws -> [Video] {
+        
         let snapshot = try await Firestore
             .firestore()
             .collection("Video")
@@ -42,19 +51,31 @@ class VideoService {
     }
     
     static func updatTitle(vId:String, title: String) async throws {
-        try await Firestore.firestore().collection("Video").document(vId).updateData(["title": title])
+        
+        try await Firestore.firestore()
+            .collection("Video")
+            .document(vId)
+            .updateData(["title": title])
     }
     
-    static func deleteVideo(videoId: String) async throws {
+    static func deleteVideo(videoId: String) async {
+        
         do {
-            let snapshot = try await Firestore.firestore().collection("Video").document(videoId).getDocument()
+            let snapshot = try await Firestore.firestore()
+                .collection("Video")
+                .document(videoId)
+                .getDocument()
+            
             let video = try snapshot.data(as: Video.self)
             
             let storageRef = Storage.storage().reference(forURL: video.videoURL)
             
             try await storageRef.delete()
             
-            try await Firestore.firestore().collection("Video").document(video.id).delete()
+            try await Firestore.firestore()
+                .collection("Video")
+                .document(video.id).delete()
+            
         } catch {
             print("DEBUGE: error delete - \(error.localizedDescription)")
         }

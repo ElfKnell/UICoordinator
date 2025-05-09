@@ -12,4 +12,7 @@ protocol FetchRepliesProtocol {
     func getReplies(userId: String, localUsers: [User], pageSize: Int) async -> [Colloquy]
     
     func getReplies(colloquyId: String, localUsers: [User], pageSize: Int) async -> [Colloquy]
+    
+    func getRepliesByColloquy(colloquyId: String) async throws -> [Colloquy]
+    
 }

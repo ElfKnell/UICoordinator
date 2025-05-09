@@ -12,6 +12,7 @@ struct UserContentListView: View {
     @EnvironmentObject var container: DIContainer
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @State private var selectedFilter: ProfileColloquyFilter = .colloquies
+    @State var isDeleted = false
     @Namespace var animation
     
     init(user: User) {
@@ -57,19 +58,41 @@ struct UserContentListView: View {
                     
                     ForEach(viewModel.colloquies) { colloquy in
                         
-                        ColloquyCell(colloquy: colloquy)
-                            .padding(.horizontal, isLandscape ? 41 : 1)
-                            .onAppear {
-                                
-                                if colloquy == viewModel.colloquies.last {
+                        if viewModel.user == container.currentUserService.currentUser {
+                            
+                            ColloquyCellForCurrentUser(colloquy: colloquy,
+                                                       user: viewModel.user,
+                                                       isDeleted: $isDeleted)
+                                .padding(.horizontal, isLandscape ? 41 : 1)
+                                .onAppear {
                                     
-                                    Task {
-                                        try await viewModel.fetchColloquiesNext()
+                                    if colloquy == viewModel.colloquies.last {
                                         
+                                        Task {
+                                            try await viewModel.fetchColloquiesNext()
+                                            
+                                        }
                                     }
+                                    
                                 }
-                                
-                            }
+                            
+                        } else {
+                            
+                            ColloquyCell(colloquy: colloquy)
+                                .padding(.horizontal, isLandscape ? 41 : 1)
+                                .onAppear {
+                                    
+                                    if colloquy == viewModel.colloquies.last {
+                                        
+                                        Task {
+                                            try await viewModel.fetchColloquiesNext()
+                                            
+                                        }
+                                    }
+                                    
+                                }
+                        }
+                            
                             
                     }
                     
@@ -130,7 +153,7 @@ struct UserContentListView: View {
             }
         }
         .padding(.vertical, 8)
-        .onAppear {
+        .onChange(of: isDeleted) {
             Task {
                 await viewModel.loadDate(currentUser: container.currentUserService.currentUser)
             }

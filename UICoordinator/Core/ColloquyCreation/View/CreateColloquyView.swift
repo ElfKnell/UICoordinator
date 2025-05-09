@@ -13,7 +13,6 @@ struct CreateColloquyView: View {
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
     var location: Location?
-    var colloquy: Colloquy?
     var activityId: String?
     
     @State private var isUploadingError = false
@@ -27,12 +26,6 @@ struct CreateColloquyView: View {
         NavigationStack {
             
             VStack {
-                
-                if let colloquy = colloquy {
-                    
-                    ReplyCreateView(colloquy: colloquy)
-                    
-                }
                 
                 HStack(alignment: .top) {
                     
@@ -63,6 +56,7 @@ struct CreateColloquyView: View {
                 }
                 
                 Spacer()
+                
             }
             .padding()
             .navigationTitle("\(location?.name ?? "Reply") Colloquy")
@@ -81,7 +75,7 @@ struct CreateColloquyView: View {
                         
                         Task {
                             
-                            await viewModel.uploadColloquy(userId: container.authService.userSession?.uid, caption: caption, locatioId: location?.id, ownerColloquy: colloquy?.id, activityId: activityId)
+                            await viewModel.uploadColloquy(userId: container.authService.userSession?.uid, caption: caption, locatioId: location?.id, activityId: activityId)
                             
                             if viewModel.errorUpload != nil {
                                 self.isUploadingError = true

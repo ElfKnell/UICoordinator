@@ -64,9 +64,10 @@ struct FeedView: View {
                             .font(.title2)
                     }
                 }
-            }
-            .sheet(isPresented: $showColloquyCreate) {
-                CreateColloquyView()
+                .sheet(isPresented: $showColloquyCreate) {
+                    CreateColloquyView()
+                        .presentationDetents([.height(340), .medium])
+                }
             }
         }
     }

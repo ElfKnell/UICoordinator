@@ -26,7 +26,7 @@ class VideoViewModel: ObservableObject {
             guard let lId = locationId else { return }
             guard let item = selectedItem else { return }
             guard let videoData = try await item.loadTransferable(type: Data.self) else { return }
-            guard let videoURL = try await VideoService.uploadVideoStorage(withData: videoData, locationId: lId) else { return }
+            guard let videoURL = await VideoService.uploadVideoStorage(withData: videoData, locationId: lId) else { return }
             let video = Video(locationUid: lId, timestamp: Timestamp(), videoURL: videoURL)
             try await VideoService.uploadVideo(video)
             
@@ -49,7 +49,7 @@ class VideoViewModel: ObservableObject {
     
     @MainActor
     func deleteVideo(_ videoId: String) async throws{
-        try await VideoService.deleteVideo(videoId: videoId)
+        await VideoService.deleteVideo(videoId: videoId)
         try await fetchVideoByLocation()
     }
 }
