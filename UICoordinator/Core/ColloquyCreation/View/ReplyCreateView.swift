@@ -10,6 +10,8 @@ import SwiftUI
 struct ReplyCreateView: View {
     
     let colloquy: Colloquy
+    let isNeedButton: Bool
+    @Binding var isEdit: Bool
     
     var body: some View {
         
@@ -53,12 +55,22 @@ struct ReplyCreateView: View {
                 }
             }
             
-            VerticalSeparatorView()
+            HStack {
+                VerticalSeparatorView()
+                
+                if isNeedButton {
+                    Button {
+                        isEdit.toggle()
+                    } label: {
+                        Image(systemName: isEdit ? "pencil.slash" : "pencil.line")
+                    }
+                }
+            }
             
         }
     }
 }
 
 #Preview {
-    ReplyCreateView(colloquy: DeveloperPreview.colloquy)
+    ReplyCreateView(colloquy: DeveloperPreview.colloquy, isNeedButton: false, isEdit: .constant(false))
 }

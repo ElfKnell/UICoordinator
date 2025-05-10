@@ -81,20 +81,16 @@ struct ActivityCell: View {
                         
                         Spacer()
                         
-                        Button {
-                            Task {
-                                await viewModelLike.doLike(userId: activity.ownerUid, currentUserId: container.currentUserService.currentUser?.id, likeToObject: activity)
+                        if activity.user != container.currentUserService.currentUser {
+                            Button {
                                 
-                                isUpdate.toggle()
-                            }
-                        } label: {
-                            if viewModelLike.likeId == nil {
-                                Image(systemName: "heart")
-                            } else {
-                                Image(systemName: "heart.fill")
-                                    .foregroundStyle(.red)
+                            } label: {
+                                Image(systemName: "arrowshape.bounce.right")
                             }
                         }
+                        
+                        LikeButtonView(colloquyOrActivity: activity, userId: container.currentUserService.currentUser?.id)
+                            .environmentObject(viewModelLike)
                         
                         Button {
                             showReplies.toggle()

@@ -115,7 +115,7 @@ struct UserContentListView: View {
                 LazyVStack {
                     if !viewModel.replies.isEmpty || viewModel.isLoading {
                         ForEach(viewModel.replies) { colloquy in
-                            RepliesView(colloquy: colloquy, user: container.currentUserService.currentUser)
+                            ReplyComposerView(colloquy: colloquy, user: container.currentUserService.currentUser, isEditButton: true)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
                                 .onAppear {
                                     
@@ -140,6 +140,7 @@ struct UserContentListView: View {
                             .padding()
                     }
                 }
+                .padding(.horizontal)
                 .onAppear {
                     Task {
                         

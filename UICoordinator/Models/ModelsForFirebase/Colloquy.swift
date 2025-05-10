@@ -8,7 +8,7 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-struct Colloquy: Identifiable, Codable, Hashable, Equatable {
+struct Colloquy: Identifiable, Codable, Hashable, Equatable, LikeObject {
 
     @DocumentID var threadId: String?
     

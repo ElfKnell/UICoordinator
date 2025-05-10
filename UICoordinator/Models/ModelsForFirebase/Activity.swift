@@ -9,7 +9,7 @@ import Firebase
 import FirebaseFirestoreSwift
 import MapKit
 
-struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol {
+struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol, LikeObject {
     
     @DocumentID var activityId: String?
     let ownerUid: String
@@ -26,6 +26,7 @@ struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol {
     var likes: Int
     var mapStyle: UserMapStyle?
     var repliesCount: Int?
+    //var isSpread: Bool?
     
     var locationsId: [String]
     

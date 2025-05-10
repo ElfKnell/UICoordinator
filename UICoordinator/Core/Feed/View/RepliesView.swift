@@ -23,55 +23,24 @@ struct RepliesView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
-            ScrollView(showsIndicators: false) {
-                
-                ReplyCreateView(colloquy: colloquy)
-                
-                Divider()
-                
-                HStack {
-                    Divider()
-                        .frame(width: 10)
+            
+            ReplyComposerView(colloquy: colloquy, user: user, isEditButton: false)
+                .padding(.horizontal)
+                .navigationTitle("Replies")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
                     
-                    LazyVStack {
-                        ForEach(viewModel.replies) { reply in
-                            ColloquyCell(colloquy: reply)
-                                .onAppear {
-                                    Task {
-                                        await viewModel.fetchReplies(colloquy.id, currentUser: user)
-                                    }
-                                }
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "arrow.left.to.line")
+                                .fontWeight(.semibold)
                         }
                     }
                 }
-                .padding(.horizontal)
-                .onChange(of: isCreate) {
-                    Task {
-                        await viewModel.fetchRepliesRefresh(colloquy.id, currentUser: user)
-                    }
-                }
-                
-            }
-            .padding(.horizontal)
-            .navigationTitle("Replies")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "arrow.left.to.line")
-                            .fontWeight(.semibold)
-                    }
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
-                
-                CreateReplyView(isCreate: $isCreate, colloquyId: colloquy.id, user: user)
-                
-            }
         }
     }
 }

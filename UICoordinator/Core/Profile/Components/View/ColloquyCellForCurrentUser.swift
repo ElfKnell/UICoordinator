@@ -70,22 +70,8 @@ struct ColloquyCellForCurrentUser: View {
                         
                         Spacer()
                         
-                        Button {
-                            Task {
-                                await viewModel.doLike(userId: colloquy.ownerUid, currentUserId: user.id, likeToObject: colloquy)
-                            }
-                        } label: {
-                            if viewModel.likeId == nil {
-                                Image(systemName: "heart")
-                            } else {
-                                Image(systemName: "heart.fill")
-                                    .foregroundStyle(.red)
-                            }
-                        }
-                        
-                        if colloquy.likes > 0 {
-                            Text("\(colloquy.likes)")
-                        }
+                        LikeButtonView(colloquyOrActivity: colloquy, userId: user.id)
+                            .environmentObject(viewModel)
                         
                         Spacer()
                         
