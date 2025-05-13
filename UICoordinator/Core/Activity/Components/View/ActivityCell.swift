@@ -13,13 +13,38 @@ struct ActivityCell: View {
     @StateObject var viewModelLike = LikesViewModel(collectionName: .activityLikes)
     @StateObject var viewModel = ActivityCellViewModel()
     @EnvironmentObject var container: DIContainer
-    @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
+    
     @Binding var isDelete: Bool
     @Binding var isUpdate: Bool
-    @State private var showReplies = false
     
     var body: some View {
         VStack {
+            if let user = activity.spreadUser {
+                HStack {
+                    CircularProfileImageView(user: user, size: .xSmall)
+                        .padding(.top, 8)
+                    
+                    VStack {
+                        Text(user.fullname)
+                            .font(.footnote)
+                            .fontWeight(.bold)
+                        
+                        Text(user.username)
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                    }
+                    
+                    Spacer()
+                    
+                    Text("Spread")
+                    
+                    Image(systemName: "arrow.turn.right.down")
+                        .foregroundStyle(.green)
+                    
+                    Spacer()
+                }
+            }
+            
             HStack(alignment: .top, spacing: 12) {
                 
                 CircularProfileImageView(user: activity.user, size: .small)
@@ -29,7 +54,7 @@ struct ActivityCell: View {
                     
                     NavigationLink {
                         
-                        if ActivityCurrentUser.isCurrentUser(activity.ownerUid) {
+                        if viewModel.isCurrentUser(activity.ownerUid, currentUser: container.currentUserService.currentUser) {
                             
                             ActivityEditView(activity: activity)
                                 .onDisappear {
@@ -82,10 +107,18 @@ struct ActivityCell: View {
                         Spacer()
                         
                         if activity.user != container.currentUserService.currentUser {
-                            Button {
-                                
-                            } label: {
-                                Image(systemName: "arrowshape.bounce.right")
+                            if viewModel.isStread {
+                                Image(systemName: "arrowshape.bounce.forward.fill")
+                                    .foregroundStyle(.green)
+                            } else {
+                                Button {
+                                    
+                                    Task {
+                                        await viewModel.spreadActivity(activity, userId: container.currentUserService.currentUser?.id)
+                                    }
+                                } label: {
+                                    Image(systemName: "arrowshape.bounce.forward")
+                                }
                             }
                         }
                         
@@ -93,7 +126,7 @@ struct ActivityCell: View {
                             .environmentObject(viewModelLike)
                         
                         Button {
-                            showReplies.toggle()
+                            viewModel.showReplies.toggle()
                         } label: {
                             Image(systemName: "bubble.right")
                         }
@@ -102,13 +135,13 @@ struct ActivityCell: View {
                             Text("\(count)")
                         }
                         
-                        if ActivityCurrentUser.isCurrentUser(activity.ownerUid) {
+                        if viewModel.isCurrentUser(activity.ownerUid, currentUser: container.currentUserService.currentUser) {
                             
                             Button {
                                 Task {
                                     isDelete = true
                                     
-                                    try await viewModel.deleteActivity(activity: activity)
+                                    await viewModel.markForDelete(activity)
                                     
                                     isDelete = false
                                     
@@ -127,20 +160,23 @@ struct ActivityCell: View {
             
         }
         .padding([.horizontal, .top])
-        .padding(.horizontal, isLandscape ? 21 : 1)
+        .padding(.horizontal, viewModel.isLandscape ? 21 : 1)
         .onAppear {
             
             UIDevice.current.beginGeneratingDeviceOrientationNotifications()
             NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
-                isLandscape = UIDevice.current.orientation.isLandscape
+                viewModel.isLandscape = UIDevice.current.orientation.isLandscape
             }
             
             Task {
+                viewModel.isStread(activity,
+                                      user: container.currentUserService.currentUser)
+                
                 await viewModelLike.isLike(cid: activity.id, currentUserId: container.currentUserService.currentUser?.id)
             }
             
         }
-        .sheet(isPresented: $showReplies, content: {
+        .sheet(isPresented: $viewModel.showReplies, content: {
             ActivityRepliesView(activity: activity, user: container.currentUserService.currentUser)
         })
     }

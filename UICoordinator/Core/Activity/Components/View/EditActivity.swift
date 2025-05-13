@@ -12,6 +12,8 @@ struct EditActivity: View {
     @Binding var activity: Activity
     @Binding var isSettings: Bool
     
+    private let activityUpdate = ActivityServiceUpdate()
+    
     var body: some View {
         VStack {
             
@@ -87,7 +89,7 @@ struct EditActivity: View {
                 Button {
                     
                     Task {
-                        try await ActivityService.updateActivity(activity)
+                        await activityUpdate.updateActivity(activity)
                         isSettings = false
                     }
                     

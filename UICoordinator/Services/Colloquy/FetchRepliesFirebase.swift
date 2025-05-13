@@ -58,7 +58,7 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
         
     }
     
-    func getReplies(colloquyId: String, localUsers: [User], pageSize: Int) async -> [Colloquy] {
+    func getReplies(colloquyId: String, localUsers: [User], pageSize: Int, ordering: Bool) async -> [Colloquy] {
         
         do {
             
@@ -69,7 +69,7 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
                 .collection("colloquies")
                 .whereField("ownerColloquy", isEqualTo: colloquyId)
                 .whereField("isDelete", isEqualTo: false)
-                .order(by: "timestamp", descending: true)
+                .order(by: "timestamp", descending: ordering)
                 .limit(to: pageSize)
                 
             if let lastDoc = lastDocumentColloquy {

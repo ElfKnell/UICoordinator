@@ -19,6 +19,7 @@ struct Colloquy: Identifiable, Codable, Hashable, Equatable, LikeObject {
     let locationId: String?
     let ownerColloquy: String
     var repliesCount: Int?
+    var spreadCount: Int?
     var isDelete: Bool
     
     var id: String {

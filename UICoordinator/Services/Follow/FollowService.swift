@@ -11,10 +11,10 @@ import FirebaseFirestoreSwift
 class FollowService {
     
     private let nameCollection = "Follow"
-    let serviceCreate: FirestoreFolloweCreateServiseProtocol
+    let serviceCreate: FirestoreGeneralCreateServiseProtocol
     let servaceDelete: FirestoreGeneralDeleteProtocol
     
-    init(serviceCreate: FirestoreFolloweCreateServiseProtocol = FirestoreFollowServiceCreate(), servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService()) {
+    init(serviceCreate: FirestoreGeneralCreateServiseProtocol = FirestoreGeneralServiceCreate(), servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService()) {
         self.serviceCreate = serviceCreate
         self.servaceDelete = servaceDelete
     }
@@ -25,7 +25,7 @@ class FollowService {
             guard let followData = try? Firestore.Encoder()
                 .encode(follow) else { throw FollowError.encodingFailed }
             
-            try await self.serviceCreate.addDocument(data: followData)
+            try await self.serviceCreate.addDocument(from: nameCollection, data: followData)
         } catch {
             print("ERROR CREATE FOLLOW: \(error.localizedDescription)")
         }

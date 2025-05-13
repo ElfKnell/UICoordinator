@@ -17,6 +17,7 @@ class LikesViewModel: ObservableObject {
     private let likeService = LikeService(serviceCreate: FirestoreLikeCreateServise(),
                                           serviceDetete: FirestoreGeneralDeleteService())
     private let fethingLike = FetchLikesService(likeRepository: FirestoreLikeRepository())
+    private let activityUpdate = ActivityServiceUpdate()
     
     init(likeId: String? = nil, collectionName: CollectionNameForLike) {
         
@@ -70,7 +71,7 @@ class LikesViewModel: ObservableObject {
             if let colloquy = object as? Colloquy {
                 await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: colloquy.likes + 1)
             } else if let activity = object as? Activity {
-                try await ActivityService.updateLikeCount(activityId: activity.id, countLikes: activity.likes + 1)
+                await activityUpdate.updateLikeCount(activityId: activity.id, countLikes: activity.likes + 1)
             } else {
                 throw UserError.invalidType
             }
@@ -89,7 +90,7 @@ class LikesViewModel: ObservableObject {
                 await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: countLike)
             } else if let activity = object as? Activity {
                 let countLike = activity.likes - 1 > 0 ? activity.likes - 1 : 0
-                try await ActivityService.updateLikeCount(activityId: activity.id, countLikes: countLike)
+                await activityUpdate.updateLikeCount(activityId: activity.id, countLikes: countLike)
             } else {
                 throw UserError.invalidType
             }

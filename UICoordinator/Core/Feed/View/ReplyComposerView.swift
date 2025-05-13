@@ -20,7 +20,7 @@ struct ReplyComposerView: View {
     init(colloquy: Colloquy, user: User?, isEditButton: Bool) {
         self.colloquy = colloquy
         self.user = user
-        _viewModel = StateObject(wrappedValue: RepliesViewModel(colloquy.id, currentUser: user))
+        _viewModel = StateObject(wrappedValue: RepliesViewModel(colloquy.id, currentUser: user, isOrdering: false))
         self.isEditButton = isEditButton
         _isVisible = .init(wrappedValue: !isEditButton)
     }

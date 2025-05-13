@@ -1,5 +1,5 @@
 //
-//  FirestoreServiceDeleteProtocol.swift
+//  FirestoreGeneralDeleteProtocol.swift
 //  UICoordinator
 //
 //  Created by Andrii Kyrychenko on 25/04/2025.

@@ -30,6 +30,9 @@ struct LikeButtonView<T: LikeObject>: View {
                 }
             }
             
+            if colloquyOrActivity.likes > 0 {
+                Text("\(colloquyOrActivity.likes)")
+            }
         }
     }
 }

@@ -14,56 +14,53 @@ class ActivityViewModel: ObservableObject {
     private var localUserServise = LocalUserService()
     private var userService = UserService()
     private let fetchingLikes = FetchLikesService(likeRepository: FirestoreLikeRepository())
+    private let pageSize = 20
+    private let collectionName = "Activity"
+    private var activitySpread = ActivitySpreading()
+    private let fetchingActivity = FetchingActivityService()
+    private var fetchingActivities = FetchingActivitiesService()
     
-    func createActivity(name: String, currentUserId: String?) async throws -> Activity? {
-        guard let currentUserId else { return nil }
-        
-        let activityNew = Activity(ownerUid: currentUserId, name: name, typeActivity: .travel, description: "", time: Timestamp(), status: true, likes: 0, locationsId: [])
-        
-        try await ActivityService.uploadedActivity(activityNew)
-        
-        let act = try await ActivityService.fitchActivity(time: activityNew.time)
-        
-        return act
-    }
-    
-    private func fetchFollowersActivity(currentUser: User?) async throws {
+    private func fetchFollowersActivity(currentUser: User?) async {
         
         self.activities = []
-        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
-        var followersId = users.map({ $0.id })
-        followersId.removeAll(where: { $0 == currentUser?.id })
-        self.activities = try await ActivityService.fitchActivities(usersId: followersId)
+        fetchingActivities = FetchingActivitiesService()
+        var users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         
-        try await fetchUserForActivity(users: users)
+        users.removeAll(where: { $0 == currentUser })
         
+        var activities = await fetchingActivities.fetchActivities(users: users, pageSize: pageSize)
+        
+        activitySpread = ActivitySpreading()
+        let spreads = await activitySpread.getSpreads(users: users,
+                                                      pageSize: pageSize,
+                                                      byField: "activityId")
+        
+        var activitySpreads: [Activity] = []
+        for spread in spreads {
+            
+            if spread.userId != currentUser?.id {
+                guard var activity = spread.activity else { return }
+                activity.user = spread.user
+                activity.spreadUser = spread.ownerUser
+                activitySpreads.append(activity)
+            }
+        }
+        
+        activities.append(contentsOf: activitySpreads)
+        self.activities = activities.sorted(by: { $0.time.dateValue() > $1.time.dateValue() })
+
     }
     
-    private func fetchMyActivity(currentUser: User?) async throws {
+    private func fetchMyActivity(currentUser: User?) async {
         
         guard let currentUser else { return }
         self.activities = []
-        self.activities = try await ActivityService.fetchCurrentUserActivity()
-        
-        for i in activities.indices {
-            activities[i].user = currentUser
-        }
+        self.activities = await fetchingActivities.fetchActivitiesByUser(user: currentUser,
+                                                                         pageSize: pageSize)
         
     }
     
-    private func fetchUserForActivity(users: [User]) async throws {
-        
-        for i in 0 ..< activities.count {
-            let activity = activities[i]
-            var activityUser = users.first(where: { $0.id == activity.ownerUid })
-            if activityUser == nil {
-                activityUser = await userService.fetchUser(withUid: activity.ownerUid)
-            }
-            activities[i].user = activityUser
-        }
-    }
-    
-    private func fetchLikeActivity(currentUser: User?) async throws {
+    private func fetchLikeActivity(currentUser: User?) async {
         
         let likes = await fetchingLikes.getLikes(collectionName: .activityLikes, byField: .ownerUidField, userId: currentUser?.id)
         
@@ -71,11 +68,15 @@ class ActivityViewModel: ObservableObject {
         let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         
         for like in likes {
-            let activity = try await ActivityService.fitchActivity(documentId: like.colloquyId)
+            var activity = await fetchingActivity.fetchActivity(documentId: like.colloquyId)
+            var activityUser = users.first(where: { $0.id == activity.ownerUid })
+            if activityUser == nil {
+                activityUser = await userService.fetchUser(withUid: activity.ownerUid)
+            }
+            activity.user = activityUser
             self.activities.append(activity)
         }
         
-        try await fetchUserForActivity(users: users)
     }
     
     func fetchActivity(typeActivity: PropertyTypeActivity, currentUser: User?) async throws {
@@ -83,15 +84,15 @@ class ActivityViewModel: ObservableObject {
         switch typeActivity {
         case .myActivity:
             Task {
-                try await fetchMyActivity(currentUser: currentUser)
+                await fetchMyActivity(currentUser: currentUser)
             }
         case .likeActivity:
             Task {
-                try await fetchLikeActivity(currentUser: currentUser)
+                await fetchLikeActivity(currentUser: currentUser)
             }
         case .followerActivity:
             Task {
-                try await fetchFollowersActivity(currentUser: currentUser)
+                await fetchFollowersActivity(currentUser: currentUser)
             }
         }
     }

@@ -8,13 +8,13 @@
 import Foundation
 import Firebase
 
-class FirestoreFollowServiceCreate: FirestoreFolloweCreateServiseProtocol {
+class FirestoreGeneralServiceCreate: FirestoreGeneralCreateServiseProtocol {
     
     let db = Firestore.firestore()
     
-    func addDocument(data: [String : Any]) async throws {
+    func addDocument(from collection: String, data: [String : Any]) async throws {
         try await db
-            .collection("Follow")
+            .collection(collection)
             .addDocument(data: data)
     }
     

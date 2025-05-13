@@ -12,24 +12,19 @@ class CreateColloquyViewModel: ObservableObject {
     @Published var errorUpload: String?
     private let likeCount = ColloquyInteractionCounterService()
     private let colloquyService = ColloquyService(serviceDetete: FirestoreGeneralDeleteService(), repliesFetchingService: FetchRepliesFirebase())
+    private let activityUpdate = ActivityServiceUpdate()
     
     @MainActor
     func uploadColloquy(userId: String?, caption: String, locatioId: String?, activityId: String?) async {
         
-        do {
-            
-            guard let uid = userId else { return }
-            
-            let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
-            
-            await colloquyService.uploadeColloquy(colloquy)
-            
-            if let activityId = activityId {
-                try await ActivityService.incrementRepliesCount(activityId: activityId)
-            }
-            
-        } catch {
-            errorUpload = String("Colloquy upload error: \(error.localizedDescription)")
+        guard let uid = userId else { return }
+        
+        let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
+        
+        await colloquyService.uploadeColloquy(colloquy)
+        
+        if let activityId = activityId {
+            await activityUpdate.incrementRepliesCount(activityId: activityId)
         }
     }
 }

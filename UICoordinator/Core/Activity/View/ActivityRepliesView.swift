@@ -18,7 +18,7 @@ struct ActivityRepliesView: View {
     init(activity: Activity, user: User?) {
         self.activity = activity
         self.user = user
-        _viewModel = StateObject(wrappedValue: RepliesViewModel(activity.id, currentUser: user))
+        _viewModel = StateObject(wrappedValue: RepliesViewModel(activity.id, currentUser: user, isOrdering: true))
     }
     
     var body: some View {

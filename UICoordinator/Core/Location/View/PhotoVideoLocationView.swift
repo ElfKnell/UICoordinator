@@ -9,12 +9,14 @@ import SwiftUI
 
 struct PhotoVideoLocationView: View {
     let location: MapSelectionProtocol
+    @EnvironmentObject var conteiner: DIContainer
+    let verificationOwner = CheckingForCurrentUser()
     
     var body: some View {
         Group {
             VStack {
                 
-                if ActivityCurrentUser.isCurrentUser(location.ownerUid) {
+                if verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser) {
                     
                     NavigationLink(destination: PhotosWithChangingView(locationId: location.id)) {
                         Text("Choose Photo")
@@ -34,7 +36,7 @@ struct PhotoVideoLocationView: View {
             }
             
             VStack {
-                NavigationLink(destination: VideoView(locationId: location.id, isAccessible: ActivityCurrentUser.isCurrentUser(location.ownerUid))) {
+                NavigationLink(destination: VideoView(locationId: location.id, isAccessible: verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))) {
                     Text("Choose Video")
                 }
                 .navigationBarTitleDisplayMode(.inline)

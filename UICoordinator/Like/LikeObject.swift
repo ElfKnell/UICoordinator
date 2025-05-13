@@ -10,5 +10,5 @@ import Foundation
 protocol LikeObject: Identifiable {
     
     var ownerUid: String { get }
-    
+    var likes: Int { get }
 }

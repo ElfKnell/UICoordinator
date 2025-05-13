@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol FirestoreFolloweCreateServiseProtocol {
-    func addDocument(data: [String: Any]) async throws
+protocol FirestoreGeneralCreateServiseProtocol {
+    func addDocument(from collection: String, data: [String: Any]) async throws
 }

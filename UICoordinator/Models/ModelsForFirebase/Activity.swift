@@ -26,7 +26,8 @@ struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol, LikeObje
     var likes: Int
     var mapStyle: UserMapStyle?
     var repliesCount: Int?
-    //var isSpread: Bool?
+    var spread: [String]?
+    var isDelete: Bool
     
     var locationsId: [String]
     
@@ -47,5 +48,6 @@ struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol, LikeObje
     
     var locations: [Location]?
     var user: User?
+    var spreadUser: User?
 
 }

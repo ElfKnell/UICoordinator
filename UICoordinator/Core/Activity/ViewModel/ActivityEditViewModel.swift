@@ -28,6 +28,7 @@ class ActivityEditViewModel: ObservableObject {
     @Published var routes: [MKRoute] = []
     
     private var fetchLocatins = FetchLocationsForActivity()
+    private let activityUpdate = ActivityServiceUpdate()
     
     @MainActor
     func clean() {
@@ -38,7 +39,7 @@ class ActivityEditViewModel: ObservableObject {
         
         guard let region = region else { return }
 
-        try await ActivityService.updateActivityCoordinate(region: region, id: activityId)
+        await activityUpdate.updateActivityCoordinate(region: region, id: activityId)
     }
     
     func saveLocations(activityId: String) async throws {
@@ -47,7 +48,7 @@ class ActivityEditViewModel: ObservableObject {
             locationId.append(location.id)
         }
         
-        try await ActivityService.updateActivityLocations(locationsId: locationId, id: activityId)
+        await activityUpdate.updateActivityLocations(locationsId: locationId, id: activityId)
     }
     
     func infoView() {
