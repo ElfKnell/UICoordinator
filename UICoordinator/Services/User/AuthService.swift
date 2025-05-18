@@ -7,6 +7,7 @@
 
 import Observation
 import Firebase
+import FirebaseAuth
 import FirebaseFirestoreSwift
 
 @Observable
@@ -57,6 +58,22 @@ class AuthService: AuthServiceProtocol {
             } catch {
                 print("❌ Token refresh failed: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    func resetPassword(email: String) async {
+        do {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                Auth.auth().sendPasswordReset(withEmail: email) { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+            }
+        } catch {
+            print("Error: \(error.localizedDescription)")
         }
     }
 }

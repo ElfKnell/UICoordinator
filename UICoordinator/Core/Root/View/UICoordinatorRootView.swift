@@ -37,6 +37,15 @@ struct UICoordinatorRootView: View {
                 isLoading = false
             }
         }
+        .alert("No Internet Connection", isPresented: $container.networkMonitor.isConnected) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            HStack {
+                Image(systemName: "wifi.exclamationmark")
+                    .foregroundStyle(.red)
+                Text("Please check your connection and try again.")
+            }
+        }
     }
 }
 

@@ -5,11 +5,14 @@
 //  Created by Andrii Kyrychenko on 20/02/2024.
 //
 
+import MapKit
 import SwiftUI
 
 struct CoordinatorTabView: View {
     
     @State private var mainSelectedTab = 0
+    
+    @StateObject var viewModel = CoordinatorViewModel()
     
     var body: some View {
         
@@ -55,6 +58,14 @@ struct CoordinatorTabView: View {
                 .tag(4)
         }
         .tint(.primary)
+        .alert("Location Services", isPresented: $viewModel.isLocationServicesEnabled, actions: {
+            Button("OK", role: .cancel) {}
+        }, message: {
+            Text(viewModel.errorMessage ?? "")
+        })
+//        .onAppear {
+//            viewModel.availabilityCheck()
+//        }
     }
 }
 

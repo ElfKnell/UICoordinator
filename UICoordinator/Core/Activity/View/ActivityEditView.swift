@@ -17,7 +17,12 @@ struct ActivityEditView: View {
     @StateObject var viewModel = ActivityEditViewModel()
     
     init(activity: Activity) {
-        _cameraPosition = .init(wrappedValue: .region(activity.region ?? .startRegion))
+        let defaultCameraPosition: MapCameraPosition = .userLocation(fallback: .automatic)
+        if let region = activity.region {
+            _cameraPosition = .init(wrappedValue: .region(region))
+        } else {
+            _cameraPosition = .init(initialValue: defaultCameraPosition)
+        }
         
         self.activity = activity
     }

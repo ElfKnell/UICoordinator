@@ -11,17 +11,17 @@ import Firebase
 
 struct ActivityView: View {
 
-    @StateObject var viewModel = ActivityViewModel()
-    @State private var isCreate = false
+    @State var isCreate = false
     @State var name = ""
     @State private var path = NavigationPath()
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         NavigationStack(path: $path) {
 
             ScrollView {
                 
-                ActivityContentListView()
+                ActivityContentListView(currentUser: container.currentUserService.currentUser, isCreate: $isCreate)
                 
             }
             .navigationTitle("Activity")

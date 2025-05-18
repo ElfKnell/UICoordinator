@@ -9,12 +9,23 @@ import SwiftUI
 
 struct ActivityContentListView: View {
     
-    @StateObject var viewModel = ActivityViewModel()
-    @EnvironmentObject var container: DIContainer
+    @StateObject var viewModel: ActivityViewModel
+    let currentUser: User?
+    @Binding var isCreate: Bool
     @State private var selectedFilter: ActivityOwner = .allUsersActivities
     @Namespace var animation
     @State var isDelete = false
     @State var isUpdate = false
+    @StateObject var activityAll: FetchAllActivityViewModel
+    @StateObject var activityMy: FetchMyActivity
+    
+    init(currentUser: User?, isCreate: Binding<Bool>) {
+        self.currentUser = currentUser
+        self._viewModel = .init(wrappedValue: ActivityViewModel(currentUser: currentUser))
+        self._activityAll = .init(wrappedValue: FetchAllActivityViewModel(currentUser: currentUser))
+        self._activityMy = .init(wrappedValue: FetchMyActivity(currentUser: currentUser))
+        self._isCreate = isCreate
+    }
     
     private var filterBarWidth: CGFloat {
         let count = CGFloat(ActivityOwner.allCases.count)
@@ -53,35 +64,49 @@ struct ActivityContentListView: View {
                 if selectedFilter == .allUsersActivities {
                     
                     LazyVStack {
-                        ForEach(viewModel.activities) { activity in
+                        
+                        ForEach(activityAll.activities) { activity in
                             ActivityCell(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
-                        }
-                    }
-                    .onAppear {
-                        Task {
-                            try await viewModel.fetchActivity(typeActivity: .followerActivity, currentUser: container.currentUserService.currentUser)
+                                .onAppear {
+                                    
+                                    if activity == activityAll.activities.last {
+                                        Task {
+                                            
+                                            await activityAll.fetchFollowersActivity(currentUser: currentUser)
+                                        }
+                                    }
+                                }
                         }
                     }
                     
                 } else if selectedFilter == .currentUserActivities {
 
                     LazyVStack {
-                        if !viewModel.activities.isEmpty {
-                            ForEach(viewModel.activities) { activity in
+                        
+                        if !activityMy.activities.isEmpty {
+                            
+                            ForEach(activityMy.activities) { activity in
                                 ActivityCell(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
+                                    .onAppear {
+                                        if activity == activityMy.activities.last {
+                                            Task {
+                                                await activityMy.fetchMyActivity(currentUser: currentUser)
+                                            }
+                                        }
+                                    }
                             }
                         } else {
                             ContentUnavailableView("No Activity", systemImage: "globe.desk", description: Text("You have not set up any activity yet. Tap on the \(Image(systemName: "pencil.tip.crop.circle.badge.plus")) button in the toolbar to begin."))
                         }
                     }
-                    .onAppear {
-                        Task {
-                            try await viewModel.fetchActivity(typeActivity: .myActivity, currentUser: container.currentUserService.currentUser)
-                        }
-                    }
                     .onChange(of: isUpdate) {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .myActivity, currentUser: container.currentUserService.currentUser)
+                            await activityMy.refresh(currentUser: currentUser)
+                        }
+                    }
+                    .onChange(of: isCreate) {
+                        Task {
+                            await activityMy.refresh(currentUser: currentUser)
                         }
                     }
                     
@@ -96,14 +121,9 @@ struct ActivityContentListView: View {
                             ContentUnavailableView("No Like Activity", systemImage: "globe.desk", description: Text("You have not liked any activity yet."))
                         }
                     }
-                    .onAppear {
-                        Task {
-                            try await viewModel.fetchActivity(typeActivity: .likeActivity, currentUser: container.currentUserService.currentUser)
-                        }
-                    }
                     .onChange(of: isUpdate) {
                         Task {
-                            try await viewModel.fetchActivity(typeActivity: .likeActivity, currentUser: container.currentUserService.currentUser)
+                            await viewModel.fetchLikeActivity(currentUser: currentUser)
                         }
                     }
                 }
@@ -119,5 +139,5 @@ struct ActivityContentListView: View {
 }
 
 #Preview {
-    ActivityContentListView()
+    ActivityContentListView(currentUser: nil, isCreate: .constant(false))
 }
