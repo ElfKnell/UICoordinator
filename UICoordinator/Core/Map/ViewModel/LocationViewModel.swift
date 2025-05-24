@@ -31,7 +31,7 @@ class LocationViewModel: ObservableObject {
     
     var coordinatePosition: CLLocationCoordinate2D?
     
-    private var addLocation = FetchLocationFromFirebase()
+    private var locationService = FetchLocationFromFirebase()
     private var createRouter = CreateRouter()
     private var fetchLocations = FetchLocations()
     
@@ -63,17 +63,19 @@ class LocationViewModel: ObservableObject {
         
         guard let userId = userId else { return }
         
-        let location = addLocation.getLocation(userId: userId, coordinate: coordinate)
-        
-        if let location = location {
+        Task {
             
-            if locations.isEmpty {
-                locations.append(location)
-            } else if !locations.contains(location) {
-                locations.append(location)
+            let location = await locationService.getLocation(userId: userId, coordinate: coordinate)
+            
+            if let location = location {
+                
+                if locations.isEmpty {
+                    locations.append(location)
+                } else if !locations.contains(location) {
+                    locations.append(location)
+                }
+                cameraPosition = .region(location.regionCoordinate)
             }
-            cameraPosition = .region(location.regionCoordinate)
-            
         }
     }
     

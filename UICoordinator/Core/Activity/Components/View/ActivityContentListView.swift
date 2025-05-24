@@ -22,7 +22,7 @@ struct ActivityContentListView: View {
     init(currentUser: User?, isCreate: Binding<Bool>) {
         self.currentUser = currentUser
         self._viewModel = .init(wrappedValue: ActivityViewModel(currentUser: currentUser))
-        self._activityAll = .init(wrappedValue: FetchAllActivityViewModel(currentUser: currentUser))
+        self._activityAll = .init(wrappedValue: FetchAllActivityViewModel())
         self._activityMy = .init(wrappedValue: FetchMyActivity(currentUser: currentUser))
         self._isCreate = isCreate
     }
@@ -77,6 +77,9 @@ struct ActivityContentListView: View {
                                     }
                                 }
                         }
+                    }
+                    .task {
+                        await activityAll.refresh(currentUser: currentUser)
                     }
                     
                 } else if selectedFilter == .currentUserActivities {

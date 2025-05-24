@@ -19,8 +19,9 @@ class RegistrationViewModel: ObservableObject {
     
     var userCreate = AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService()))
     
+    @MainActor
     func createUser() async -> Bool {
-        print("\(self.email)   \(self.password)")
+        
         let isCreate = await userCreate.createUser(withEmail: self.email, password: self.password, fullname: self.name, username: self.username)
         
         if !isCreate {

@@ -13,13 +13,11 @@ class FetchLocationFromFirebase: FetchLocationProtocol {
     
     let firebase = Firestore.firestore()
     
-    func getLocation(userId: String, coordinate: CLLocationCoordinate2D) -> Location? {
+    func getLocation(userId: String, coordinate: CLLocationCoordinate2D) async -> Location? {
         
         var location: Location?
         
-        Task {
-            location = await getAsyncLocation(userId: userId, coordinate: coordinate)
-        }
+        location = await getAsyncLocation(userId: userId, coordinate: coordinate)
         
         return location
     }

@@ -9,7 +9,7 @@ import MapKit
 
 protocol FetchLocationProtocol {
     
-    func getLocation(userId: String, coordinate: CLLocationCoordinate2D) -> Location?
+    func getLocation(userId: String, coordinate: CLLocationCoordinate2D) async -> Location?
     
     func fetchLocation(withId id: String) async throws -> Location
 }

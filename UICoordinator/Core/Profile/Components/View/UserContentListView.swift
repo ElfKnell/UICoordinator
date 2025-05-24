@@ -64,14 +64,11 @@ struct UserContentListView: View {
                                                        user: viewModel.user,
                                                        isDeleted: $isDeleted)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
-                                .onAppear {
+                                .task {
                                     
                                     if colloquy == viewModel.colloquies.last {
                                         
-                                        Task {
-                                            try await viewModel.fetchColloquiesNext()
-                                            
-                                        }
+                                        await viewModel.fetchColloquiesNext()
                                     }
                                     
                                 }
@@ -80,14 +77,11 @@ struct UserContentListView: View {
                             
                             ColloquyCell(colloquy: colloquy)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
-                                .onAppear {
+                                .task {
                                     
                                     if colloquy == viewModel.colloquies.last {
                                         
-                                        Task {
-                                            try await viewModel.fetchColloquiesNext()
-                                            
-                                        }
+                                        await viewModel.fetchColloquiesNext()
                                     }
                                     
                                 }
@@ -102,13 +96,10 @@ struct UserContentListView: View {
                             .padding()
                     }
                 }
-                .onAppear {
-                    Task  {
-                        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-                        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
-                            isLandscape = UIDevice.current.orientation.isLandscape
-                        }
-                        
+                .task {
+                    UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+                    NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
+                        isLandscape = UIDevice.current.orientation.isLandscape
                     }
                 }
             } else {
@@ -117,13 +108,11 @@ struct UserContentListView: View {
                         ForEach(viewModel.replies) { colloquy in
                             ReplyComposerView(colloquy: colloquy, user: container.currentUserService.currentUser, isEditButton: true)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
-                                .onAppear {
+                                .task {
                                     
                                     if colloquy == viewModel.colloquies.last {
                                         
-                                        Task {
-                                            await viewModel.fetchNextReplies(currentUser: container.currentUserService.currentUser)
-                                        }
+                                        await viewModel.fetchNextReplies(currentUser: container.currentUserService.currentUser)
                                     }
                                 }
                         }
@@ -141,14 +130,11 @@ struct UserContentListView: View {
                     }
                 }
                 .padding(.horizontal)
-                .onAppear {
-                    Task {
-                        
-                        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-                        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
-                            isLandscape = UIDevice.current.orientation.isLandscape
-                        }
-                        
+                .task {
+                    
+                    UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+                    NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
+                        isLandscape = UIDevice.current.orientation.isLandscape
                     }
                 }
             }

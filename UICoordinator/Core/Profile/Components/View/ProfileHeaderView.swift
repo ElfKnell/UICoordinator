@@ -82,12 +82,11 @@ struct ProfileHeaderView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                await userLikes.fetchLikes(userId: user.id)
-                
-                await followToUser.fetchFollowsToUsers(usersFollowing: container.userFollow.followingIdsForCurrentUser, curretnUser: container.currentUserService.currentUser)
-            }
+        .task {
+            
+            await userLikes.fetchLikes(userId: user.id)
+            
+            await followToUser.fetchFollowsToUsers(usersFollowing: container.userFollow.followingIdsForCurrentUser, curretnUser: container.currentUserService.currentUser)
         }
     }
 }

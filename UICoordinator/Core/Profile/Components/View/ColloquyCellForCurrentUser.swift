@@ -102,10 +102,8 @@ struct ColloquyCellForCurrentUser: View {
             
         }
         .padding([.horizontal, .top])
-        .onAppear {
-            Task {
-                await viewModel.isLike(cid: colloquy.id, currentUserId: user.id)
-            }
+        .task {
+            await viewModel.isLike(cid: colloquy.id, currentUserId: user.id)
         }
         .sheet(item: $sheetStatus) { status in
             switch status {

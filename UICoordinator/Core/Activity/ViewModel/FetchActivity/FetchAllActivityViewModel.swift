@@ -16,17 +16,14 @@ class FetchAllActivityViewModel: ObservableObject {
     private var fetchingActivities = FetchingActivitiesService()
     private var activitySpread = ActivitySpreading()
     
-    init(currentUser: User?) {
-        Task {
-            await refresh(currentUser: currentUser)
-        }
-    }
-    
+    @MainActor
     func refresh(currentUser: User?) async {
+        
         activities.removeAll()
         fetchingActivities = FetchingActivitiesService()
         activitySpread = ActivitySpreading()
         await fetchFollowersActivity(currentUser: currentUser)
+
     }
     
     @MainActor

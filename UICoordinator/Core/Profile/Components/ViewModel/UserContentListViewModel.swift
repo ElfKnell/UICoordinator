@@ -53,7 +53,7 @@ class UserContentListViewModel: ObservableObject {
     }
     
     @MainActor
-    func fetchColloquiesNext() async throws {
+    func fetchColloquiesNext() async {
         
         self.isLoading = true
         

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-class LocalUser {
+final class LocalUser: Sendable {
     @Attribute(.unique) var id: String
     var fullname: String
     @Attribute(.unique) var username: String

@@ -46,15 +46,17 @@ struct LoginView: View {
                         .textInputAutocapitalization(.never)
                     
                     InputView(text: $loginModel.password, title: "Password", placeholder: "password", isSecureField: true)
+                        .padding(.bottom)
                     
                     NavigationLink {
-                        
+                        ResetPasswordView()
                     } label: {
                         Text("Forgot password?")
                             .foregroundColor(.green)
                             .font(.system(size: 20, design: .serif))
                             .offset(x:90)
                     }
+                    .padding(.bottom)
                     
                     Button {
                         Task {
