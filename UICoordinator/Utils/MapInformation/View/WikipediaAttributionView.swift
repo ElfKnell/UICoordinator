@@ -8,8 +8,23 @@
 import SwiftUI
 
 struct WikipediaAttributionView: View {
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            
+            Text("Content provided by")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            
+            Link("Wikipedia (CC BY-SA 4.0)", destination: URL(string: "https://creativecommons.org/licenses/by-sa/4.0/")!)
+                .font(.footnote)
+                .foregroundStyle(.blue)
+            
+            Text("Wikipedia® is a trademark of the Wikimedia Foundation.")
+                .font(.caption2)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.gray)
+        }
     }
 }
 

@@ -28,15 +28,16 @@ struct InformationLocationView: View {
                     + Text(page.description)
                         .italic()
                 }
+                
+                WikipediaAttributionView()
+                
             case .failed:
                 Text("Please try again later.")
             }
             
         }
         .task {
-            Task {
-                try await viewModel.fetchNearbyPlaces(coordinate: coordinate)
-            }
+            await viewModel.fetchNearbyPlaces(coordinate: coordinate)
         }
     }
 }

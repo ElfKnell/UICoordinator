@@ -58,14 +58,11 @@ struct CoordinatorTabView: View {
                 .tag(4)
         }
         .tint(.primary)
-        .alert("Location Services", isPresented: $viewModel.isLocationServicesEnabled, actions: {
+        .alert("Location Services", isPresented: $viewModel.isLocationServicesEnabled) {
             Button("OK", role: .cancel) {}
-        }, message: {
+        } message: {
             Text(viewModel.errorMessage ?? "")
-        })
-//        .onAppear {
-//            viewModel.availabilityCheck()
-//        }
+        }
     }
 }
 
