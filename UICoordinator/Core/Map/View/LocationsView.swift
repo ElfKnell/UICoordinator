@@ -124,10 +124,8 @@ struct LocationsView: View {
             }
             .navigationTitle("Map Locations")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                Task {
-                    await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
-                }
+            .task {
+                await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
             }
             .onChange(of: viewModel.isSave) {
                 Task {

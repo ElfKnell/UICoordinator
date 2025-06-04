@@ -161,19 +161,17 @@ struct ActivityCell: View {
         }
         .padding([.horizontal, .top])
         .padding(.horizontal, viewModel.isLandscape ? 21 : 1)
-        .onAppear {
+        .task {
             
             UIDevice.current.beginGeneratingDeviceOrientationNotifications()
             NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
                 viewModel.isLandscape = UIDevice.current.orientation.isLandscape
             }
             
-            Task {
-                viewModel.isStread(activity,
-                                      user: container.currentUserService.currentUser)
-                
-                await viewModelLike.isLike(cid: activity.id, currentUserId: container.currentUserService.currentUser?.id)
-            }
+            viewModel.isStread(activity,
+                                  user: container.currentUserService.currentUser)
+            
+            await viewModelLike.isLike(cid: activity.id, currentUserId: container.currentUserService.currentUser?.id)
             
         }
         .sheet(isPresented: $viewModel.showReplies, content: {

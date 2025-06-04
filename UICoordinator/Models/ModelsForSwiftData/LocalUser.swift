@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class LocalUser: Sendable {
+final class LocalUser: @unchecked Sendable {
     @Attribute(.unique) var id: String
     var fullname: String
     @Attribute(.unique) var username: String

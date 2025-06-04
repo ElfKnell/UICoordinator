@@ -28,7 +28,7 @@ class UserLocationsViewModel: ObservableObject {
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
     
-    func fetchUserForLocations(userId: String) async throws {
+    func fetchUserForLocations(userId: String) async {
         
         self.locations = await fetchLocations.fetchLocation(userId)
         

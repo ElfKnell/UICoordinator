@@ -47,10 +47,8 @@ struct ActivityMapVisionView: View {
         .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
             cameraPosition = .region(mapCameraUpdateContext.region)
         }
-        .onAppear {
-            Task {
-                try await viewModel.getRoutes(activity: activity)
-            }
+        .task {
+            await viewModel.getRoutes(activity: activity)
         }
         .onChange(of: viewModel.selectedPlace, { oldValue, newValue in
             if viewModel.selectedPlace != nil {

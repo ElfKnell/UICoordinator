@@ -109,10 +109,8 @@ struct ColloquyCell: View {
             
         }
         .padding([.horizontal, .top])
-        .onAppear {
-            Task {
-                await viewModel.isLike(cid:colloquy.id, currentUserId: container.currentUserService.currentUser?.id)
-            }
+        .task {
+            await viewModel.isLike(cid:colloquy.id, currentUserId: container.currentUserService.currentUser?.id)
         }
         .onChange(of: isChange) {
             

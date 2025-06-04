@@ -67,14 +67,12 @@ struct ActivityEditView: View {
                     viewModel.sheetConfig = .confirmationLocation
                 }
             }
-            .onAppear {
-                Task {
-                    try await viewModel.getRoutes(activity: activity)
-                }
+            .task {
+                await viewModel.getRoutes(activity: activity)
             }
             .onChange(of: viewModel.isSave) {
                 Task {
-                    try await viewModel.getRoutes(activity: activity)
+                    await viewModel.getRoutes(activity: activity)
                 }
             }
             .onChange(of: viewModel.selectedPlace, { oldValue, newValue in

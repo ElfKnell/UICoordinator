@@ -53,10 +53,8 @@ struct UserLocationsView: View {
             }
             .navigationTitle("Map Locations")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                Task {
-                    try await viewModel.fetchUserForLocations(userId: userId)
-                }
+            .task {
+                await viewModel.fetchUserForLocations(userId: userId)
             }
             .onChange(of: viewModel.mapSelection) { oldValue, newValue in
                 if viewModel.mapSelection != nil {

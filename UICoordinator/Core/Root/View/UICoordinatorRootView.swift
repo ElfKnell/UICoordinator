@@ -19,23 +19,17 @@ struct UICoordinatorRootView: View {
                 LoadingView(width: 300, height: 300)
             } else if let user = container.currentUserService.currentUser {
                 CoordinatorTabView()
-                    .onAppear {
-                        Task {
-                                
-                            await container.userFollow.loadFollowersCurrentUser(userId: user.id)
-                                
-                        }
+                    .task {
+                        await container.userFollow.loadFollowersCurrentUser(userId: user.id)
                     }
             } else {
                 LoginView()
             }
         }
-        .onAppear {
-            Task {
-                isLoading = true
-                await container.authService.checkUserSession()
-                isLoading = false
-            }
+        .task {
+            isLoading = true
+            await container.authService.checkUserSession()
+            isLoading = false
         }
         .alert("No Internet Connection", isPresented: $container.networkMonitor.isConnected) {
             Button("OK", role: .cancel) {}

@@ -21,10 +21,8 @@ struct ActivityCreate: View {
                 LoadingView(width: 150, height: 150)
             }
         }
-        .onAppear {
-            Task {
-                viewModel.activity = await viewModel.createActivity(name: nameActivyty, currentUserId: container.currentUserService.currentUser?.id)
-            }
+        .task {
+            viewModel.activity = await viewModel.createActivity(name: nameActivyty, currentUserId: container.currentUserService.currentUser?.id)
         }
     }
 }

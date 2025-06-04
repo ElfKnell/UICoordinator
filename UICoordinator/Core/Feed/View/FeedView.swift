@@ -37,11 +37,9 @@ struct FeedView: View {
                     }
                     
                 }
-                .onAppear {
-                    Task {
-                        if viewModel.colloquies.isEmpty {
-                            await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
-                        }
+                .task {
+                    if viewModel.colloquies.isEmpty {
+                        await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                     }
                 }
                 .onChange(of: showColloquyCreate) {

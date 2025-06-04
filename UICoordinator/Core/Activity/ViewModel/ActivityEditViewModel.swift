@@ -60,15 +60,19 @@ class ActivityEditViewModel: ObservableObject {
     }
     
     @MainActor
-    func getRoutes(activity: Activity) async throws {
+    func getRoutes(activity: Activity) async {
 
-        if activity.typeActivity == .track {
-            let locations = await fetchLocatins.getLocations(activityId: activity.id)
-            self.locations = locations
-            let activityRouter = ActivityRouters()
-            self.routes = try await activityRouter.getRoutes(locations: locations)
-        } else {
-            self.locations = await fetchLocatins.getLocations(activityId: activity.id)
+        do {
+            if activity.typeActivity == .track {
+                let locations = await fetchLocatins.getLocations(activityId: activity.id)
+                self.locations = locations
+                let activityRouter = ActivityRouters()
+                self.routes = try await activityRouter.getRoutes(locations: locations)
+            } else {
+                self.locations = await fetchLocatins.getLocations(activityId: activity.id)
+            }
+        } catch {
+            print("ERROR GET ROUTES: \(error.localizedDescription)")
         }
 
     }
