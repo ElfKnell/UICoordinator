@@ -35,14 +35,12 @@ struct VideoView: View {
                 }
                 .refreshable {
                     Task {
-                        try await viewModel.fetchVideoByLocation()
+                        await viewModel.fetchVideoByLocation()
                     }
                 }
-                .onAppear {
+                .task {
                     viewModel.locationId = locationId
-                    Task {
-                        try await viewModel.fetchVideoByLocation()
-                    }
+                    await viewModel.fetchVideoByLocation()
                 }
                 .navigationTitle("Videos")
                 .navigationBarTitleDisplayMode(.inline)

@@ -10,7 +10,7 @@ import FirebaseStorage
 
 class VideoService {
     
-    static func uploadVideoStorage(withData videoData: Data, locationId: String) async -> String? {
+    func uploadVideoStorage(withData videoData: Data, locationId: String) async {
         
         let filename = NSUUID().uuidString
         let ref = Storage.storage()
@@ -23,23 +23,28 @@ class VideoService {
         do {
             let _ = try await ref.putDataAsync(videoData, metadata: metadata)
             let url = try await ref.downloadURL()
-            return url.absoluteString
+            let video = Video(locationUid: locationId, timestamp: Timestamp(), videoURL: url.absoluteString)
+            await uploadVideo(video)
         } catch {
-            return nil
+            print("ERROR WHILE UPLOADING VIDEO: \(error.localizedDescription)")
         }
     }
     
-    static func uploadVideo(_ video: Video) async throws {
+    private func uploadVideo(_ video: Video) async {
         
-        guard let videoData = try? Firestore.Encoder()
-            .encode(video) else { return }
-        
-        try await Firestore.firestore()
-            .collection("Video")
-            .addDocument(data: videoData)
+        do {
+            guard let videoData = try? Firestore.Encoder()
+                .encode(video) else { return }
+            
+            try await Firestore.firestore()
+                .collection("Video")
+                .addDocument(data: videoData)
+        } catch {
+            print("ERROR WHILE UPLOADING VIDEO: \(error.localizedDescription)")
+        }
     }
     
-    static func fetchVideosByLocation(_ locationId: String) async throws -> [Video] {
+    func fetchVideosByLocation(_ locationId: String) async throws -> [Video] {
         
         let snapshot = try await Firestore
             .firestore()
@@ -50,7 +55,7 @@ class VideoService {
         return videos.sorted(by: { $0.timestamp.dateValue() > $1.timestamp.dateValue() })
     }
     
-    static func updatTitle(vId:String, title: String) async throws {
+    func updatTitle(vId:String, title: String) async throws {
         
         try await Firestore.firestore()
             .collection("Video")
@@ -58,7 +63,7 @@ class VideoService {
             .updateData(["title": title])
     }
     
-    static func deleteVideo(videoId: String) async {
+    func deleteVideo(videoId: String) async {
         
         do {
             let snapshot = try await Firestore.firestore()

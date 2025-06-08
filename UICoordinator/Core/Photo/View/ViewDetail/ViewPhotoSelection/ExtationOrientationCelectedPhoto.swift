@@ -50,7 +50,7 @@ extension OrientationPhotoSelectedView {
             HStack {
                 Button {
                     Task {
-                        try await viewModel.deletePhoto()
+                        await viewModel.deletePhoto()
                     }
                 } label: {
                     LabelButtonView(imageName: "trash.circle.fill", label: "Delete")
@@ -59,7 +59,7 @@ extension OrientationPhotoSelectedView {
                 
                 Button {
                     Task {
-                        try await viewModel.updatePhotoName()
+                        await viewModel.updatePhotoName()
                     }
                 } label: {
                      LabelButtonView(imageName: "square.and.arrow.up.circle.fill", label: "Update")

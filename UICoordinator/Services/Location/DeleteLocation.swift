@@ -10,7 +10,6 @@ import FirebaseFirestoreSwift
 
 class DeleteLocation: DeleteLocationProtocol {
     
-    
     func deleteLocation(at locationId: String) async {
         
         do {
@@ -23,6 +22,4 @@ class DeleteLocation: DeleteLocationProtocol {
             print("ERROR delete location: \(error.localizedDescription)")
         }
     }
-    
-    
 }

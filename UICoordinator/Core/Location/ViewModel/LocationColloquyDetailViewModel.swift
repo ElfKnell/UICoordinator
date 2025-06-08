@@ -14,19 +14,32 @@ class LocationColloquyDetailViewModel: ObservableObject {
     @Published var switcher = PhotoSwitch.noPhoto
     @Published var videos = [Video]()
     
+    let videoService = VideoService()
+    let photoService = PhotoService()
+    
     @MainActor
-    func fetchPhoto(_ locationId: String) async throws {
-        self.photos = try await PhotoService.fetchPhotosByLocation(locationId)
-        
-        if !self.photos.isEmpty {
-            self.switcher = .newPhoto
-        } else {
-            self.switcher = .noPhoto
+    func fetchPhoto(_ locationId: String) async {
+        do {
+            self.photos = try await photoService
+                .fetchPhotosByLocation(locationId)
+            
+            if !self.photos.isEmpty {
+                self.switcher = .newPhoto
+            } else {
+                self.switcher = .noPhoto
+            }
+        } catch {
+            print("ERROR FETCHING PHOTO: \(error.localizedDescription)")
         }
     }
     
     @MainActor
-    func fetchVideos(_ locationId: String) async throws {
-        self.videos = try await VideoService.fetchVideosByLocation(locationId)
+    func fetchVideos(_ locationId: String) async {
+        do {
+            self.videos = try await videoService
+                .fetchVideosByLocation(locationId)
+        } catch {
+            print("ERROR FETCHING VIDEO: \(error.localizedDescription)")
+        }
     }
 }

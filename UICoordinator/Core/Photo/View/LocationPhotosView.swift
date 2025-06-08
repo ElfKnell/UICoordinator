@@ -54,10 +54,8 @@ struct LocationPhotosView: View {
         }
         .navigationTitle(activity.name)
         .navigationBarBackButtonHidden()
-        .onAppear {
-            Task {
-                try await viewModel.fetchPhoto(activity.id)
-            }
+        .task {
+            await viewModel.fetchPhoto(activity.id)
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

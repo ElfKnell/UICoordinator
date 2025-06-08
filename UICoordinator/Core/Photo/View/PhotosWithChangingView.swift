@@ -54,10 +54,8 @@ struct PhotosWithChangingView: View {
                 .navigationTitle("Photos")
                 .navigationBarBackButtonHidden()
                 .navigationBarTitleDisplayMode(.inline)
-                .onAppear {
-                    Task {
-                        try await viewModel.fetchPhoto(locationId)
-                    }
+                .task {
+                    await viewModel.fetchPhoto(locationId)
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {

@@ -47,7 +47,7 @@ struct NewPhotoView: View {
                 
                 Button {
                     Task {
-                        try await viewModel.uploadPhoto(locationId: locationId)
+                        await viewModel.uploadPhoto(locationId: locationId)
                     }
                 } label: {
                     LabelButtonView(imageName: "square.and.arrow.up.fill", label: "Save")

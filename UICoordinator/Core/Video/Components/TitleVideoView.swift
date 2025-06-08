@@ -26,7 +26,7 @@ struct TitleVideoView: View {
                 Button {
                     Task {
                         isLoaded = false
-                        try await viewModel.uploadTitle(vId: vId, title: title)
+                        await viewModel.uploadTitle(vId: vId, title: title)
                         isLoaded = true
                     }
                 } label: {
@@ -37,7 +37,7 @@ struct TitleVideoView: View {
                 
                 Button {
                     Task {
-                        try await viewModel.deleteVideo(vId)
+                        await viewModel.deleteVideo(vId)
                     }
                 } label: {
                     Image(systemName: "trash.circle.fill")

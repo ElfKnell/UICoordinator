@@ -17,32 +17,35 @@ class PhotoViewModel : ObservableObject {
     @Published var namePhoto = ""
     @Published var isLoading = false
     
+    let photoService = PhotoService()
+    
     @Published var switcher = PhotoSwitch.noPhoto
     
     @Published var selectedImage: UIImage?
     @Published var selectedItem: PhotosPickerItem? {
         didSet {
             Task {
-                try await setImage(selectedItem)
+                await setImage(selectedItem)
             }
         }
     }
     
-    func uploadPhoto(locationId: String) async throws {
+    func uploadPhoto(locationId: String) async {
         self.isLoading = true
         
         guard let image = selectedImage else { return }
-        guard let photoURL = try await PhotoService.uploadePhotoStorage(image, locationId: locationId) else { return }
-        let photo = Photo(locationUid: locationId, name: self.namePhoto, timestamp: Timestamp(), photoURL: photoURL)
-        try await PhotoService.uploadePhoto(photo)
+        let name = self.namePhoto
+        if name == "" { return }
+        await photoService
+            .uploadePhotoStorage(image, locationId: locationId, namePhoto: name)
         
-        try await fetchPhoto(locationId)
+        await fetchPhoto(locationId)
         
         clean()
         self.isLoading = false
     }
     
-    func setImage(_ selectedItem: PhotosPickerItem?) async throws {
+    private func setImage(_ selectedItem: PhotosPickerItem?) async {
         do {
             guard let item = selectedItem else { return }
             let data = try await item.loadTransferable(type: Data.self)
@@ -55,30 +58,40 @@ class PhotoViewModel : ObservableObject {
         }
     }
     
-    func fetchPhoto(_ locationId: String) async throws {
-        self.isLoading = true
-        self.photos = try await PhotoService.fetchPhotosByLocation(locationId)
-        self.isLoading = false
+    func fetchPhoto(_ locationId: String) async {
+        
+        do {
+            self.isLoading = true
+            self.photos = try await photoService.fetchPhotosByLocation(locationId)
+            self.isLoading = false
+        } catch {
+            print("ERROR FETCHING PHOTO: \(error.localizedDescription)")
+        }
     }
     
-    func updatePhotoName() async throws {
-        isLoading = true
-        guard let photo = self.photo else { return }
-        try await PhotoService.updateNamePhoto(photoId: photo.id, photoName: self.namePhoto)
-        
-        try await fetchPhoto(photo.locationUid)
-        clean()
-        isLoading = false
+    func updatePhotoName() async {
+        do {
+            isLoading = true
+            guard let photo = self.photo else { return }
+            if self.namePhoto == "" { return }
+            try await photoService.updateNamePhoto(photoId: photo.id, photoName: self.namePhoto)
+            
+            await fetchPhoto(photo.locationUid)
+            clean()
+            isLoading = false
+        } catch {
+            print("ERROR UPDATE NAME PHOTO: \(error.localizedDescription)")
+        }
     }
     
-    func deletePhoto() async throws {
+    func deletePhoto() async {
         isLoading = true
         
         guard let photo = self.photo else { return }
         
-        try await PhotoService.deletePhoto(photo: photo)
+        await photoService.deletePhoto(photo: photo)
         
-        try await fetchPhoto(photo.locationUid)
+        await fetchPhoto(photo.locationUid)
         clean()
         isLoading = false
     }

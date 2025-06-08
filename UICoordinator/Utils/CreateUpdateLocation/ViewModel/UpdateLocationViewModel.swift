@@ -15,6 +15,8 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     @Published var address = ""
     
     private var deleteLocation = DeleteLocation()
+    private let photoService = PhotoService()
+    private let videoService = VideoService()
     
     func initInfo(location: Location?) {
         self.name = location?.name ?? ""
@@ -31,15 +33,15 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
             guard let locationId = locationId else { return }
             
             if activityId == nil {
-                let fotos = try await PhotoService.fetchPhotosByLocation(locationId)
-                let videos = try await VideoService.fetchVideosByLocation(locationId)
+                let fotos = try await photoService.fetchPhotosByLocation(locationId)
+                let videos = try await videoService.fetchVideosByLocation(locationId)
                 
                 for foto in fotos {
-                    try await PhotoService.deletePhoto(photo: foto)
+                    await photoService.deletePhoto(photo: foto)
                 }
                 
                 for video in videos {
-                    await VideoService.deleteVideo(videoId: video.id)
+                    await videoService.deleteVideo(videoId: video.id)
                 }
             }
 
