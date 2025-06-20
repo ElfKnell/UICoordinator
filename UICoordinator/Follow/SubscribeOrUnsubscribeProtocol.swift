@@ -7,7 +7,7 @@
 
 import SwiftData
 
-protocol SubscribeOrUnsubscribeProtool {
+protocol SubscribeOrUnsubscribeProtocol {
     
     func subscribed(with user: User, currentUserId: String?) async
     

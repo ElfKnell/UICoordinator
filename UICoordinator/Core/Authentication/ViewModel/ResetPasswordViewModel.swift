@@ -14,7 +14,11 @@ class ResetPasswordViewModel {
     var message = ""
     var processReset: ResetPasswordCheck = .isStart
     
-    private let authReset = AuthResetPasswordService()
+    private let authReset: AuthResetPasswordProtocol
+    
+    init(authReset: AuthResetPasswordProtocol) {
+        self.authReset = authReset
+    }
     
     func resetPassword() async {
         do {

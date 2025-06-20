@@ -12,16 +12,25 @@ class FetchAllActivityViewModel: ObservableObject {
     @Published var activities: [Activity] = []
     
     private let pageSize = 10
-    private var localUserServise = LocalUserService()
-    private var fetchingActivities = FetchingActivitiesService()
-    private var activitySpread = ActivitySpreading()
+    private let localUserServise: LocalUserServiceProtocol
+    private var fetchingActivities: FetchingActivitiesProtocol
+    private var activitySpread: SpreadingActivityProtocol
+    
+    init(localUserServise: LocalUserServiceProtocol,
+         fetchingActivities: FetchingActivitiesProtocol,
+         activitySpread: SpreadingActivityProtocol) {
+        
+        self.localUserServise = localUserServise
+        self.fetchingActivities = fetchingActivities
+        self.activitySpread = activitySpread
+    }
     
     @MainActor
     func refresh(currentUser: User?) async {
         
         activities.removeAll()
-        fetchingActivities = FetchingActivitiesService()
-        activitySpread = ActivitySpreading()
+        fetchingActivities.clean()
+        activitySpread.clean()
         await fetchFollowersActivity(currentUser: currentUser)
 
     }

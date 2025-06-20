@@ -15,7 +15,7 @@ struct LocationsDetailView: View {
     @Binding var getDirections: Bool
     @Binding var isUpdate: MapSheetConfig?
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = LocationDetailViewModel()
+    @StateObject var viewModel = LocationDetailViewModel(fetchLocations: FetchLocationForActivity())
     @EnvironmentObject var container: DIContainer
     var activity: Activity?
     

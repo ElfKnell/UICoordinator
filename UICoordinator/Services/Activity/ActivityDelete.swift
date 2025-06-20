@@ -11,13 +11,20 @@ import Foundation
 class ActivityDelete: ActivityDeleteProtocol {
     
     let servaceDelete: FirestoreGeneralDeleteProtocol
+    let locationDelete: DeleteLocationProtocol
+    let likesDelete: LikesDeleteServiceProtocol
     
-    init(servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService()) {
+    init(servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService(),
+         locationDelete: DeleteLocationProtocol,
+         likesDelete: LikesDeleteServiceProtocol) {
         
         self.servaceDelete = servaceDelete
+        self.locationDelete = locationDelete
+        self.likesDelete = likesDelete
     }
     
     func markActivityForDelete(activityId: String) async {
+        
         do {
             
             try await Firestore.firestore()
@@ -30,10 +37,14 @@ class ActivityDelete: ActivityDeleteProtocol {
         }
     }
     
-    func deleteActivity(activityId: String) async {
+    func deleteActivity(activity: Activity) async {
+        
         do {
+            await locationDelete.deleteLocations(with: activity.locationsId)
             
-            try await self.servaceDelete.deleteDocument(from: "Activity", documentId: activityId)
+            await likesDelete.likesDelete(objectId: activity.id, collectionName: .activityLikes)
+            
+            try await self.servaceDelete.deleteDocument(from: "Activity", documentId: activity.id)
             
         } catch {
             print("ERROR DELETE FOLLOW: \(error.localizedDescription)")

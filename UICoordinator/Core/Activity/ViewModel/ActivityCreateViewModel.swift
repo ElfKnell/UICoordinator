@@ -12,8 +12,15 @@ class ActivityCreateViewModel: ObservableObject {
     
     @Published var activity: Activity?
     
-    private let createActivity = ActivityCreateService()
-    private let fetchingActivity = FetchingActivityService()
+    private let createActivity: ActivityCreateProtocol
+    private let fetchingActivity: FetchingActivityProtocol
+    
+    init(createActivity: ActivityCreateProtocol,
+         fetchingActivity: FetchingActivityProtocol) {
+        
+        self.createActivity = createActivity
+        self.fetchingActivity = fetchingActivity
+    }
     
     func createActivity(name: String, currentUserId: String?) async -> Activity? {
         

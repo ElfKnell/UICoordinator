@@ -10,8 +10,18 @@ import SwiftUI
 struct ActivityCreate: View {
     var nameActivyty: String
     
-    @StateObject var viewModel = ActivityCreateViewModel()
+    @StateObject var viewModel: ActivityCreateViewModel
     @EnvironmentObject var container: DIContainer
+    
+    init(nameActivyty: String, viewModelBilder: () -> ActivityCreateViewModel = { ActivityCreateViewModel(
+        createActivity: ActivityCreateService(),
+        fetchingActivity: FetchingActivityService())
+    }) {
+        self.nameActivyty = nameActivyty
+        let mv = viewModelBilder()
+        self._viewModel = StateObject(wrappedValue: mv)
+        
+    }
     
     var body: some View {
         Group {

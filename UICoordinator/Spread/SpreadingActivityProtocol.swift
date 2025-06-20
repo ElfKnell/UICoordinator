@@ -11,4 +11,6 @@ protocol SpreadingActivityProtocol {
     func createSpread(_ spreadActivity: Spread) async
     
     func getSpreads(users: [User], pageSize: Int, byField: String) async -> [Spread]
+    
+    func clean()
 }

@@ -17,7 +17,11 @@ class RegistrationViewModel: ObservableObject {
     @Published var errorCreated: String?
     @Published var isCreateUserError = false
     
-    var userCreate = AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService()))
+    private let userCreate: AuthCreateServiceProtocol
+    
+    init(userCreate: AuthCreateServiceProtocol) {
+        self.userCreate = userCreate
+    }
     
     @MainActor
     func createUser() async -> Bool {

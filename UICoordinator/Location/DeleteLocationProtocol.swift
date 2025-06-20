@@ -9,4 +9,6 @@ import Foundation
 
 protocol DeleteLocationProtocol {
     func deleteLocation(at locationId: String) async
+    
+    func deleteLocations(with locationsId: [String]) async
 }

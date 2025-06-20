@@ -12,9 +12,11 @@ class FetchMyActivity: ObservableObject {
     @Published var activities: [Activity] = []
     
     private let pageSize = 7
-    private var fetchingActivities = FetchingActivitiesService()
+    private let fetchingActivities: FetchingActivitiesProtocol
     
-    init(currentUser: User?) {
+    init(currentUser: User?, fetchingActivities: FetchingActivitiesProtocol) {
+        
+        self.fetchingActivities = fetchingActivities
         Task {
             await fetchMyActivity(currentUser: currentUser)
         }
@@ -23,7 +25,7 @@ class FetchMyActivity: ObservableObject {
     @MainActor
     func refresh(currentUser: User?) async {
         activities.removeAll()
-        fetchingActivities = FetchingActivitiesService()
+        fetchingActivities.clean()
         await fetchMyActivity(currentUser: currentUser)
     }
     

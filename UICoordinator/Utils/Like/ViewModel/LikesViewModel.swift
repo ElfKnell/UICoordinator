@@ -13,17 +13,24 @@ class LikesViewModel: ObservableObject {
     @Published var collectionName: CollectionNameForLike
     @Published var likeId: String?
     
-    private let likeCount = ColloquyInteractionCounterService()
-    private let likeService = LikeService(serviceCreate: FirestoreLikeCreateServise(),
-                                          serviceDetete: FirestoreGeneralDeleteService())
-    private let fethingLike = FetchLikesService(likeRepository: FirestoreLikeRepository())
-    private let activityUpdate = ActivityServiceUpdate()
+    private let likeCount: ColloquyInteractionCounterServiceProtocol //ColloquyInteractionCounterService()
+    private let likeService: LikeServiceProtocol //LikeService(serviceCreate: FirestoreLikeCreateServise(),
+                                          //serviceDetete: FirestoreGeneralDeleteService())
+    private let fethingLike: FetchLikesServiceProtocol //FetchLikesService(likeRepository: FirestoreLikeRepository())
+    private let activityUpdate: ActivityUpdateProtocol //ActivityServiceUpdate()
     
-    init(likeId: String? = nil, collectionName: CollectionNameForLike) {
+    init(likeId: String? = nil, collectionName: CollectionNameForLike,
+         likeCount: ColloquyInteractionCounterServiceProtocol,
+         likeService: LikeServiceProtocol,
+         fethingLike: FetchLikesServiceProtocol,
+         activityUpdate: ActivityUpdateProtocol) {
         
         self.likeId = likeId
         self.collectionName = collectionName
-        
+        self.likeCount = likeCount
+        self.likeService = likeService
+        self.fethingLike = fethingLike
+        self.activityUpdate = activityUpdate
     }
     
     func doLike<T: Identifiable>(userId: String, currentUserId: String?,  likeToObject:T) async {

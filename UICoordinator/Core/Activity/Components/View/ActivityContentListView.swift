@@ -21,9 +21,13 @@ struct ActivityContentListView: View {
     
     init(currentUser: User?, isCreate: Binding<Bool>) {
         self.currentUser = currentUser
-        self._viewModel = .init(wrappedValue: ActivityViewModel(currentUser: currentUser))
-        self._activityAll = .init(wrappedValue: FetchAllActivityViewModel())
-        self._activityMy = .init(wrappedValue: FetchMyActivity(currentUser: currentUser))
+        
+        self._viewModel = .init(wrappedValue: ActivityViewModelFactory.makeActivityViewModel(for: currentUser))
+        
+        self._activityAll = .init(wrappedValue: ActivityViewModelFactory.makeFetchAllActivityViewModel())
+        
+        self._activityMy = .init(wrappedValue: ActivityViewModelFactory.makeFetchMyActivityViewModel(for: currentUser))
+        
         self._isCreate = isCreate
     }
     
@@ -66,12 +70,11 @@ struct ActivityContentListView: View {
                     LazyVStack {
                         
                         ForEach(activityAll.activities) { activity in
-                            ActivityCell(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
+                            ActivityCellFactory.make(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
                                 .onAppear {
                                     
                                     if activity == activityAll.activities.last {
                                         Task {
-                                            
                                             await activityAll.fetchFollowersActivity(currentUser: currentUser)
                                         }
                                     }
@@ -89,7 +92,7 @@ struct ActivityContentListView: View {
                         if !activityMy.activities.isEmpty {
                             
                             ForEach(activityMy.activities) { activity in
-                                ActivityCell(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
+                                ActivityCellFactory.make(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
                                     .onAppear {
                                         if activity == activityMy.activities.last {
                                             Task {
@@ -118,16 +121,14 @@ struct ActivityContentListView: View {
                     LazyVStack {
                         if !viewModel.activities.isEmpty {
                             ForEach(viewModel.activities) { activity in
-                                ActivityCell(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
+                                ActivityCellFactory.make(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
                             }
                         } else {
                             ContentUnavailableView("No Like Activity", systemImage: "globe.desk", description: Text("You have not liked any activity yet."))
                         }
                     }
-                    .onChange(of: isUpdate) {
-                        Task {
-                            await viewModel.fetchLikeActivity(currentUser: currentUser)
-                        }
+                    .task {
+                        await viewModel.fetchLikeActivity(currentUser: currentUser)
                     }
                 }
                 

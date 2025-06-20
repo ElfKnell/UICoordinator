@@ -8,7 +8,7 @@
 import Firebase
 import FirebaseStorage
 
-class VideoService {
+class VideoService: VideoServiceProtocol {
     
     func uploadVideoStorage(withData videoData: Data, locationId: String) async {
         

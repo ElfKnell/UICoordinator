@@ -11,5 +11,5 @@ protocol ActivityDeleteProtocol {
     
     func markActivityForDelete(activityId: String) async
     
-    func deleteActivity(activityId: String) async
+    func deleteActivity(activity: Activity) async
 }

@@ -8,9 +8,13 @@
 import Firebase
 import SwiftData
 
-class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtool {
+class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtocol {
     
-    private let followServise = FollowService()
+    private let followServise: FollowServiceProtocol
+    
+    init(followServise: FollowServiceProtocol) {
+        self.followServise = followServise
+    }
     
     func subscribed(with user: User, currentUserId: String?) async {
         

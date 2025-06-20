@@ -14,12 +14,19 @@ struct ActivityMapVisionView: View {
     @State private var cameraPosition: MapCameraPosition
     @FocusState private var isSearch: Bool
     @State private var isSelected = false
-    @StateObject var viewModel = ActivityEditViewModel()
     
-    init(activity: Activity) {
-        _cameraPosition = .init(wrappedValue: .region(activity.region ?? .startRegion))
+    @StateObject var viewModel: ActivityEditViewModel
+    
+    init(activity: Activity, viewModelBilder: () -> ActivityEditViewModel =
+         { ActivityEditViewModel(
+            fetchLocatins: FetchLocationsForActivity(),
+            activityUpdate: ActivityServiceUpdate())
+    } ) {
         
         self.activity = activity
+        let mv = viewModelBilder()
+        self._viewModel = StateObject(wrappedValue: mv)
+        self._cameraPosition = .init(wrappedValue: mv.initialCamera(for: activity))
     }
     
     var body: some View {

@@ -10,7 +10,7 @@ import SwiftUI
 struct ColloquyCell: View {
     let colloquy: Colloquy
     @EnvironmentObject var container: DIContainer
-    @StateObject var viewModel = LikesViewModel(collectionName: .likes)
+    @StateObject var viewModelLike = LikesViewModel(collectionName: .likes, likeCount: ColloquyInteractionCounterService(), likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService()), fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()), activityUpdate: ActivityServiceUpdate())
     @State private var showReplieCreate = false
     @State var isChange = false
     
@@ -78,7 +78,7 @@ struct ColloquyCell: View {
                         Spacer()
                         
                         LikeButtonView(colloquyOrActivity: colloquy, userId: container.currentUserService.currentUser?.id)
-                            .environmentObject(viewModel)
+                            .environmentObject(viewModelLike)
                         
                         Spacer()
                         
@@ -110,7 +110,7 @@ struct ColloquyCell: View {
         }
         .padding([.horizontal, .top])
         .task {
-            await viewModel.isLike(cid:colloquy.id, currentUserId: container.currentUserService.currentUser?.id)
+            await viewModelLike.isLike(cid:colloquy.id, currentUserId: container.currentUserService.currentUser?.id)
         }
         .onChange(of: isChange) {
             
@@ -128,5 +128,8 @@ struct ColloquyCell: View {
 }
 
 #Preview {
+    
+    //let viewModelLike = LikesViewModel(collectionName: .likes, likeCount: ColloquyInteractionCounterService(), likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService()), fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()), activityUpdate: ActivityServiceUpdate())
+    
     ColloquyCell(colloquy: DeveloperPreview.colloquy)
 }

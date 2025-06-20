@@ -13,13 +13,17 @@ class ActivitySpreading: SpreadingActivityProtocol {
     private let nameCollection = "Spread"
     private var lastDocument: DocumentSnapshot?
     private var isDataLoaded = false
-    private var userServise = UserService()
-    private let fetchingActivity = FetchingActivityService()
+    private var userServise: UserServiceProtocol
+    private let fetchingActivity: FetchingActivityProtocol
     
     let serviceCreate: FirestoreGeneralCreateServiseProtocol
     
-    init(serviceCreate: FirestoreGeneralCreateServiseProtocol = FirestoreGeneralServiceCreate()) {
+    init(serviceCreate: FirestoreGeneralCreateServiseProtocol = FirestoreGeneralServiceCreate(),
+         userServise: UserServiceProtocol,
+         fetchingActivity: FetchingActivityProtocol) {
         self.serviceCreate = serviceCreate
+        self.userServise = userServise
+        self.fetchingActivity = fetchingActivity
     }
     
     func createSpread(_ spreadActivity: Spread) async {
@@ -84,5 +88,10 @@ class ActivitySpreading: SpreadingActivityProtocol {
             print("ERROR FETCHING SPREAD: \(error.localizedDescription)")
             return []
         }
+    }
+    
+    func clean() {
+        self.lastDocument = nil
+        self.isDataLoaded = false
     }
 }

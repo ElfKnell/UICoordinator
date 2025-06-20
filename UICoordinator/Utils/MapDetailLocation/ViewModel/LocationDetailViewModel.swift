@@ -11,7 +11,11 @@ import SwiftUI
 @MainActor
 class LocationDetailViewModel: ObservableObject {
 
-    private let fetchLocations = FetchLocationForActivity()
+    private let fetchLocations: FetchLocationForActivityProtocol
+    
+    init(fetchLocations: FetchLocationForActivityProtocol) {
+        self.fetchLocations = fetchLocations
+    }
 
     func openMap(mapSeliction: Location?) {
         if let mapSeliction {

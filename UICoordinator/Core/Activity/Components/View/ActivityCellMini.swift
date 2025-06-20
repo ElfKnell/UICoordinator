@@ -8,10 +8,8 @@
 import SwiftUI
 
 struct ActivityCellMini: View {
+    
     let activity: Activity
-
-    @StateObject var viewModel = ActivityCellViewModel()
-    @State private var showReplies = false
     
     var body: some View {
         VStack {

@@ -9,11 +9,18 @@ import SwiftUI
 
 struct RegistrationView: View {
     
-    @StateObject var registrationModel = RegistrationViewModel()
     @Binding var isNewUser: Bool
+    @StateObject var registrationModel: RegistrationViewModel
     
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.dismiss) var dismiss
+    
+    init(isNewUser: Binding<Bool>, viewModelBuilder: @escaping () -> RegistrationViewModel = { RegistrationViewModel(userCreate: AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService())))
+    }) {
+        
+        self._isNewUser = isNewUser
+        _registrationModel = StateObject(wrappedValue: viewModelBuilder())
+    }
     
     var body: some View {
         
@@ -119,5 +126,6 @@ struct RegistrationView: View {
 }
 
 #Preview {
+    
     RegistrationView(isNewUser: .constant(false))
 }

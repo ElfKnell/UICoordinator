@@ -10,8 +10,10 @@ import SwiftUI
 struct ActivityCell: View {
     
     let activity: Activity
-    @StateObject var viewModelLike = LikesViewModel(collectionName: .activityLikes)
-    @StateObject var viewModel = ActivityCellViewModel()
+    
+    @StateObject var viewModel: ActivityCellViewModel
+    @StateObject var viewModelLike: LikesViewModel
+    
     @EnvironmentObject var container: DIContainer
     
     @Binding var isDelete: Bool
@@ -181,5 +183,7 @@ struct ActivityCell: View {
 }
 
 #Preview {
-    ActivityCell(activity: DeveloperPreview.activity, isDelete: .constant(false), isUpdate: .constant(false))
+    
+    ActivityCellFactory.make(activity: DeveloperPreview.activity, isDelete: .constant(false), isUpdate: .constant(false))
+
 }

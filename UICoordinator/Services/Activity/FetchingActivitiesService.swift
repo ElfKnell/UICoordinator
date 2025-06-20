@@ -100,5 +100,10 @@ class FetchingActivitiesService: FetchingActivitiesProtocol {
         }
     }
     
-    
+    func clean() {
+        self.lastDocument = nil
+        self.isDataLoaded = false
+        self.lastDocumentByUser = nil
+        self.isDataLoadedByUser = false
+    }
 }

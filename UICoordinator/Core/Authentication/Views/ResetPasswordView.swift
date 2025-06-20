@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ResetPasswordView: View {
     
-    @State var viewModel = ResetPasswordViewModel()
+    @State var viewModel = ResetPasswordViewModel(authReset: AuthResetPasswordService())
     @FocusState private var emailFieldFocused: Bool
     @Environment(\.dismiss) var dismiss
     
@@ -104,5 +104,8 @@ struct ResetPasswordView: View {
 }
 
 #Preview {
+    
+    //let viewModel = ResetPasswordViewModel(authReset: AuthResetPasswordService())
+    
     ResetPasswordView()
 }

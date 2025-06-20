@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseStorage
 
-class  PhotoService {
+class PhotoService: PhotoServiceProtocol {
     
     func uploadePhotoStorage(_ photo: UIImage, locationId: String, namePhoto: String) async {
         

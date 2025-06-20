@@ -13,12 +13,22 @@ class ActivityViewModel: ObservableObject {
     
     @Published var activities = [Activity]()
     
-    private var localUserServise = LocalUserService()
-    private var userService = UserService()
-    private let fetchingLikes = FetchLikesService(likeRepository: FirestoreLikeRepository())
-    private let fetchingActivity = FetchingActivityService()
+    private let localUserServise: LocalUserServiceProtocol
+    private let userService: UserServiceProtocol
+    private let fetchingLikes: FetchLikesServiceProtocol
+    private let fetchingActivity: FetchingActivityProtocol
     
-    init(currentUser: User?) {
+    init(currentUser: User?,
+         localUserServise: LocalUserServiceProtocol,
+         userService: UserServiceProtocol,
+         fetchingLikes: FetchLikesServiceProtocol,
+         fetchingActivity: FetchingActivityProtocol) {
+        
+        self.localUserServise = localUserServise
+        self.userService = userService
+        self.fetchingLikes = fetchingLikes
+        self.fetchingActivity = fetchingActivity
+        
         Task {
             await fetchLikeActivity(currentUser: currentUser)
         }

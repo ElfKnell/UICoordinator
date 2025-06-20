@@ -22,4 +22,13 @@ class DeleteLocation: DeleteLocationProtocol {
             print("ERROR delete location: \(error.localizedDescription)")
         }
     }
+    
+    func deleteLocations(with locationsId: [String]) async {
+        
+        if locationsId.isEmpty { return }
+        
+        for id in locationsId {
+            await deleteLocation(at: id)
+        }
+    }
 }

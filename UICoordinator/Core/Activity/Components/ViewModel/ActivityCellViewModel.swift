@@ -15,13 +15,18 @@ class ActivityCellViewModel: ObservableObject {
     @Published var isStread = false
     @Published var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     
-    private var spreadActivity = ActivitySpreading()
-    private var activityUpdate = ActivityServiceUpdate()
-    private var deleteActivity = ActivityDelete()
-    private var deleteLocation = DeleteLocation()
-    private var serviceLike = LikeService(serviceCreate: FirestoreLikeCreateServise(),
-                                          serviceDetete: FirestoreGeneralDeleteService())
-    private var fetchingLikes = FetchLikesService(likeRepository: FirestoreLikeRepository())
+    private var spreadActivity: SpreadingActivityProtocol
+    private var activityUpdate: ActivityUpdateProtocol
+    private var deleteActivity: ActivityDeleteProtocol
+    
+    init(spreadActivity: SpreadingActivityProtocol,
+         activityUpdate: ActivityUpdateProtocol,
+         deleteActivity: ActivityDeleteProtocol) {
+        
+        self.spreadActivity = spreadActivity
+        self.activityUpdate = activityUpdate
+        self.deleteActivity = deleteActivity
+    }
     
     func markForDelete(_ activity: Activity) async {
         await deleteActivity.markActivityForDelete(activityId: activity.id)
@@ -29,21 +34,7 @@ class ActivityCellViewModel: ObservableObject {
     
     func deleteActivity(activity: Activity) async {
         
-        let likes = await fetchingLikes.getLikes(collectionName: .activityLikes, byField: .userIdField, userId: activity.ownerUid)
-        
-        if !likes.isEmpty {
-            for i in 0 ..< likes.count {
-                await serviceLike.deleteLike(likeId: likes[i].id, collectionName: .activityLikes)
-            }
-        }
-        
-        if !activity.locationsId.isEmpty {
-            for i in 0 ..< activity.locationsId.count {
-                await deleteLocation.deleteLocation(at: activity.locationsId[i])
-            }
-        }
-        
-        await deleteActivity.deleteActivity(activityId: activity.id)
+        await deleteActivity.deleteActivity(activity: activity)
     }
     
     func isCurrentUser(_ userActivityId: String, currentUser: User?) -> Bool {

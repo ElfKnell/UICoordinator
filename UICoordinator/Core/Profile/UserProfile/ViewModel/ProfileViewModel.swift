@@ -12,7 +12,7 @@ class ProfileViewModel: ObservableObject {
     
     private var userActor: UserDataActor?
     
-    private var subscription = SubscribeOrUnsubscribe()
+    private var subscription = SubscribeOrUnsubscribe(followServise: FollowService())
     
     func follow(user: User, currentUserId: String?) {
         

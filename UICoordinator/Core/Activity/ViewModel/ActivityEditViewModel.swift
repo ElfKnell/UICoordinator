@@ -27,12 +27,26 @@ class ActivityEditViewModel: ObservableObject {
     
     @Published var routes: [MKRoute] = []
     
-    private var fetchLocatins = FetchLocationsForActivity()
-    private let activityUpdate = ActivityServiceUpdate()
+    private let fetchLocatins: FetchLocationsForActivityProtocol
+    private let activityUpdate: ActivityUpdateProtocol
+    
+    init(fetchLocatins: FetchLocationsForActivityProtocol, activityUpdate: ActivityUpdateProtocol) {
+       
+        self.fetchLocatins = fetchLocatins
+        self.activityUpdate = activityUpdate
+    }
     
     @MainActor
     func clean() {
         searchLocations.removeAll()
+    }
+    
+    func initialCamera(for activity: Activity) -> MapCameraPosition {
+        if let region = activity.region {
+            return .region(region)
+        } else {
+            return .userLocation(fallback: .automatic)
+        }
     }
     
     func saveRegione(_ region: MKCoordinateRegion?, activityId: String) async throws {
