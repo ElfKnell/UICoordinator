@@ -9,9 +9,18 @@ import SwiftUI
 
 struct FeedView: View {
     
-    @StateObject var viewModel = FeedViewModel()
+    @StateObject var viewModel: FeedViewModel
     @State private var showColloquyCreate = false
     @EnvironmentObject var container: DIContainer
+    
+    init(viewModelBilder: @escaping () -> FeedViewModel = {
+        FeedViewModel(
+            localUserServise: LocalUserService(),
+            fetchColloquies: FetchColloquiesFirebase(
+                fetchLocation: FetchLocationFromFirebase()))
+    }) {
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         NavigationStack {
@@ -19,7 +28,7 @@ struct FeedView: View {
                 ScrollView(showsIndicators: false) {
                     LazyVStack {
                         ForEach(viewModel.colloquies) { colloquy in
-                            ColloquyCell(colloquy: colloquy)
+                            ColloquyCellFactory.make(colloquy: colloquy)
                                 .onAppear {
                                     // Load more data when the last post appears
                                     if colloquy == viewModel.colloquies.last {

@@ -18,7 +18,11 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
     private var lastDocumentForDeleted: DocumentSnapshot?
     private var isUserDataDeleted = false
     
-    private var fetchLocation = FetchLocationFromFirebase()
+    private let fetchLocation: FetchLocationFormFirebaseProtocol
+    
+    init(fetchLocation: FetchLocationFormFirebaseProtocol) {
+        self.fetchLocation = fetchLocation
+    }
     
     func getColloquies(users: [User], pageSize: Int) async -> [Colloquy] {
         
@@ -164,5 +168,14 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
             print("Fetch for user failed: \(error.localizedDescription)")
             return []
         }
+    }
+    
+    func reload() {
+        self.lastDocument = nil
+        self.isDataLoaded = false
+        self.lastDocumentForUser = nil
+        self.isUserDataLoaded = false
+        self.lastDocumentForDeleted = nil
+        self.isUserDataDeleted = false
     }
 }

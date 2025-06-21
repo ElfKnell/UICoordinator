@@ -11,7 +11,7 @@ struct ColloquyCellForCurrentUser: View {
     
     let colloquy: Colloquy
     let user: User
-    let colloquyService = ColloquyService(serviceDetete: FirestoreGeneralDeleteService(), repliesFetchingService: FetchRepliesFirebase())
+    let colloquyService = ColloquyService(serviceDetete: FirestoreGeneralDeleteService(), repliesFetchingService: FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService()))
     @Binding var isDeleted: Bool
     @StateObject var viewModel = LikesViewModel(collectionName: .likes, likeCount: ColloquyInteractionCounterService(), likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService()), fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()), activityUpdate: ActivityServiceUpdate())
     @State private var sheetStatus: SheetStatus? = nil

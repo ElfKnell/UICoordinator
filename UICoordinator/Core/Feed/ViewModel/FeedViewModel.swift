@@ -9,17 +9,23 @@ import SwiftUI
 import Firebase
 import SwiftData
 
-@MainActor
 class FeedViewModel: ObservableObject {
-    
-    private var localUserServise = LocalUserService()
     
     @Published var colloquies = [Colloquy]()
     @Published var isLoading = false
     
-    private var fetchColloquiesFromFirebase = FetchColloquiesFirebase()
+    private let localUserServise: LocalUserServiceProtocol
+    private let fetchColloquies: FetchColloquiesProtocol
     private let pageSize = 15
     
+    init(localUserServise: LocalUserServiceProtocol,
+         fetchColloquies: FetchColloquiesProtocol) {
+        
+        self.localUserServise = localUserServise
+        self.fetchColloquies = fetchColloquies
+    }
+    
+    @MainActor
     func fetchColloquies(currentUser: User?) async {
         
         self.isLoading = true
@@ -29,12 +35,12 @@ class FeedViewModel: ObservableObject {
         self.isLoading = false
     }
     
-    
+    @MainActor
     func fetchColloquiesRefresh(currentUser: User?) async {
         
         self.isLoading = true
         
-        fetchColloquiesFromFirebase = FetchColloquiesFirebase()
+        fetchColloquies.reload()
         self.colloquies.removeAll()
         await fetchColloquiesFirebase(currentUser: currentUser)
         
@@ -42,10 +48,11 @@ class FeedViewModel: ObservableObject {
         
     }
     
+    @MainActor
     private func fetchColloquiesFirebase(currentUser: User?) async {
         
         let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
-        let items = await fetchColloquiesFromFirebase.getColloquies(users: users, pageSize: pageSize)
+        let items = await fetchColloquies.getColloquies(users: users, pageSize: pageSize)
         self.colloquies.append(contentsOf: items)
 
     }

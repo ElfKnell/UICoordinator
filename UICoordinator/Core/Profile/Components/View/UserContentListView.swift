@@ -75,7 +75,7 @@ struct UserContentListView: View {
                             
                         } else {
                             
-                            ColloquyCell(colloquy: colloquy)
+                            ColloquyCellFactory.make(colloquy: colloquy)
                                 .padding(.horizontal, isLandscape ? 41 : 1)
                                 .task {
                                     

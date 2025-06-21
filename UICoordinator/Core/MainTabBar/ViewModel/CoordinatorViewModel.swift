@@ -13,7 +13,7 @@ class CoordinatorViewModel: ObservableObject {
     @Published var isLocationServicesEnabled = false
     @Published var mainSelectedTab = 0
     @Published var errorMessage: String?
-    private var locationManager = LocationManager()
+    private let locationManager = LocationManager()
     
     init() {
         Task {

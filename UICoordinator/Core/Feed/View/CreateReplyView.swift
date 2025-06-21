@@ -10,11 +10,30 @@ import SwiftUI
 struct CreateReplyView: View {
     
     @Binding var isCreate: Bool
-    @State var viewModel = CreateReplyViewModel()
-    @FocusState private var isSearch: Bool
-    
     let colloquyId: String
     let user: User?
+    @StateObject var viewModel: CreateReplyViewModel
+    @FocusState private var isSearch: Bool
+    
+    init(isCreate: Binding<Bool>,
+         colloquyId: String,
+         user: User?,
+         viewModelBilder: () -> CreateReplyViewModel = {
+        CreateReplyViewModel(
+            colloquyService: ColloquyService(
+                serviceDetete: FirestoreGeneralDeleteService(),
+                repliesFetchingService: FetchRepliesFirebase(
+                    fetchLocation: FetchLocationFromFirebase(),
+                    userService: UserService())),
+            increment: ColloquyInteractionCounterService())
+    }) {
+        
+        let vm = viewModelBilder()
+        self._isCreate = isCreate
+        self._viewModel = StateObject(wrappedValue: vm)
+        self.colloquyId = colloquyId
+        self.user = user
+    }
     
     var body: some View {
         HStack {

@@ -13,8 +13,8 @@ class UserContentListViewModel: ObservableObject {
     @Published var replies = [Colloquy]()
     @Published var isLoading = false
     
-    private var fetchColloquies = FetchColloquiesFirebase()
-    private var fetchReplies = FetchRepliesFirebase()
+    private var fetchColloquies = FetchColloquiesFirebase(fetchLocation: FetchLocationFromFirebase())
+    private var fetchReplies = FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService())
     private var localUserServise = LocalUserService()
     private var pageSize = 10
     
@@ -32,8 +32,8 @@ class UserContentListViewModel: ObservableObject {
         
         self.isLoading = true
         
-        fetchColloquies = FetchColloquiesFirebase()
-        fetchReplies = FetchRepliesFirebase()
+        fetchColloquies = FetchColloquiesFirebase(fetchLocation: FetchLocationFromFirebase())
+        fetchReplies = FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService())
         self.colloquies.removeAll()
         self.replies.removeAll()
         

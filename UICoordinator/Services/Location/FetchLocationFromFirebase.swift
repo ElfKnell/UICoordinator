@@ -9,7 +9,7 @@ import MapKit
 import Firebase
 import FirebaseFirestoreSwift
 
-class FetchLocationFromFirebase: FetchLocationProtocol {
+class FetchLocationFromFirebase: FetchLocationFormFirebaseProtocol {
     
     let firebase = Firestore.firestore()
     

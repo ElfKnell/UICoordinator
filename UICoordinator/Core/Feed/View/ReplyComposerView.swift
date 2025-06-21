@@ -11,16 +11,17 @@ struct ReplyComposerView: View {
     
     let colloquy: Colloquy
     let user: User?
+    let isEditButton: Bool
     
     @State var isCreate = false
-    @StateObject var viewModel: RepliesViewModel
-    let isEditButton: Bool
     @State var isVisible = false
+    
+    @StateObject var viewModel: RepliesViewModel
     
     init(colloquy: Colloquy, user: User?, isEditButton: Bool) {
         self.colloquy = colloquy
         self.user = user
-        _viewModel = StateObject(wrappedValue: RepliesViewModel(colloquy.id, currentUser: user, isOrdering: false))
+        _viewModel = StateObject(wrappedValue: RepliesViewModelFactory.makeRepliesViewModel(colloquy.id, currentUser: user, isOrdering: false))
         self.isEditButton = isEditButton
         _isVisible = .init(wrappedValue: !isEditButton)
     }
@@ -39,7 +40,7 @@ struct ReplyComposerView: View {
                 
                 LazyVStack {
                     ForEach(viewModel.replies) { reply in
-                        ColloquyCell(colloquy: reply)
+                        ColloquyCellFactory.make(colloquy: reply)
                             .onAppear {
                                 Task {
                                     await viewModel.fetchReplies(colloquy.id, currentUser: user)

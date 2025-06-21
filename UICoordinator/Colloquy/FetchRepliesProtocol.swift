@@ -15,4 +15,5 @@ protocol FetchRepliesProtocol {
     
     func getRepliesByColloquy(colloquyId: String) async throws -> [Colloquy]
     
+    func reload()
 }

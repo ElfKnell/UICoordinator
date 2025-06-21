@@ -13,10 +13,17 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
     
     private var lastDocument: DocumentSnapshot?
     private var isDataLoaded = false
-    private var fetchLocation = FetchLocationFromFirebase()
     private var lastDocumentColloquy: DocumentSnapshot?
     private var isDataLoadedColloquy = false
-    private var userService = UserService()
+    
+    private var fetchLocation: FetchLocationFormFirebaseProtocol
+    private var userService: UserServiceProtocol
+    
+    init(fetchLocation: FetchLocationFormFirebaseProtocol, userService: UserServiceProtocol) {
+        
+        self.fetchLocation = fetchLocation
+        self.userService = userService
+    }
     
     func getReplies(userId: String, localUsers: [User], pageSize: Int) async -> [Colloquy] {
         
@@ -129,5 +136,12 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
         }
         
         return addReplies
+    }
+    
+    func reload() {
+        self.lastDocument = nil
+        self.isDataLoaded = false
+        self.lastDocumentColloquy = nil
+        self.isDataLoadedColloquy = false
     }
 }

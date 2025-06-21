@@ -10,7 +10,11 @@ import Foundation
 class MainUsersViewModel: ObservableObject {
     @Published var users = [User]()
     
-    private var fetchUsers = FetchingUsersServiceFirebase(repository: FirestoreUserRepository())
+    private let fetchUsers: FetchingUsersServiceProtocol
+    
+    init(fetchUsers: FetchingUsersServiceProtocol) {
+        self.fetchUsers = fetchUsers
+    }
     
     @MainActor
     func featchUsers(userId: String?) async {

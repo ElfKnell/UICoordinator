@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct ColloquyCell: View {
+    
     let colloquy: Colloquy
     @EnvironmentObject var container: DIContainer
-    @StateObject var viewModelLike = LikesViewModel(collectionName: .likes, likeCount: ColloquyInteractionCounterService(), likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService()), fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()), activityUpdate: ActivityServiceUpdate())
+    @StateObject var viewModelLike: LikesViewModel
     @State private var showReplieCreate = false
     @State var isChange = false
     
@@ -128,8 +129,6 @@ struct ColloquyCell: View {
 }
 
 #Preview {
-    
-    //let viewModelLike = LikesViewModel(collectionName: .likes, likeCount: ColloquyInteractionCounterService(), likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService()), fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()), activityUpdate: ActivityServiceUpdate())
-    
-    ColloquyCell(colloquy: DeveloperPreview.colloquy)
+
+    ColloquyCellFactory.make(colloquy: DeveloperPreview.colloquy)
 }

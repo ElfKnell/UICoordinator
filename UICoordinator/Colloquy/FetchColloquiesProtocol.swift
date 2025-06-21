@@ -14,4 +14,6 @@ protocol FetchColloquiesProtocol {
     func getUserColloquies(user: User, pageSize: Int) async -> [Colloquy]
     
     func getDeletedColloquies(user: User, pageSize: Int) async -> [Colloquy]
+    
+    func reload()
 }

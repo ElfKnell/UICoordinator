@@ -8,17 +8,37 @@
 import SwiftUI
 
 struct CreateColloquyView: View {
-    @StateObject var viewModel = CreateColloquyViewModel()
+    
+    var location: Location?
+    var activityId: String?
+    
+    @StateObject var viewModel: CreateColloquyViewModel
     @EnvironmentObject var container: DIContainer
     @State private var caption = ""
     @Environment(\.dismiss) var dismiss
-    var location: Location?
-    var activityId: String?
     
     @State private var isUploadingError = false
     
     private var user: User? {
         return container.currentUserService.currentUser
+    }
+    
+    init(location: Location? = nil, activityId: String? = nil, viewModelBilder: () -> CreateColloquyViewModel = {
+        CreateColloquyViewModel(
+            likeCount: ColloquyInteractionCounterService(),
+            colloquyService: ColloquyService(
+                serviceDetete: FirestoreGeneralDeleteService(),
+                repliesFetchingService: FetchRepliesFirebase(
+                    fetchLocation: FetchLocationFromFirebase(),
+                    userService: UserService())),
+            activityUpdate: ActivityServiceUpdate())
+    }) {
+        
+        let vm = viewModelBilder()
+        self.location = location
+        self.activityId = activityId
+        _viewModel = StateObject(wrappedValue: vm)
+        
     }
     
     var body: some View {
@@ -101,5 +121,5 @@ struct CreateColloquyView: View {
 }
 
 #Preview {
-    CreateColloquyView()
+    CreateColloquyView(location: nil, activityId: nil)
 }

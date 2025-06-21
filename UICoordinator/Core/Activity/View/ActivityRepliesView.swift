@@ -18,7 +18,7 @@ struct ActivityRepliesView: View {
     init(activity: Activity, user: User?) {
         self.activity = activity
         self.user = user
-        _viewModel = StateObject(wrappedValue: RepliesViewModel(activity.id, currentUser: user, isOrdering: true))
+        _viewModel = StateObject(wrappedValue: RepliesViewModelFactory.makeRepliesViewModel(activity.id, currentUser: user, isOrdering: true))
     }
     
     var body: some View {
@@ -37,7 +37,7 @@ struct ActivityRepliesView: View {
                     
                     LazyVStack {
                         ForEach(viewModel.replies) { reply in
-                            ColloquyCell(colloquy: reply)
+                            ColloquyCellFactory.make(colloquy: reply)
                                 .onAppear {
                                     Task {
                                         await viewModel.fetchReplies(activity.id, currentUser: user)

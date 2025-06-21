@@ -7,24 +7,29 @@
 
 import Foundation
 
-@MainActor
 class RepliesViewModel: ObservableObject {
     
     @Published var replies = [Colloquy]()
     @Published var isLoading = false
     
     let isOrdering: Bool
-    private var pageSize = 20
-    private var fetchRepliesFirebase = FetchRepliesFirebase()
-    private var localUserServise = LocalUserService()
+    private let pageSize = 20
+    private let fetchRepliesFirebase: FetchRepliesProtocol
+    private let localUserServise: LocalUserServiceProtocol
     
-    init(_ cid: String, currentUser: User?, isOrdering: Bool) {
+    init(_ cid: String, currentUser: User?, isOrdering: Bool,
+         fetchRepliesFirebase: FetchRepliesProtocol,
+         localUserServise: LocalUserServiceProtocol) {
+        
         self.isOrdering = isOrdering
+        self.fetchRepliesFirebase = fetchRepliesFirebase
+        self.localUserServise = localUserServise
         Task {
             await fetchRepliesRefresh(cid, currentUser: currentUser)
         }
     }
     
+    @MainActor
     func fetchReplies(_ cid: String, currentUser: User?) async {
         
         self.isLoading = true
@@ -34,12 +39,12 @@ class RepliesViewModel: ObservableObject {
         self.isLoading = false
     }
     
-    
+    @MainActor
     func fetchRepliesRefresh(_ cid: String, currentUser: User?) async {
         
         self.isLoading = true
         
-        fetchRepliesFirebase = FetchRepliesFirebase()
+        fetchRepliesFirebase.reload()
         self.replies.removeAll()
         await fetchRepliesData(cid: cid, currentUser: currentUser)
         
@@ -47,6 +52,7 @@ class RepliesViewModel: ObservableObject {
         
     }
     
+    @MainActor
     func fetchRepliesData(cid: String, currentUser: User?) async {
         
         let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
