@@ -11,16 +11,16 @@ import SwiftUI
 
 class FetchLocations: ObservableObject {
     
-    private var fetchLocationByUser: FetchLocationsProtocol
-    private var pageSize = 25
+    private let fetchLocationByUser: FetchLocationsProtocol
+    private let pageSize = 25
     
-    init() {
+    init(fetchLocationByUser: FetchLocationsProtocol) {
         
-        self.fetchLocationByUser = FetchLocationsFromFirebase()
+        self.fetchLocationByUser = fetchLocationByUser
 
     }
     
-    func fetchLocation(_ userId: String?) async -> [Location] {
+    func fetchLocations(_ userId: String?) async -> [Location] {
         
         guard let id = userId else { return [] }
         

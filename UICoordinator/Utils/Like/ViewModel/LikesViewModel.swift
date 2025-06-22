@@ -13,11 +13,10 @@ class LikesViewModel: ObservableObject {
     @Published var collectionName: CollectionNameForLike
     @Published var likeId: String?
     
-    private let likeCount: ColloquyInteractionCounterServiceProtocol //ColloquyInteractionCounterService()
-    private let likeService: LikeServiceProtocol //LikeService(serviceCreate: FirestoreLikeCreateServise(),
-                                          //serviceDetete: FirestoreGeneralDeleteService())
-    private let fethingLike: FetchLikesServiceProtocol //FetchLikesService(likeRepository: FirestoreLikeRepository())
-    private let activityUpdate: ActivityUpdateProtocol //ActivityServiceUpdate()
+    private let likeCount: ColloquyInteractionCounterServiceProtocol
+    private let likeService: LikeServiceProtocol
+    private let fethingLike: FetchLikesServiceProtocol
+    private let activityUpdate: ActivityUpdateProtocol
     
     init(likeId: String? = nil, collectionName: CollectionNameForLike,
          likeCount: ColloquyInteractionCounterServiceProtocol,

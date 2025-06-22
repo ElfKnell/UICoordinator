@@ -11,10 +11,19 @@ import MapKit
 struct LocationEditView: View {
     
     @State var location: Location
-    @StateObject var viewModel = EditLocationViewModel()
+    @StateObject var viewModel: EditLocationViewModel
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var locationViewModel: LocationViewModel
     @State private var showCreatColloqy = false
+    
+    init(location: Location,
+         viewModelBilder: @escaping () -> EditLocationViewModel = {
+        EditLocationViewModel(
+            serviseLocation: LocationService())
+    }) {
+        self.location = location
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         Form {

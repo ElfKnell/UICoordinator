@@ -10,7 +10,17 @@ import SwiftUI
 struct LocationPhotosView: View {
     
     let activity: MapSelectionProtocol
-    @StateObject var viewModel = LocationColloquyDetailViewModel()
+    @StateObject var viewModel: LocationColloquyDetailViewModel
+    
+    init(activity: MapSelectionProtocol,
+         viewModelBilder: @escaping () -> LocationColloquyDetailViewModel = {
+        LocationColloquyDetailViewModel(
+            videoService: VideoService(),
+            photoService: PhotoService())
+    }) {
+        self.activity = activity
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         ZStack {

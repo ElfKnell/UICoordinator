@@ -11,7 +11,15 @@ import PhotosUI
 struct PhotosWithChangingView: View {
     
     let locationId: String
-    @StateObject var viewModel = PhotoViewModel()
+    @StateObject var viewModel: PhotoViewModel
+    
+    init(locationId: String,
+         viewModelBilder: @escaping () -> PhotoViewModel = {
+        PhotoViewModel(photoService: PhotoService())
+    }) {
+        self.locationId = locationId
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         NavigationStack {

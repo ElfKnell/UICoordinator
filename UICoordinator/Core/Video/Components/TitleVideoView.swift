@@ -54,5 +54,5 @@ struct TitleVideoView: View {
 }
 
 #Preview {
-    TitleVideoView(vId: "", title: "", viewModel: VideoViewModel())
+    TitleVideoView(vId: "", title: "", viewModel: VideoViewModel(videoService: VideoService()))
 }

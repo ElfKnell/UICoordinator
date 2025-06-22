@@ -13,7 +13,17 @@ struct VideoView: View {
     
     let locationId: String
     let isAccessible: Bool
-    @StateObject var viewModel = VideoViewModel()
+    @StateObject var viewModel: VideoViewModel
+    
+    init(locationId: String,
+         isAccessible: Bool,
+         viewModelBilder: @escaping () -> VideoViewModel = {
+        VideoViewModel(videoService: VideoService())
+    }) {
+        self.locationId = locationId
+        self.isAccessible = isAccessible
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
             

@@ -9,7 +9,6 @@ import Firebase
 import MapKit
 import SwiftUI
 
-@MainActor
 class LocationViewModel: ObservableObject {
     
     @Published var locations = [Location]()
@@ -31,17 +30,28 @@ class LocationViewModel: ObservableObject {
     
     var coordinatePosition: CLLocationCoordinate2D?
     
-    private var locationService = FetchLocationFromFirebase()
-    private var createRouter = CreateRouter()
-    private var fetchLocations = FetchLocations()
+    private let locationService: FetchLocationFormFirebaseProtocol
+    private let createRouter: CreateRouterProtocol
+    private let fetchLocations: FetchLocations
     
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
+    init(locationService: FetchLocationFormFirebaseProtocol,
+         createRouter: CreateRouterProtocol,
+         fetchLocations: FetchLocations) {
+        
+        self.locationService = locationService
+        self.createRouter = createRouter
+        self.fetchLocations = fetchLocations
+        
+    }
+    
+    @MainActor
     func fetchLocationsByCurrentUser(userId: String?) async {
         
         if self.locations.isEmpty {
             
-            self.locations = await fetchLocations.fetchLocation(userId)
+            self.locations = await fetchLocations.fetchLocations(userId)
             
             getCameraPosition()
             
@@ -50,15 +60,17 @@ class LocationViewModel: ObservableObject {
         
     }
     
+    @MainActor
     func fetchMoreLocationsByCurentUser(userId: String?) {
         
         Task {
             
-            self.locations.append(contentsOf: await fetchLocations.fetchLocation(userId))
+            self.locations.append(contentsOf: await fetchLocations.fetchLocations(userId))
             
         }
     }
     
+    @MainActor
     func addLocation(userId: String?) async {
         
         guard let userId = userId else { return }

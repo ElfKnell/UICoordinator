@@ -13,15 +13,23 @@ class UserContentListViewModel: ObservableObject {
     @Published var replies = [Colloquy]()
     @Published var isLoading = false
     
-    private var fetchColloquies = FetchColloquiesFirebase(fetchLocation: FetchLocationFromFirebase())
-    private var fetchReplies = FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService())
-    private var localUserServise = LocalUserService()
-    private var pageSize = 10
+    private let fetchColloquies: FetchColloquiesProtocol // = FetchColloquiesFirebase(fetchLocation: FetchLocationFromFirebase())
+    private let fetchReplies: FetchRepliesProtocol // = FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService())
+    private let localUserServise: LocalUserServiceProtocol // = LocalUserService()
+    private let pageSize = 10
     
     let user: User
     
-    init(user: User) {
+    init(user: User,
+         fetchColloquies: FetchColloquiesProtocol,
+         fetchReplies: FetchRepliesProtocol,
+         localUserServise: LocalUserServiceProtocol) {
+        
+        self.fetchColloquies = fetchColloquies
+        self.fetchReplies = fetchReplies
+        self.localUserServise = localUserServise
         self.user = user
+        
         Task {
             await loadDate(currentUser: user)
         }
@@ -32,8 +40,8 @@ class UserContentListViewModel: ObservableObject {
         
         self.isLoading = true
         
-        fetchColloquies = FetchColloquiesFirebase(fetchLocation: FetchLocationFromFirebase())
-        fetchReplies = FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService())
+        fetchColloquies.reload()
+        fetchReplies.reload()
         self.colloquies.removeAll()
         self.replies.removeAll()
         

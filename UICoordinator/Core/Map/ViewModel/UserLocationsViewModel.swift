@@ -9,7 +9,6 @@ import Firebase
 import MapKit
 import SwiftUI
 
-@MainActor
 class UserLocationsViewModel: ObservableObject {
     
     @Published var locations = [Location]()
@@ -23,29 +22,52 @@ class UserLocationsViewModel: ObservableObject {
     @Published var getDirections = false
     @Published var sheetConfig: MapSheetConfig?
     
-    private var fetchLocations = FetchLocations()
+    @Published var userId: String
+    private let fetchLocationsService: FetchLocationsProtocol
+    private let pageSize = 25
     
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
-    
-    func fetchUserForLocations(userId: String) async {
-        
-        self.locations = await fetchLocations.fetchLocation(userId)
-        
-        getCameraPosition()
-
-    }
-    
-    func fetchMoreLocationsByCurentUser(userId: String) {
+    init(userId: String, fetchLocationsService: FetchLocationsProtocol) {
+        self.userId = userId
+        self.fetchLocationsService = fetchLocationsService
         Task {
-            self.locations.append(contentsOf: await fetchLocations.fetchLocation(userId))
+            await fetchUserForLocations()
         }
     }
     
+    @MainActor
+    func fetchUserForLocations() async {
+        
+        let fetchLocationsList = await fetchLocations()
+        self.locations = fetchLocationsList
+        getCameraPosition()
+    }
+    
+    @MainActor
+    func fetchMoreLocationsByCurentUser() {
+        Task {
+            let moreLocations = await fetchLocations()
+            
+            self.locations.append(contentsOf: moreLocations)
+            
+        }
+    }
+    
+    @MainActor
     private func getCameraPosition() {
         
         if !locations.isEmpty {
             self.cameraPosition = .region(locations[0].regionCoordinate)
+        } else {
+            self.cameraPosition = .automatic
         }
+    }
+    
+    private func fetchLocations() async -> [Location] {
+        
+        let locations = await fetchLocationsService.getLocations(userId: self.userId, pageSize: pageSize)
+
+        return locations
     }
 }

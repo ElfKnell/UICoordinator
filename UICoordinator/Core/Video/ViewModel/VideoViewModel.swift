@@ -17,7 +17,12 @@ class VideoViewModel: ObservableObject {
     @Published var selectedItem: PhotosPickerItem? {
         didSet { Task { await uploadVideo() }}
     }
-    private let videoService = VideoService()
+    private let videoService: VideoServiceProtocol
+    
+    init(videoService: VideoServiceProtocol) {
+        
+        self.videoService = videoService
+    }
     
     @MainActor
     func uploadVideo() async {

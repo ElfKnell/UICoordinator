@@ -11,8 +11,17 @@ import Firebase
 
 struct LocationsView: View {
 
-    @StateObject var viewModel = LocationViewModel()
+    @StateObject var viewModel: LocationViewModel
     @EnvironmentObject var container: DIContainer
+    
+    init(viewModelBilder: @escaping () -> LocationViewModel = {
+        LocationViewModel(
+            locationService: FetchLocationFromFirebase(),
+            createRouter: CreateRouter(),
+            fetchLocations: FetchLocations(fetchLocationByUser: FetchLocationsFromFirebase()))
+    }) {
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         

@@ -9,15 +9,12 @@ import SwiftUI
 import PhotosUI
 import Firebase
 
-@MainActor
 class PhotoViewModel : ObservableObject {
     
     @Published var photos = [Photo]()
     @Published var photo: Photo?
     @Published var namePhoto = ""
     @Published var isLoading = false
-    
-    let photoService = PhotoService()
     
     @Published var switcher = PhotoSwitch.noPhoto
     
@@ -30,6 +27,13 @@ class PhotoViewModel : ObservableObject {
         }
     }
     
+    let photoService: PhotoServiceProtocol
+    
+    init(photoService: PhotoServiceProtocol) {
+        self.photoService = photoService
+    }
+    
+    @MainActor
     func uploadPhoto(locationId: String) async {
         self.isLoading = true
         
@@ -58,6 +62,7 @@ class PhotoViewModel : ObservableObject {
         }
     }
     
+    @MainActor
     func fetchPhoto(_ locationId: String) async {
         
         do {
@@ -69,6 +74,7 @@ class PhotoViewModel : ObservableObject {
         }
     }
     
+    @MainActor
     func updatePhotoName() async {
         do {
             isLoading = true
@@ -84,6 +90,7 @@ class PhotoViewModel : ObservableObject {
         }
     }
     
+    @MainActor
     func deletePhoto() async {
         isLoading = true
         
@@ -96,6 +103,7 @@ class PhotoViewModel : ObservableObject {
         isLoading = false
     }
     
+    @MainActor
     func clean() {
         self.selectedItem = nil
         self.selectedImage = nil

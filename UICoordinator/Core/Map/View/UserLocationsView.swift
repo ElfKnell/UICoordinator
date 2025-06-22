@@ -12,7 +12,12 @@ import Firebase
 struct UserLocationsView: View {
     
     var userId: String
-    @StateObject var viewModel = UserLocationsViewModel()
+    @StateObject var viewModel: UserLocationsViewModel
+
+    init(userId: String) {
+        self.userId = userId
+        self._viewModel = StateObject(wrappedValue: UserLocationsViewModelFactory.makeViewModel(userId: userId))
+    }
     
     var body: some View {
         
@@ -47,15 +52,12 @@ struct UserLocationsView: View {
                 .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
                     viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
                     
-                    viewModel.fetchMoreLocationsByCurentUser(userId: userId)
+                    viewModel.fetchMoreLocationsByCurentUser()
                 }
                 
             }
             .navigationTitle("Map Locations")
             .navigationBarTitleDisplayMode(.inline)
-            .task {
-                await viewModel.fetchUserForLocations(userId: userId)
-            }
             .onChange(of: viewModel.mapSelection) { oldValue, newValue in
                 if viewModel.mapSelection != nil {
                     viewModel.isSelected = true

@@ -10,7 +10,11 @@ import Firebase
 
 class EditLocationViewModel: ObservableObject {
     
-    private var serviseLocation = LocationService()
+    private var serviseLocation: UpdateLocationProtocol
+    
+    init(serviseLocation: UpdateLocationProtocol) {
+        self.serviseLocation = serviseLocation
+    }
     
     func updateLocation(_ location: Location) async {
         

@@ -12,7 +12,13 @@ struct CoordinatorTabView: View {
     
     @State private var mainSelectedTab = 0
     
-    @StateObject var viewModel = CoordinatorViewModel()
+    @StateObject var viewModel: CoordinatorViewModel
+    
+    init(viewModelBilder: @escaping () -> CoordinatorViewModel = {
+        CoordinatorViewModel()
+    }) {
+        _viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         
@@ -58,6 +64,9 @@ struct CoordinatorTabView: View {
                 .tag(4)
         }
         .tint(.primary)
+        .task {
+            await viewModel.start()
+        }
         .alert("Location Services", isPresented: $viewModel.isLocationServicesEnabled) {
             Button("OK", role: .cancel) {}
         } message: {

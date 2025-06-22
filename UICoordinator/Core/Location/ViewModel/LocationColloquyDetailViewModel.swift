@@ -14,8 +14,14 @@ class LocationColloquyDetailViewModel: ObservableObject {
     @Published var switcher = PhotoSwitch.noPhoto
     @Published var videos = [Video]()
     
-    let videoService = VideoService()
-    let photoService = PhotoService()
+    let videoService: VideoServiceProtocol
+    let photoService: PhotoServiceProtocol
+    
+    init(videoService: VideoServiceProtocol, photoService: PhotoServiceProtocol) {
+        
+        self.videoService = videoService
+        self.photoService = photoService
+    }
     
     @MainActor
     func fetchPhoto(_ locationId: String) async {

@@ -16,7 +16,7 @@ struct UserContentListView: View {
     @Namespace var animation
     
     init(user: User) {
-        self._viewModel = StateObject(wrappedValue: UserContentListViewModel(user: user))
+        self._viewModel = StateObject(wrappedValue: UserContentListViewModelFactory.make(user: user))
     }
     
     private var filterBarWidth: CGFloat {
