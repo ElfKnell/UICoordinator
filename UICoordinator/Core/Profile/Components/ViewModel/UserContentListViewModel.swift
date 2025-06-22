@@ -13,9 +13,9 @@ class UserContentListViewModel: ObservableObject {
     @Published var replies = [Colloquy]()
     @Published var isLoading = false
     
-    private let fetchColloquies: FetchColloquiesProtocol // = FetchColloquiesFirebase(fetchLocation: FetchLocationFromFirebase())
-    private let fetchReplies: FetchRepliesProtocol // = FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService())
-    private let localUserServise: LocalUserServiceProtocol // = LocalUserService()
+    private let fetchColloquies: FetchColloquiesProtocol
+    private let fetchReplies: FetchRepliesProtocol
+    private let localUserServise: LocalUserServiceProtocol
     private let pageSize = 10
     
     let user: User

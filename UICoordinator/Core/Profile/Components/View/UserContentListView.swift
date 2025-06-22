@@ -60,7 +60,7 @@ struct UserContentListView: View {
                         
                         if viewModel.user == container.currentUserService.currentUser {
                             
-                            ColloquyCellForCurrentUser(colloquy: colloquy,
+                            ColloquyCellForCurrentUserFactory.make(colloquy: colloquy,
                                                        user: viewModel.user,
                                                        isDeleted: $isDeleted)
                                 .padding(.horizontal, isLandscape ? 41 : 1)

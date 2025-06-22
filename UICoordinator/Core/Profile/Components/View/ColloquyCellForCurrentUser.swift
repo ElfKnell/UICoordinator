@@ -11,9 +11,10 @@ struct ColloquyCellForCurrentUser: View {
     
     let colloquy: Colloquy
     let user: User
-    let colloquyService = ColloquyService(serviceDetete: FirestoreGeneralDeleteService(), repliesFetchingService: FetchRepliesFirebase(fetchLocation: FetchLocationFromFirebase(), userService: UserService()))
     @Binding var isDeleted: Bool
-    @StateObject var viewModel = LikesViewModel(collectionName: .likes, likeCount: ColloquyInteractionCounterService(), likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService()), fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()), activityUpdate: ActivityServiceUpdate())
+    
+    @StateObject var colloquyService: ColloquyServiceViewModel
+    @StateObject var viewModel: LikesViewModel
     @State private var sheetStatus: SheetStatus? = nil
     
     var body: some View {
@@ -39,10 +40,8 @@ struct ColloquyCellForCurrentUser: View {
                             .foregroundStyle(Color(.systemGray3))
                         
                         Button {
-                            Task {
-                                await colloquyService.markForDelete(colloquy.id)
-                                isDeleted.toggle()
-                            }
+                            colloquyService.deleteColloquy(colloquy.id)
+                            isDeleted.toggle()
                         } label: {
                             Image(systemName: "trash.circle")
                                 .foregroundStyle(.red)
@@ -117,7 +116,8 @@ struct ColloquyCellForCurrentUser: View {
 }
 
 #Preview {
-    ColloquyCellForCurrentUser(colloquy: DeveloperPreview.colloquy,
-                               user: DeveloperPreview.user,
-                               isDeleted: .constant(false))
+    ColloquyCellForCurrentUserFactory.make(
+        colloquy: DeveloperPreview.colloquy,
+        user: DeveloperPreview.user,
+        isDeleted: .constant(false))
 }

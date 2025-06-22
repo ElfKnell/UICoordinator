@@ -11,11 +11,20 @@ import SwiftData
 struct ProfileView: View {
     
     let user: User
-    @StateObject var viewModel = ProfileViewModel()
+    @Binding var isChange: Bool
+    @StateObject var viewModel: ProfileViewModel
     @EnvironmentObject var container: DIContainer
     @Environment(\.modelContext) private var modelContext
-    @Binding var isChange: Bool
     @Environment(\.dismiss) var dismiss
+    
+    init(user: User, isChange: Binding<Bool>,
+         viewModelBilder: @escaping () -> ProfileViewModel = {
+        ProfileViewModel(subscription: SubscribeOrUnsubscribe(followServise: FollowService()))
+    }) {
+        self.user = user
+        self._isChange = isChange
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         
@@ -25,7 +34,7 @@ struct ProfileView: View {
                 
                 VStack(spacing: 20) {
                     
-                    ProfileHeaderView(user: user)
+                    ProfileHeaderFactory.make(user: user)
                     
                     HStack {
                         

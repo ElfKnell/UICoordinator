@@ -11,8 +11,8 @@ struct ProfileHeaderView: View {
     
     let user: User
     @EnvironmentObject var container: DIContainer
-    @StateObject var userLikes = UserLikeCount()
-    @StateObject var followToUser = FollowsToUsers()
+    @StateObject var userLikes: UserLikeCount
+    @StateObject var followToUser: FollowsToUsers
     
     var body: some View {
         VStack(spacing: 16) {
@@ -92,5 +92,5 @@ struct ProfileHeaderView: View {
 }
 
 #Preview {
-    ProfileHeaderView(user: DeveloperPreview.user)
+    ProfileHeaderFactory.make(user: DeveloperPreview.user)
 }

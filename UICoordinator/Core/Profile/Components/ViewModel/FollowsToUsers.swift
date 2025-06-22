@@ -11,8 +11,14 @@ class FollowsToUsers: ObservableObject {
     @Published var followingUsers = [User]()
     @Published var followerUsers = [User]()
     
-    private var localUserServise = LocalUserService()
-    private var fetchUsers = FetchingUsersServiceFirebase(repository: FirestoreUserRepository())
+    private var localUserServise: LocalUserServiceProtocol //= LocalUserService()
+    private var fetchUsers: FetchingUsersServiceProtocol //= FetchingUsersServiceFirebase(repository: FirestoreUserRepository())
+    
+    init(localUserServise: LocalUserServiceProtocol, fetchUsers: FetchingUsersServiceProtocol) {
+        
+        self.localUserServise = localUserServise
+        self.fetchUsers = fetchUsers
+    }
     
     @MainActor
     func fetchFollowsToUsers(usersFollowing: [String], curretnUser: User?) async {

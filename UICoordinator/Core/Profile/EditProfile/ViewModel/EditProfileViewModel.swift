@@ -16,7 +16,12 @@ class EditProfileViewModel: ObservableObject {
     @Published var profileImage: Image?
     @Published var isDelete = false
     private var uiImage: UIImage?
-    private var userServiseUpdate = UserServiceUpdate()
+    private let userServiseUpdate: UserServiceUpdateProtocol
+    
+    init(userServiseUpdate: UserServiceUpdateProtocol) {
+        
+        self.userServiseUpdate = userServiseUpdate
+    }
     
     func updateUserData(user: User, nickname: String, bio: String, link: String, isPrivateProfile: Bool) async {
         if user.isPrivateProfile != isPrivateProfile && (isPrivateProfile || user.isPrivateProfile != nil) {

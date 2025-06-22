@@ -21,7 +21,7 @@ struct CurrentUserProfileView: View {
                 if let currentUser = container.currentUserService.currentUser {
                     VStack(spacing: 20) {
                         
-                        ProfileHeaderView(user: currentUser)
+                        ProfileHeaderFactory.make(user: currentUser)
                         
                         Button {
                             viewModel.showEditProfile.toggle()

@@ -17,8 +17,17 @@ struct EditProfileView: View {
     @State private var isPrivateProfile = false
     @EnvironmentObject var container: DIContainer
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = EditProfileViewModel()
     @Binding var isSaved: Bool
+    @StateObject var viewModel: EditProfileViewModel
+    
+    init(user: User, isSaved: Binding<Bool>,
+         viewModelBilder: @escaping () -> EditProfileViewModel = {
+        EditProfileViewModel(userServiseUpdate: UserServiceUpdate())
+    }) {
+        self.user = user
+        self._isSaved = isSaved
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         NavigationStack {
