@@ -10,11 +10,29 @@ import MapKit
 
 struct UpdateLocationView: View {
     
+    var activityId: String?
     @Binding var location: Location?
     @Binding var isSave: Bool
+    
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = UpdateLocationViewModel()
-    var activityId: String?
+    @StateObject var viewModel: UpdateLocationViewModel
+    
+    init(
+        activityId: String? = nil,
+        location: Binding<Location?>,
+        isSave: Binding<Bool>,
+        viewModelBilder: @escaping () -> UpdateLocationViewModel = {
+            UpdateLocationViewModel(
+                deleteLocation: DeleteLocation(),
+                photoService: PhotoService(),
+                videoService: VideoService())
+        }) {
+        
+        self.activityId = activityId
+        self._location = location
+        self._isSave = isSave
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         

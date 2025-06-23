@@ -14,9 +14,16 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     @Published var description = ""
     @Published var address = ""
     
-    private var deleteLocation = DeleteLocation()
-    private let photoService = PhotoService()
-    private let videoService = VideoService()
+    private let deleteLocation: DeleteLocationProtocol
+    private let photoService: PhotoServiceProtocol
+    private let videoService: VideoServiceProtocol
+    
+    init(deleteLocation: DeleteLocationProtocol, photoService: PhotoServiceProtocol, videoService: VideoServiceProtocol) {
+        
+        self.deleteLocation = deleteLocation
+        self.photoService = photoService
+        self.videoService = videoService
+    }
     
     func initInfo(location: Location?) {
         self.name = location?.name ?? ""

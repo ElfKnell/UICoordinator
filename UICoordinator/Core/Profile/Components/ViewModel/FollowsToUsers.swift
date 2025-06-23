@@ -11,8 +11,8 @@ class FollowsToUsers: ObservableObject {
     @Published var followingUsers = [User]()
     @Published var followerUsers = [User]()
     
-    private var localUserServise: LocalUserServiceProtocol //= LocalUserService()
-    private var fetchUsers: FetchingUsersServiceProtocol //= FetchingUsersServiceFirebase(repository: FirestoreUserRepository())
+    private var localUserServise: LocalUserServiceProtocol
+    private var fetchUsers: FetchingUsersServiceProtocol
     
     init(localUserServise: LocalUserServiceProtocol, fetchUsers: FetchingUsersServiceProtocol) {
         

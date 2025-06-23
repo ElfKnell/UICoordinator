@@ -10,14 +10,32 @@ import MapKit
 
 struct LocationsDetailView: View {
     
+    var activity: Activity?
     @Binding var mapSeliction: Location?
-    @State private var lookAroundScene: MKLookAroundScene?
     @Binding var getDirections: Bool
     @Binding var isUpdate: MapSheetConfig?
+    
+    @StateObject var viewModel: LocationDetailViewModel
+    
+    @State private var lookAroundScene: MKLookAroundScene?
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = LocationDetailViewModel(fetchLocations: FetchLocationForActivity())
     @EnvironmentObject var container: DIContainer
-    var activity: Activity?
+    
+    init(
+        activity: Activity? = nil,
+        mapSeliction: Binding<Location?>,
+        getDirections: Binding<Bool>,
+        isUpdate: Binding<MapSheetConfig?>,
+        viewModelBilder: @escaping () -> LocationDetailViewModel = {
+            LocationDetailViewModel(fetchLocations: FetchLocationForActivity())
+        }) {
+        
+        self.activity = activity
+        self._mapSeliction = mapSeliction
+        self._getDirections = getDirections
+        self._isUpdate = isUpdate
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         VStack {

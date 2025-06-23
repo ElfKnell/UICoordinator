@@ -12,7 +12,6 @@ struct BottomSideMenu: View {
     let widthButton: CGFloat
     @State private var isLoggedOut = false
     @EnvironmentObject var container: DIContainer
-    var userServise = UserService()
     
     var body: some View {
         NavigationStack {

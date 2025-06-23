@@ -12,8 +12,8 @@ class UserLikeCount: ObservableObject {
     @Published var countLikes = 0
     @Published var usersLike = [User]()
     
-    private let userService: UserServiceProtocol //= UserService()
-    private let fetchingLikes: FetchLikesServiceProtocol //= FetchLikesService(likeRepository: FirestoreLikeRepository())
+    private let userService: UserServiceProtocol
+    private let fetchingLikes: FetchLikesServiceProtocol
     
     init(userService: UserServiceProtocol, fetchingLikes: FetchLikesServiceProtocol) {
         

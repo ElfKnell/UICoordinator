@@ -8,7 +8,6 @@
 import MapKit
 import SwiftUI
 
-@MainActor
 class LocationDetailViewModel: ObservableObject {
 
     private let fetchLocations: FetchLocationForActivityProtocol

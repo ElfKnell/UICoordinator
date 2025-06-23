@@ -12,7 +12,6 @@ class CurrentUserProfileViewModel: ObservableObject {
     @Published var isLoaded = false
     @Published var isSaved = false
     @Published var showEditProfile = false
-    
-    
+      
 }
 

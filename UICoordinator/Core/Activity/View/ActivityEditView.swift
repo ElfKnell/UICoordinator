@@ -98,13 +98,13 @@ struct ActivityEditView: View {
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
 
                 case .locationsDetail:
-                    LocationsDetailView(mapSeliction: $viewModel.selectedPlace, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig, activity: activity)
+                    LocationsDetailView(activity: activity, mapSeliction: $viewModel.selectedPlace, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
                         .presentationDetents([.height(340)])
                         .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
                         .presentationCornerRadius(12)
                 
                 case .locationUpdateOrSave:
-                    UpdateLocationView(location: $viewModel.selectedPlace, isSave: $viewModel.isSave, activityId: activity.id)
+                    UpdateLocationView(activityId: activity.id, location: $viewModel.selectedPlace, isSave: $viewModel.isSave)
                         .presentationDetents([.height(340), .medium])
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }

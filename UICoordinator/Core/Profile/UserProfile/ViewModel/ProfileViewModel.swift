@@ -12,7 +12,7 @@ class ProfileViewModel: ObservableObject {
     
     private var userActor: UserDataActor?
     
-    private let subscription: SubscribeOrUnsubscribeProtocol // = SubscribeOrUnsubscribe(followServise: FollowService())
+    private let subscription: SubscribeOrUnsubscribeProtocol
     
     init(subscription: SubscribeOrUnsubscribeProtocol) {
         self.subscription = subscription
