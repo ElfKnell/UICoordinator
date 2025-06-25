@@ -10,9 +10,16 @@ import Foundation
 import SwiftData
 
 final class MockLocalUserService: LocalUserServiceProtocol {
+    
     var localUsers: [LocalUser] = []
+    var users: [User] = []
+    
     func fetchLocalUsers() async -> [LocalUser] {
         return localUsers
+    }
+    
+    func fetchUsersbyLocalUsers(currentUser: User?) async -> [User] {
+        return users
     }
 }
 

@@ -11,15 +11,7 @@ import PhotosUI
 struct PhotosWithChangingView: View {
     
     let locationId: String
-    @StateObject var viewModel: PhotoViewModel
-    
-    init(locationId: String,
-         viewModelBilder: @escaping () -> PhotoViewModel = {
-        PhotoViewModel(photoService: PhotoService())
-    }) {
-        self.locationId = locationId
-        self._viewModel = StateObject(wrappedValue: viewModelBilder())
-    }
+    @EnvironmentObject var viewModel: PhotoViewModel
     
     var body: some View {
         NavigationStack {
@@ -65,6 +57,14 @@ struct PhotosWithChangingView: View {
                 .task {
                     await viewModel.fetchPhoto(locationId)
                 }
+                .alert("Error", isPresented: $viewModel.isError, actions: {
+                    Button("OK", role: .cancel) {
+                        viewModel.activeError = nil
+                        viewModel.isError = false
+                    }
+                }, message: {
+                    Text(viewModel.activeError ?? "An unexpected error occurred.")
+                })
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         BackButtonView()

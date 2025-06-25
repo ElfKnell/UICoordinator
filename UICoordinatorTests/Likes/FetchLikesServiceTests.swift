@@ -29,7 +29,7 @@ final class FetchLikesServiceTests: XCTestCase {
     func testGetLikeByColloquyAndUser_Error() async {
         
         mockRepocitory.shouldThrowGenericError = true
-        let servise = FetchLikesService(likeRepository: mockRepocitory)
+        _ = FetchLikesService(likeRepository: mockRepocitory)
         
         let result = await sut.getLikeByColloquyAndUser(collectionName: .likes, colloquyId: "testColloquy", userId: "user123")
         
@@ -46,7 +46,7 @@ final class FetchLikesServiceTests: XCTestCase {
     
     func testGetLikes_Error() async {
         mockRepocitory.shouldThrowGenericError = true
-        let servise = FetchLikesService(likeRepository: mockRepocitory)
+        _ = FetchLikesService(likeRepository: mockRepocitory)
         
         let result = await sut.getLikes(collectionName: .likes, byField: .userIdField, userId: "user123")
         

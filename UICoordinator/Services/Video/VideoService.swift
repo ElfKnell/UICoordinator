@@ -63,27 +63,23 @@ class VideoService: VideoServiceProtocol {
             .updateData(["title": title])
     }
     
-    func deleteVideo(videoId: String) async {
+    func deleteVideo(videoId: String) async throws {
         
-        do {
-            let snapshot = try await Firestore.firestore()
-                .collection("Video")
-                .document(videoId)
-                .getDocument()
-            
-            let video = try snapshot.data(as: Video.self)
-            
-            let storageRef = Storage.storage().reference(forURL: video.videoURL)
-            
-            try await storageRef.delete()
-            
-            try await Firestore.firestore()
-                .collection("Video")
-                .document(video.id).delete()
-            
-        } catch {
-            print("DEBUGE: error delete - \(error.localizedDescription)")
-        }
+        let snapshot = try await Firestore.firestore()
+            .collection("Video")
+            .document(videoId)
+            .getDocument()
+        
+        let video = try snapshot.data(as: Video.self)
+        
+        let storageRef = Storage.storage().reference(forURL: video.videoURL)
+        
+        try await storageRef.delete()
+        
+        try await Firestore.firestore()
+            .collection("Video")
+            .document(video.id).delete()
+        
     }
 
 }

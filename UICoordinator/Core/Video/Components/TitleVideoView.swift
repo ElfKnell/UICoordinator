@@ -10,7 +10,7 @@ import SwiftUI
 struct TitleVideoView: View {
     var vId: String
     @State var title: String
-    @StateObject var viewModel: VideoViewModel
+    @EnvironmentObject var viewModel: VideoViewModel
     @State private var isLoaded = true
     
     var body: some View {
@@ -54,5 +54,5 @@ struct TitleVideoView: View {
 }
 
 #Preview {
-    TitleVideoView(vId: "", title: "", viewModel: VideoViewModel(videoService: VideoService()))
+    TitleVideoView(vId: "", title: "")
 }

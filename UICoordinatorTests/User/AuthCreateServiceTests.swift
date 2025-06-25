@@ -16,7 +16,7 @@ final class AuthCreateServiceTests: XCTestCase {
             createUserService: mockCreateUser
         )
         
-        let email = "test@test.com"
+        let email = "test5@test.com"
         let fullname = "Van Gog"
         let username = "vangog"
         let password = "123456"

@@ -15,6 +15,6 @@ protocol VideoServiceProtocol {
     
     func updatTitle(vId:String, title: String) async throws
     
-    func deleteVideo(videoId: String) async
+    func deleteVideo(videoId: String) async throws
     
 }

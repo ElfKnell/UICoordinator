@@ -8,9 +8,25 @@
 import SwiftUI
 
 struct PhotoVideoLocationView: View {
+    
     let location: MapSelectionProtocol
     @EnvironmentObject var conteiner: DIContainer
     let verificationOwner = CheckingForCurrentUser()
+    
+    @StateObject var viewModelPhoto: PhotoViewModel
+    @StateObject var viewModelVideo: VideoViewModel
+    
+    @MainActor
+    init(location: MapSelectionProtocol,
+         viewModelPhotoBilder: @MainActor @escaping () -> PhotoViewModel = {
+        PhotoViewModelFactory.make()
+    }, viewModelVideoBilder: @MainActor @escaping () -> VideoViewModel = {
+        VideoViewModelFactory.make()
+    }) {
+        self.location = location
+        _viewModelPhoto = StateObject(wrappedValue: viewModelPhotoBilder())
+        _viewModelVideo = StateObject(wrappedValue: viewModelVideoBilder())
+    }
     
     var body: some View {
         Group {
@@ -18,7 +34,11 @@ struct PhotoVideoLocationView: View {
                 
                 if verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser) {
                     
-                    NavigationLink(destination: PhotosWithChangingView(locationId: location.id)) {
+                    NavigationLink {
+                        PhotosWithChangingView(locationId: location.id)
+                            .environmentObject(viewModelPhoto)
+                        
+                    } label: {
                         Text("Choose Photo")
                     }
                     .navigationBarTitleDisplayMode(.inline)
@@ -26,7 +46,11 @@ struct PhotoVideoLocationView: View {
                     
                 } else {
                     
-                    NavigationLink(destination: LocationPhotosView(activity: location)) {
+                    NavigationLink {
+                        PhotosWithChangingView(locationId: location.id)
+                            .environmentObject(viewModelPhoto)
+                        
+                    } label: {
                         Text("Choose Photo")
                     }
                     .navigationBarTitleDisplayMode(.inline)
@@ -36,7 +60,12 @@ struct PhotoVideoLocationView: View {
             }
             
             VStack {
-                NavigationLink(destination: VideoView(locationId: location.id, isAccessible: verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))) {
+                NavigationLink {
+                    VideoView(
+                        locationId: location.id,
+                        isAccessible: verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))
+                        .environmentObject(viewModelVideo)
+                } label: {
                     Text("Choose Video")
                 }
                 .navigationBarTitleDisplayMode(.inline)

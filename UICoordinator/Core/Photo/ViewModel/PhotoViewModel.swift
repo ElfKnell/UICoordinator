@@ -9,6 +9,7 @@ import SwiftUI
 import PhotosUI
 import Firebase
 
+@MainActor
 class PhotoViewModel : ObservableObject {
     
     @Published var photos = [Photo]()
@@ -16,6 +17,13 @@ class PhotoViewModel : ObservableObject {
     @Published var namePhoto = ""
     @Published var isLoading = false
     
+    @Published var activeError: String? {
+        didSet {
+            isError = activeError != nil
+        }
+    }
+    @Published var isError = false
+
     @Published var switcher = PhotoSwitch.noPhoto
     
     @Published var selectedImage: UIImage?
@@ -28,28 +36,47 @@ class PhotoViewModel : ObservableObject {
     }
     
     let photoService: PhotoServiceProtocol
+    let photoUploadService: PhotoUploadToFirebaseProtocol
     
-    init(photoService: PhotoServiceProtocol) {
+    init(photoService: PhotoServiceProtocol, photoUploadService: PhotoUploadToFirebaseProtocol) {
         self.photoService = photoService
+        self.photoUploadService = photoUploadService
     }
     
-    @MainActor
     func uploadPhoto(locationId: String) async {
+        
         self.isLoading = true
+        self.activeError = nil
         
-        guard let image = selectedImage else { return }
-        let name = self.namePhoto
-        if name == "" { return }
-        await photoService
-            .uploadePhotoStorage(image, locationId: locationId, namePhoto: name)
+        do {
+            guard let image = selectedImage else {
+                throw PhotoServiceError.invalidImage
+            }
+            let name = self.namePhoto
+            if name == "" {
+                throw PhotoServiceError.missingPhotoName
+            }
+            try await photoUploadService
+                .uploadePhotoStorage(image, locationId: locationId, namePhoto: name)
+            
+            await fetchPhoto(locationId)
+            
+            clean()
+            
+            
+        } catch let error as PhotoServiceError {
+            self.activeError = error.localizedDescription
+        } catch {
+            self.activeError = "An unexpected error occurred: \(error.localizedDescription)"
+        }
         
-        await fetchPhoto(locationId)
-        
-        clean()
         self.isLoading = false
     }
     
     private func setImage(_ selectedItem: PhotosPickerItem?) async {
+        
+        self.activeError = nil
+        
         do {
             guard let item = selectedItem else { return }
             let data = try await item.loadTransferable(type: Data.self)
@@ -58,52 +85,67 @@ class PhotoViewModel : ObservableObject {
             
             switcher = .newPhoto
         } catch {
-            print("Debug: set image error: \(error.localizedDescription)")
+            self.activeError = "Set image error: \(error.localizedDescription)"
         }
     }
     
-    @MainActor
     func fetchPhoto(_ locationId: String) async {
         
+        self.isLoading = true
+        self.activeError = nil
+        
         do {
-            self.isLoading = true
+            
             self.photos = try await photoService.fetchPhotosByLocation(locationId)
-            self.isLoading = false
+            
         } catch {
-            print("ERROR FETCHING PHOTO: \(error.localizedDescription)")
+            self.activeError = "ERROR FETCHING PHOTO: \(error.localizedDescription)"
         }
+        
+        self.isLoading = false
     }
     
-    @MainActor
     func updatePhotoName() async {
+        
+        isLoading = true
+        self.activeError = nil
+        
         do {
-            isLoading = true
+            
             guard let photo = self.photo else { return }
             if self.namePhoto == "" { return }
             try await photoService.updateNamePhoto(photoId: photo.id, photoName: self.namePhoto)
             
             await fetchPhoto(photo.locationUid)
             clean()
-            isLoading = false
+            
         } catch {
-            print("ERROR UPDATE NAME PHOTO: \(error.localizedDescription)")
+            self.activeError = "ERROR UPDATE NAME PHOTO: \(error.localizedDescription)"
         }
-    }
-    
-    @MainActor
-    func deletePhoto() async {
-        isLoading = true
-        
-        guard let photo = self.photo else { return }
-        
-        await photoService.deletePhoto(photo: photo)
-        
-        await fetchPhoto(photo.locationUid)
-        clean()
         isLoading = false
     }
     
-    @MainActor
+    func deletePhoto() async {
+        
+        isLoading = true
+        self.activeError = nil
+        
+        do {
+            guard let photo = self.photo else { return }
+            
+            try await photoService.deletePhoto(photo: photo)
+            
+            await fetchPhoto(photo.locationUid)
+            
+            clean()
+            
+        } catch {
+            self.activeError = "ERROR DELETE PHOTO: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
+    }
+    
     func clean() {
         self.selectedItem = nil
         self.selectedImage = nil
@@ -111,6 +153,4 @@ class PhotoViewModel : ObservableObject {
         self.namePhoto = ""
         self.switcher = .noPhoto
     }
-    
-    
 }

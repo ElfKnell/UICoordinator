@@ -18,7 +18,9 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     private let photoService: PhotoServiceProtocol
     private let videoService: VideoServiceProtocol
     
-    init(deleteLocation: DeleteLocationProtocol, photoService: PhotoServiceProtocol, videoService: VideoServiceProtocol) {
+    init(deleteLocation: DeleteLocationProtocol,
+         photoService: PhotoServiceProtocol,
+         videoService: VideoServiceProtocol) {
         
         self.deleteLocation = deleteLocation
         self.photoService = photoService
@@ -44,11 +46,11 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
                 let videos = try await videoService.fetchVideosByLocation(locationId)
                 
                 for foto in fotos {
-                    await photoService.deletePhoto(photo: foto)
+                    try await photoService.deletePhoto(photo: foto)
                 }
                 
                 for video in videos {
-                    await videoService.deleteVideo(videoId: video.id)
+                    try await videoService.deleteVideo(videoId: video.id)
                 }
             }
 

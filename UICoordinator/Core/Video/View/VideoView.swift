@@ -13,17 +13,7 @@ struct VideoView: View {
     
     let locationId: String
     let isAccessible: Bool
-    @StateObject var viewModel: VideoViewModel
-    
-    init(locationId: String,
-         isAccessible: Bool,
-         viewModelBilder: @escaping () -> VideoViewModel = {
-        VideoViewModel(videoService: VideoService())
-    }) {
-        self.locationId = locationId
-        self.isAccessible = isAccessible
-        self._viewModel = StateObject(wrappedValue: viewModelBilder())
-    }
+    @EnvironmentObject var viewModel: VideoViewModel
     
     var body: some View {
             
@@ -38,7 +28,8 @@ struct VideoView: View {
                                 VideoPlayer(player: AVPlayer(url: URL(string: video.videoURL)!))
                                     .frame(height: 250)
                                     
-                                TitleVideoView(vId: video.id, title: video.title ?? "", viewModel: viewModel)
+                                TitleVideoView(vId: video.id, title: video.title ?? "")
+                                    .environmentObject(viewModel)
                             }
                         }
                     }
