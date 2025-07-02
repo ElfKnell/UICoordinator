@@ -11,8 +11,6 @@ import FirebaseFirestoreSwift
 
 class AuthCreateService: AuthCreateServiceProtocol {
     
-    var errorMessage: String?
-    
     private var createUserService: CreateUserProtocol
     
     init(createUserService: CreateUserProtocol) {
@@ -23,22 +21,37 @@ class AuthCreateService: AuthCreateServiceProtocol {
     func createUser(withEmail email: String,
                     password: String,
                     fullname: String,
-                    username: String) async -> Bool {
+                    username: String) async throws {
+        
+        var result: AuthDataResult?
         
         do {
-            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            result = try await Auth.auth().createUser(withEmail: email, password: password)
+            
+            guard let result else {
+                throw UserError.userCreateNil
+            }
             
             try await createUserService.uploadUserData(id: result.user.uid,
                                             withEmail: email,
                                             fullname: fullname,
                                             username: username)
             
-            self.errorMessage = nil
-            return true
             
+        } catch let authError as NSError {
+            
+            if let user = result?.user {
+                try? await user.delete()
+            }
+            
+            throw UserError.authCreationFailed(authError)
         } catch {
-            errorMessage = error.localizedDescription
-            return false
+            
+            if let user = result?.user {
+                try? await user.delete()
+            }
+            
+            throw UserError.unknownError(error)
         }
     }
 }

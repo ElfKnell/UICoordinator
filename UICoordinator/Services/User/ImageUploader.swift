@@ -9,19 +9,42 @@ import Foundation
 import Firebase
 import FirebaseStorage
 
-struct ImageUploader {
-    static func uploadeImage(_ image: UIImage) async -> String? {
+class ImageUploader: ImageUploaderProtocol {
+    
+    private let maxPhotoSize: Int = 2 * 1024 * 1024
+    
+    func uploadeImage(_ image: UIImage, currentUser: User) async throws -> String? {
+        
         guard let imageData = image.jpegData(compressionQuality: 0.25) else { return nil }
+        
+        if imageData.count > maxPhotoSize {
+            let currentSizeMB = Double(imageData.count) / 1024 / 1024
+            let maxSizeMB = Double(maxPhotoSize) / 1024 / 1024
+            throw UserError.imageTooLarge(currentSizeMB: currentSizeMB, maxSizeMB: maxSizeMB)
+        }
+        
         let filename = NSUUID().uuidString
         let storegeRef = Storage.storage().reference(withPath: "profile_images/\(filename)")
         
         do {
             let _ = try await storegeRef.putDataAsync(imageData)
             let url = try await storegeRef.downloadURL()
+            
+            try await deleteImage(currentUser: currentUser)
+            
             return url.absoluteString
         } catch {
-            print("DEBUG: Failed to upload image with error \(error.localizedDescription)")
-            return nil
+            throw UserError.imageUploadError(error)
         }
+    }
+    
+    func deleteImage(currentUser: User)  async throws {
+        
+        guard let photoURL = currentUser.profileImageURL else { return }
+        let storageRef = Storage.storage()
+            .reference(forURL: photoURL)
+        
+        try await storageRef.delete()
+        
     }
 }

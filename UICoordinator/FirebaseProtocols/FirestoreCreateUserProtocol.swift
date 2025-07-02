@@ -8,5 +8,7 @@
 import Foundation
 
 protocol FirestoreCreateUserProtocol {
-    func setUserData(id: String, data: [String: Any]) async throws
+    //func setUserData(id: String, data: [String: Any]) async throws
+    
+    func createUserWithUniqueUsername(user: User, username: String) async throws
 }

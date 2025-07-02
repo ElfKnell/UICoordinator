@@ -14,7 +14,7 @@ class ActivityDelete: ActivityDeleteProtocol {
     let locationDelete: DeleteLocationProtocol
     let likesDelete: LikesDeleteServiceProtocol
     
-    init(servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService(),
+    init(servaceDelete: FirestoreGeneralDeleteProtocol,
          locationDelete: DeleteLocationProtocol,
          likesDelete: LikesDeleteServiceProtocol) {
         

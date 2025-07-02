@@ -6,7 +6,12 @@
 //
 
 import Foundation
+import Firebase
+import FirebaseFirestoreSwift
 
 protocol FirestoreProtocol {
-    func collection(_ path: String) -> FirestoreCollectionProtocol
+    
+    func collection(_ collectionPath: String) -> CollectionReference
+    
+    func runTransaction(_ updateBlock: @escaping (TransactionProtocol, NSErrorPointer) -> Any?) async throws
 }

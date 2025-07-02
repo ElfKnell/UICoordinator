@@ -21,7 +21,8 @@ struct CreateReplyView: View {
          viewModelBilder: () -> CreateReplyViewModel = {
         CreateReplyViewModel(
             colloquyService: ColloquyService(
-                serviceDetete: FirestoreGeneralDeleteService(),
+                serviceDetete: FirestoreGeneralDeleteService(
+                    db: FirestoreAdapter()),
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService())),

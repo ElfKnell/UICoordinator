@@ -27,7 +27,7 @@ struct CreateColloquyView: View {
         CreateColloquyViewModel(
             likeCount: ColloquyInteractionCounterService(),
             colloquyService: ColloquyService(
-                serviceDetete: FirestoreGeneralDeleteService(),
+                serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter()),
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService())),

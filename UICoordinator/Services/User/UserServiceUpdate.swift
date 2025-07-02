@@ -12,36 +12,39 @@ import FirebaseFirestoreSwift
 class UserServiceUpdate: UserServiceUpdateProtocol {
     
     private let firestore: FirestoreProtocol
+    private let imageUpload: ImageUploaderProtocol
 
-    init(firestore: FirestoreProtocol = Firestore.firestore()) {
+    init(firestore: FirestoreProtocol, imageUpload: ImageUploaderProtocol) {
         
         self.firestore = firestore
+        self.imageUpload = imageUpload
         
     }
     
-    func updateUserProfile(userId: String, nickname: String, bio: String, link: String) async {
+    func updateUserProfile(user: User, image: UIImage?, dataUser: [String: Any]) async throws {
         
         do {
-            try await firestore
-                .collection("users")
-                .document(userId)
-                .updateData(["username": nickname, "bio": bio, "link": link])
+            var updatedData = dataUser
             
-        } catch {
-            print("ERROR UPDATE USER PROFILE:\(error.localizedDescription)")
-        }
-    }
-    
-    func updateUserProfileImage(withImageURL imageURL: String, userId: String) async {
-        
-        do {
-            try await firestore
-                .collection("users")
-                .document(userId)
-                .updateData(["profileImageURL": imageURL])
+            if let image {
+                let imageURL = try await imageUpload.uploadeImage(image, currentUser: user)
+                updatedData["profileImageURL"] = imageURL
+            }
             
+            if let username = dataUser["username"] as? String,
+                user.username.lowercased() != username.lowercased() {
+                try await updateUserWithUniqueUsername(user: user,
+                                                       username: username,
+                                                       dataUser: updatedData)
+            } else {
+                
+                try await firestore
+                    .collection("users")
+                    .document(user.id)
+                    .updateData(updatedData)
+            }
         } catch {
-            print("ERROR UPDATE USER PROFILE PHOTO: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -63,16 +66,49 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
         }
     }
     
-    func updateUserPrivate(isPrivateProfile: Bool, userId: String) async {
+    private func updateUserWithUniqueUsername(user: User, username: String, dataUser: [String: Any]) async throws {
         
-        do {
-            try await firestore
-                .collection("users")
-                .document(userId)
-                .updateData(["isPrivateProfile": isPrivateProfile])
+        let lowercasedUsername = username.lowercased()
+        let currentUsername = user.username.lowercased()
+        
+        _ = try await firestore.runTransaction { (transaction, errorPointer) -> Any? in
             
-        } catch {
-            print("ERROR UPDATE USER PROFILE PHOTO: \(error.localizedDescription)")
+            let userDocRef = transaction.collection("users")
+            let uniqueUsernameDocRef = transaction.collection("unique_usernames")
+            
+            do {
+                let existingUniqueDoc = try transaction.getDocument(uniqueUsernameDocRef
+                    .document(lowercasedUsername))
+                
+                if existingUniqueDoc.exists {
+                    let nsError = NSError(domain: "AuthError",
+                                          code: 409,
+                                          userInfo: [NSLocalizedDescriptionKey: "Username was taken during registration. Please try again."])
+                    errorPointer?.pointee = nsError
+                    return nil
+                }
+                
+                try transaction.updateData(dataUser, forDocument: userDocRef.document(user.id))
+                
+                let uniqueEntry = UniqueUsernameEntry(userId: user.id, time: Timestamp())
+                
+                try transaction.setData(from: uniqueEntry,
+                                        forDocument: uniqueUsernameDocRef
+                    .document(lowercasedUsername))
+                try transaction.deleteDocument(uniqueUsernameDocRef.document(currentUsername))
+                
+                return nil
+            } catch let error as NSError {
+                errorPointer?.pointee = error
+                return nil
+            } catch {
+                let nsError = NSError(
+                    domain: "FirestoreCreateUserService",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
+                errorPointer?.pointee = nsError
+                return nil
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ struct EditProfileView: View {
     
     init(user: User, isSaved: Binding<Bool>,
          viewModelBilder: @escaping () -> EditProfileViewModel = {
-        EditProfileViewModel(userServiseUpdate: UserServiceUpdate())
+        EditProfileViewModel(userServiseUpdate: UserServiceUpdate(firestore: FirestoreAdapter(), imageUpload: ImageUploader()))
     }) {
         self.user = user
         self._isSaved = isSaved
@@ -104,6 +104,11 @@ struct EditProfileView: View {
                 .padding()
                 .foregroundStyle(.black)
             }
+            .alert("Udate error", isPresented: $viewModel.isError, actions: {
+                Button("Ok", role: .cancel) {}
+            }, message: {
+                Text(viewModel.errorMessage ?? "not discription")
+            })
             .navigationTitle("Edit Profile")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
@@ -151,7 +156,9 @@ struct EditProfileView: View {
                                                                isPrivateProfile: isPrivateProfile)
                                 
                                 isSaved.toggle()
-                                dismiss()
+                                if !viewModel.isError {
+                                    dismiss()
+                                }
                             }
                         }
                         .font(.subheadline)

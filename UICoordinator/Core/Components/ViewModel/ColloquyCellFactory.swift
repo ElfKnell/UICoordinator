@@ -15,7 +15,8 @@ struct ColloquyCellFactory {
             collectionName: .likes,
             likeCount: ColloquyInteractionCounterService(),
             likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(),
-                                     serviceDetete: FirestoreGeneralDeleteService()),
+                                     serviceDetete: FirestoreGeneralDeleteService(
+                                        db: FirestoreAdapter())),
             fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()),
             activityUpdate: ActivityServiceUpdate())
         

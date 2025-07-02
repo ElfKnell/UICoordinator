@@ -9,10 +9,8 @@ import Foundation
 
 protocol AuthCreateServiceProtocol {
     
-    var errorMessage: String? { get set }
-    
     func createUser(withEmail email: String,
                     password: String,
                     fullname: String,
-                    username: String) async -> Bool
+                    username: String) async throws
 }

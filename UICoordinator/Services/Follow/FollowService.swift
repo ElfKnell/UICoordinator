@@ -14,7 +14,8 @@ class FollowService: FollowServiceProtocol {
     let serviceCreate: FirestoreGeneralCreateServiseProtocol
     let servaceDelete: FirestoreGeneralDeleteProtocol
     
-    init(serviceCreate: FirestoreGeneralCreateServiseProtocol = FirestoreGeneralServiceCreate(), servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService()) {
+    init(serviceCreate: FirestoreGeneralCreateServiseProtocol = FirestoreGeneralServiceCreate(), servaceDelete: FirestoreGeneralDeleteProtocol = FirestoreGeneralDeleteService(
+        db: FirestoreAdapter())) {
         self.serviceCreate = serviceCreate
         self.servaceDelete = servaceDelete
     }

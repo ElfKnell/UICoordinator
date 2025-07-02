@@ -7,19 +7,23 @@
 
 import Testing
 
-class MockCreateFirestoreService: FirestoreCreateUserProtocol {
-
-    var receivedData: [String: Any]?
-    var receivedId: String?
-    var didCallSetData = false
-
-    func setUserData(id: String, data: [String : Any]) async throws {
-        receivedId = id
-        receivedData = data
-        didCallSetData = true
-    }
-
-}
+//class MockCreateFirestoreService: FirestoreCreateUserProtocol {
+//    
+//    func createUserWithUniqueUsername(user: User, username: String) async throws {
+//        
+//    }
+//
+//    var receivedData: [String: Any]?
+//    var receivedId: String?
+//    var didCallSetData = false
+//
+//    func setUserData(id: String, data: [String : Any]) async throws {
+//        receivedId = id
+//        receivedData = data
+//        didCallSetData = true
+//    }
+//
+//}
 
 class MockFirebaseAuthProvider : FirebaseAuthProviderProtocol {
     

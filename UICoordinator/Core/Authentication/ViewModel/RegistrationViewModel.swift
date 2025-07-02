@@ -26,12 +26,21 @@ class RegistrationViewModel: ObservableObject {
     @MainActor
     func createUser() async -> Bool {
         
-        let isCreate = await userCreate.createUser(withEmail: self.email, password: self.password, fullname: self.name, username: self.username)
+        errorCreated = nil
+        isCreateUserError = false
         
-        if !isCreate {
-            self.errorCreated = userCreate.errorMessage
+        do {
+            try await userCreate.createUser(withEmail: self.email, password: self.password, fullname: self.name, username: self.username)
+            
+            return true
+        } catch let userError as UserError {
+            errorCreated = userError.description
+            isCreateUserError = true
+            return false
+        } catch {
+            errorCreated = error.localizedDescription
+            isCreateUserError = true
+            return false
         }
-        
-        return isCreate
     }
 }

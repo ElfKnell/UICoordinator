@@ -15,6 +15,9 @@ class EditProfileViewModel: ObservableObject {
     }
     @Published var profileImage: Image?
     @Published var isDelete = false
+    @Published var isError = false
+    @Published var errorMessage: String?
+    
     private var uiImage: UIImage?
     private let userServiseUpdate: UserServiceUpdateProtocol
     
@@ -23,12 +26,45 @@ class EditProfileViewModel: ObservableObject {
         self.userServiseUpdate = userServiseUpdate
     }
     
-    func updateUserData(user: User, nickname: String, bio: String, link: String, isPrivateProfile: Bool) async {
-        if user.isPrivateProfile != isPrivateProfile && (isPrivateProfile || user.isPrivateProfile != nil) {
-            await userServiseUpdate.updateUserPrivate(isPrivateProfile: isPrivateProfile, userId: user.id)
+    @MainActor
+    func updateUserData(user: User,
+                        nickname: String,
+                        bio: String,
+                        link: String,
+                        isPrivateProfile: Bool) async {
+        
+        var userData: [String: Any]  = [:]
+        errorMessage = nil
+        isError = true
+        
+        let trimmedBio = bio.trimmingCharacters(in: .whitespaces)
+        let trimmedLink = link.trimmingCharacters(in: .whitespaces)
+        let trimmedUsername = nickname.trimmingCharacters(in: .whitespaces)
+        
+        if user.isPrivateProfile != isPrivateProfile {
+            userData["isPrivateProfile"] = isPrivateProfile
         }
-        await userServiseUpdate.updateUserProfile(userId: user.id, nickname: nickname,  bio: bio, link: link)
-        await uploadeProfileImage(userId: user.id)
+        
+        if trimmedBio != user.bio && !trimmedBio.isEmpty {
+            userData["bio"] = trimmedBio
+        }
+        
+        if trimmedLink != user.link && !trimmedLink.isEmpty {
+            userData["link"] = trimmedLink
+        }
+        
+        if trimmedUsername != user.username && !trimmedUsername.isEmpty {
+            userData["username"] = trimmedUsername
+        }
+        
+        do {
+            try await userServiseUpdate.updateUserProfile(user: user,
+                                                      image: uiImage,
+                                                      dataUser: userData)
+        } catch {
+            errorMessage = error.localizedDescription
+            isError = true
+        }
         
     }
     
@@ -43,13 +79,6 @@ class EditProfileViewModel: ObservableObject {
         guard let uiImage = UIImage(data: data) else { return }
         self.uiImage = uiImage
         self.profileImage = Image(uiImage: uiImage)
-    }
-    
-    private func uploadeProfileImage(userId: String) async {
-        guard let image = self.uiImage else { return }
-        guard let imageURL = await ImageUploader.uploadeImage(image) else { return }
-        
-        await userServiseUpdate.updateUserProfileImage(withImageURL: imageURL, userId: userId)
     }
     
 }

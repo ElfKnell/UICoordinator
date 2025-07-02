@@ -8,5 +8,10 @@
 import Foundation
 
 protocol DocumentSnapshotProtocol {
+    
+    var documentID: String { get }
+    var exists: Bool { get }
+    
+    func data() -> [String: Any]?
     func decodeData<T: Decodable>(as type: T.Type) throws -> T
 }

@@ -12,7 +12,7 @@ class FirestoreGeneralDeleteService: FirestoreGeneralDeleteProtocol {
     
     private let db: FirestoreProtocol
 
-    init(db: FirestoreProtocol = Firestore.firestore()) {
+    init(db: FirestoreProtocol) {
         self.db = db
     }
 

@@ -6,15 +6,13 @@
 //
 
 import Foundation
+import Firebase
+import FirebaseStorage
 
 protocol UserServiceUpdateProtocol {
     
-    func updateUserProfile(userId: String, nickname: String, bio: String, link: String) async
-    
-    func updateUserProfileImage(withImageURL imageURL: String, userId: String) async
+    func updateUserProfile(user: User, image: UIImage?, dataUser: [String: Any]) async throws
     
     func deleteUser(userId: String?) async
-    
-    func updateUserPrivate(isPrivateProfile: Bool, userId: String) async
     
 }

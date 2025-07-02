@@ -13,7 +13,7 @@ struct ColloquyCellForCurrentUserFactory {
     static func make(colloquy: Colloquy, user: User, isDeleted: Binding<Bool>) -> ColloquyCellForCurrentUser {
         let colloquyService = ColloquyServiceViewModel(
             colloquyServise: ColloquyService(
-                serviceDetete: FirestoreGeneralDeleteService(),
+                serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter()),
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService())))
@@ -23,7 +23,7 @@ struct ColloquyCellForCurrentUserFactory {
             likeCount: ColloquyInteractionCounterService(),
             likeService: LikeService(
                 serviceCreate: FirestoreLikeCreateServise(),
-                serviceDetete: FirestoreGeneralDeleteService()),
+                serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter())),
             fethingLike: FetchLikesService(
                 likeRepository: FirestoreLikeRepository()),
             activityUpdate: ActivityServiceUpdate())

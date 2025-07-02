@@ -15,7 +15,7 @@ struct RegistrationView: View {
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.dismiss) var dismiss
     
-    init(isNewUser: Binding<Bool>, viewModelBuilder: @escaping () -> RegistrationViewModel = { RegistrationViewModel(userCreate: AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService())))
+    init(isNewUser: Binding<Bool>, viewModelBuilder: @escaping () -> RegistrationViewModel = { RegistrationViewModel(userCreate: AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService(firestoreInstance: FirestoreAdapter()))))
     }) {
         
         self._isNewUser = isNewUser
@@ -115,7 +115,7 @@ struct RegistrationView: View {
                     Spacer()
 
                 }
-                .alert("Login problems", isPresented: $registrationModel.isCreateUserError) {
+                .alert("Registation problems", isPresented: $registrationModel.isCreateUserError) {
                     Button("OK", role: .cancel) {}
                 } message: {
                     Text(registrationModel.errorCreated ?? "no error")

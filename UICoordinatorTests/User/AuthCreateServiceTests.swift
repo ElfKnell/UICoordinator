@@ -9,7 +9,7 @@ import XCTest
 
 final class AuthCreateServiceTests: XCTestCase {
 
-    func testCreateNewUserService() async {
+    func testCreateNewUserService() async throws {
         let mockCreateUser = MockCreateUserService()
         
         let authCreateService = AuthCreateService(
@@ -21,10 +21,8 @@ final class AuthCreateServiceTests: XCTestCase {
         let username = "vangog"
         let password = "123456"
         
-        let isSave = await authCreateService.createUser(withEmail: email, password: password, fullname: fullname, username: username)
+        try await authCreateService.createUser(withEmail: email, password: password, fullname: fullname, username: username)
         
-        XCTAssertTrue(isSave)
-        XCTAssertNil(authCreateService.errorMessage)
         XCTAssertTrue(mockCreateUser.uploaded)
     }
 

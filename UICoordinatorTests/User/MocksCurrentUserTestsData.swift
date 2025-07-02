@@ -9,20 +9,29 @@ import Foundation
 import Firebase
 import Testing
 
-final class MockDocumentSnapshot: DocumentSnapshotProtocol {
-    private let user: User
-
-    init(user: User) {
-        self.user = user
-    }
-
-    func decodeData<T>(as type: T.Type) throws -> T where T : Decodable {
-        guard let decoded = user as? T else {
-            throw NSError(domain: "DecodeError", code: -1)
-        }
-        return decoded
-    }
-}
+//final class MockDocumentSnapshot: DocumentSnapshotProtocol {
+//    
+//    var documentID: String
+//    
+//    var exists: Bool
+//    
+//    func data() -> [String : Any]? {
+//        
+//    }
+//    
+//    private let user: User
+//
+//    init(user: User) {
+//        self.user = user
+//    }
+//
+//    func decodeData<T>(as type: T.Type) throws -> T where T : Decodable {
+//        guard let decoded = user as? T else {
+//            throw NSError(domain: "DecodeError", code: -1)
+//        }
+//        return decoded
+//    }
+//}
 
 final class MockFirestoreService: FirestoreServiceProtocol {
     
@@ -34,7 +43,7 @@ final class MockFirestoreService: FirestoreServiceProtocol {
             throw UserError.userNotFound
         }
 
-        return MockDocumentSnapshot(user: mockUser ?? DeveloperPreview.user)
+        return UserMockDocumentSnapshot(documentID: mockUser?.id ?? "none", exists: true)
     }
 }
 
