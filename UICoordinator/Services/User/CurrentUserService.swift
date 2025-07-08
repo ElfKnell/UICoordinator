@@ -22,7 +22,9 @@ class CurrentUserService: CurrentUserServiceProtocol {
     
     func fetchCurrentUser(userId: String?) async throws {
         
-        guard let userId else { throw UserError.userIdNil}
+        guard let userId else {
+            throw UserError.userIdNil
+        }
         
         let snapshot = try await firestoreService.getUserDocument(uid: userId)
         
@@ -31,19 +33,17 @@ class CurrentUserService: CurrentUserServiceProtocol {
         self.currentUser = user
     }
     
-    func updateCurrentUser() async {
+    func updateCurrentUser() async throws {
         
-        do {
-            guard let uid = self.currentUser?.id else { return }
-            
-            let snapshot = try await firestoreService.getUserDocument(uid: uid)
-            
-            let updatedUser = try snapshot.decodeData(as: User.self)
-            
-            self.currentUser = updatedUser
-            
-        } catch {
-            print("ERROR UPDATE Current User: \(error.localizedDescription)")
+        guard let uid = self.currentUser?.id else {
+            throw UserError.userIdNil
         }
+        
+        let snapshot = try await firestoreService.getUserDocument(uid: uid)
+        
+        let updatedUser = try snapshot.decodeData(as: User.self)
+        
+        self.currentUser = updatedUser
+        
     }
 }

@@ -13,5 +13,5 @@ protocol CurrentUserServiceProtocol {
     
     func fetchCurrentUser(userId: String?) async throws
     
-    func updateCurrentUser() async
+    func updateCurrentUser() async throws
 }

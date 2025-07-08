@@ -18,11 +18,15 @@ class AuthService: AuthServiceProtocol {
     
     private var currentUserService: CurrentUserServiceProtocol
     private var authProvider: FirebaseAuthProviderProtocol
+    private var authStaticProvider: FirebaseStaticAuthProviderProtocol
     
-    init(currentUserService: CurrentUserServiceProtocol, authProvider: FirebaseAuthProviderProtocol) {
+    init(currentUserService: CurrentUserServiceProtocol,
+         authProvider: FirebaseAuthProviderProtocol,
+         authStaticProvider: FirebaseStaticAuthProviderProtocol) {
         
         self.currentUserService = currentUserService
         self.authProvider = authProvider
+        self.authStaticProvider = authStaticProvider
     }
     
     func login(withEmail email: String, password: String) async {
@@ -35,27 +39,33 @@ class AuthService: AuthServiceProtocol {
             self.errorMessage = nil
            
         } catch {
-            errorMessage = error.localizedDescription
+            self.errorMessage = error.localizedDescription
         }
     }
     
     func signOut() {
     
+        self.errorMessage = nil
         currentUserService.currentUser = nil
-        try? Auth.auth().signOut()
+        do {
+            try authStaticProvider.signOut()
+        } catch {
+            self.errorMessage = error.localizedDescription
+        }
         userSession = nil
     }
     
     func checkUserSession() async {
         
-        if let user = Auth.auth().currentUser {
+        if let user = authStaticProvider.currentUser {
             do {
-                try await user.idTokenForcingRefresh(true)
+                _ = try await user.idTokenForcingRefresh(true)
                 self.userSession = user
                 try await currentUserService.fetchCurrentUser(userId: user.uid)
-                
+                self.errorMessage = nil
             } catch {
-                print("❌ Token refresh failed: \(error.localizedDescription)")
+                self.userSession = nil
+                self.errorMessage = error.localizedDescription
             }
         }
     }

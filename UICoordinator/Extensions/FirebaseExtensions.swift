@@ -7,28 +7,18 @@
 
 import Foundation
 import Firebase
+import FirebaseAuth
 import FirebaseFirestore
-
-//extension Firestore: FirestoreProtocol {
-//   
-//    func runTransaction(_ updateBlock: @escaping (any TransactionProtocol, NSErrorPointer) -> Any?) async throws {
-//        
-//    }
-//    
-//    func collection(_ path: String) -> FirestoreCollectionProtocol {
-//        return self.collection(path) as CollectionReference
-//    }
-//}
-//
-//extension CollectionReference: FirestoreCollectionProtocol {
-//    func document(_ id: String) -> FirestoreDocumentProtocol {
-//        return FirestoreDocumentWrapper(ref: self.document(id))
-//    }
-//}
 
 extension DocumentSnapshot: DocumentSnapshotProtocol {
     func decodeData<T: Decodable>(as type: T.Type) throws -> T {
         try self.data(as: type)
+    }
+}
+
+extension AuthDataResult: AuthDataResultProtocol {
+    var firebaseUser: FirebaseUserProtocol {
+        return self.user as FirebaseUserProtocol
     }
 }
 

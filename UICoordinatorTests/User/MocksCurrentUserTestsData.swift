@@ -33,7 +33,7 @@ import Testing
 //    }
 //}
 
-final class MockFirestoreService: FirestoreServiceProtocol {
+final class MockFirestoreService2: FirestoreServiceProtocol {
     
     var shouldThrowError = false
     var mockUser: User?

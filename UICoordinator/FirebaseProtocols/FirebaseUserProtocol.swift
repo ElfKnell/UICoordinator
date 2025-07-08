@@ -12,4 +12,6 @@ protocol FirebaseUserProtocol {
     var uid: String { get }
     var email: String? { get }
     
+    func delete() async throws
+    func idTokenForcingRefresh(_ forceRefresh: Bool) async throws -> String
 }

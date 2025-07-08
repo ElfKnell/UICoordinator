@@ -21,10 +21,12 @@ final class DIContainer: ObservableObject {
         
         let firestoreService = FirestoreService()
         let authProvider = FirebaseAuthProvider()
+        let staticAuthProvider = FirebaseStaticAuthProvider()
     
         self.currentUserService = CurrentUserService(firestoreService: firestoreService)
         self.authService = AuthService(currentUserService: self.currentUserService,
-                                       authProvider: authProvider)
+                                       authProvider: authProvider,
+                                       authStaticProvider: staticAuthProvider)
         
         let fetchingService = FetchingFollowAndFollowCount(firestoreService: FirestoreFollowService())
         let checkedFollowing = CheckedLocalUsersByFollowing(localUserService: LocalUserService(),

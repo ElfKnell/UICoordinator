@@ -52,7 +52,7 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
         mockFirestore.configureNextTransaction =  { mockTransaction in
             let userMockTransaction = mockTransaction
             let uniqueUsernamePath = "unique_usernames/\(self.testUsername.lowercased())"
-            userMockTransaction.configureGetDocument(path: uniqueUsernamePath, exists: true)
+            userMockTransaction.configureGetDocument(path: uniqueUsernamePath, exists: false)
         }
         
         try await sut.createUserWithUniqueUsername(user: testUser, username: testUsername)
@@ -95,7 +95,7 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
         } catch let error as NSError {
             XCTAssertEqual(error.code, 409, "Error code should indicate conflict.")
             XCTAssertEqual(error.localizedDescription,
-                           UserError.usernameTakenDuringRegistration.description,
+                           UserError.usernameTakenDuringRegistration.localizedDescription,
                            "Error message should match username taken message.")
             
             XCTAssertNotNil(mockFirestore.lastExecutedTransaction,
@@ -112,14 +112,14 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
     
     func test_createUserWithUniqueUsername_failure_firestoreErrorDuringGetDocument() async {
         
-        _ = NSError(domain: FirestoreErrorDomain,
+        let expectedFirestoreError = NSError(domain: FirestoreErrorDomain,
                                               code: FirestoreErrorCode.unavailable.rawValue,
                                               userInfo: [NSLocalizedDescriptionKey: "Simulated network unavailable"])
         
         mockFirestore.configureNextTransaction =  { mockTransaction in
             let userMockTransaction = mockTransaction
             let uniqueUsernamePath = "unique_usernames/\(self.testUsername.lowercased())"
-            userMockTransaction.configureGetDocument(path: uniqueUsernamePath, exists: true)
+            userMockTransaction.configureGetDocumentError(path: uniqueUsernamePath, error: expectedFirestoreError)
         }
         
         do {

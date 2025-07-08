@@ -54,7 +54,7 @@ struct CurrentUserProfileView: View {
             
             Task {
                 viewModel.isLoaded = true
-                await container.currentUserService.updateCurrentUser()
+                try await container.currentUserService.updateCurrentUser()
                 viewModel.isLoaded = false
             }
             

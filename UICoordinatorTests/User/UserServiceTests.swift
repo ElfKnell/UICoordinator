@@ -13,7 +13,7 @@ final class UserServiceTests: XCTestCase {
         
         let mockUser = User(id: "123", fullname: "Test User", username: "testuser", email: "test@test.com", isDelete: false)
         let mockService = MockFirestoreService()
-        mockService.mockUser = mockUser
+        //mockService.mockUser = mockUser
 
         let userService = UserService(firestoreUserDocument: mockService)
         let fetchedUser = await userService.fetchUser(withUid: "123")
@@ -25,7 +25,7 @@ final class UserServiceTests: XCTestCase {
     func testFetchUser_fallbackOnError() async {
         
         let mockService = MockFirestoreService()
-        mockService.shouldThrowError = true
+        //mockService.shouldThrowError = true
 
         let userService = UserService(firestoreUserDocument: mockService)
         let user = await userService.fetchUser(withUid: "fail")

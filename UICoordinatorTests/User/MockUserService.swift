@@ -8,10 +8,15 @@
 import Testing
 import Foundation
 
-struct MockFirebaseUser: FirebaseUserProtocol {
-    var uid: String
-    var email: String?
-}
+//struct MockFirebaseUser2: FirebaseUserProtocol {
+//    
+//    var uid: String
+//    var email: String?
+//    
+//    func delete() async throws {
+//        
+//    }
+//}
 
 final class MockUserService: UserServiceProtocol {
     
@@ -23,7 +28,7 @@ final class MockUserService: UserServiceProtocol {
 
 }
 
-final class MockCurrentUserService: CurrentUserServiceProtocol {
+final class MockCurrentUserService2: CurrentUserServiceProtocol {
     
     var currentUser: User?
     
@@ -41,10 +46,10 @@ final class MockCurrentUserService: CurrentUserServiceProtocol {
     func updateCurrentUser() async {}
 }
 
-final class MockCreateUserService: CreateUserProtocol {
-    var uploaded = false
-
-    func uploadUserData(id: String, withEmail email: String, fullname: String, username: String) async {
-        uploaded = true
-    }
-}
+//final class MockCreateUserService2: CreateUserProtocol {
+//    var uploaded = false
+//
+//    func uploadUserData(id: String, withEmail email: String, fullname: String, username: String) async {
+//        uploaded = true
+//    }
+//}

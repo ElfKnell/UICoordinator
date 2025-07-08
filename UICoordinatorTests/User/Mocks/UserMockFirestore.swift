@@ -12,7 +12,6 @@ import FirebaseFirestoreSwift
 
 class UserMockFirestore: FirestoreProtocol {
     
-    //var runTransactionBlockToExecute: ((TransactionProtocol, NSErrorPointer?) -> Any?)? = nil
     var runTransactionShouldThrow: Error? = nil
     var lastExecutedTransaction: UserMockTransaction? = nil
     
@@ -31,7 +30,8 @@ class UserMockFirestore: FirestoreProtocol {
         
         configureNextTransaction?(currentMockTransaction)
         
-        let nsError: NSError? = nil
+        var nsError: NSError? = nil
+        _ = updateBlock(currentMockTransaction, &nsError)
         
         if let error = nsError {
             throw error

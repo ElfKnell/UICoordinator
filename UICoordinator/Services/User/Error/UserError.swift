@@ -21,6 +21,8 @@ enum UserError: Error, LocalizedError {
     case imageUploadFailed
     case imageUploadError(Error)
     case usernameTakenDuringRegistration
+    case generalError(String)
+    case firestoreServiceError(Error)
     
     var description: String {
         switch self {
@@ -48,6 +50,10 @@ enum UserError: Error, LocalizedError {
             return "Failed to save image to storage: \(error.localizedDescription)"
         case .usernameTakenDuringRegistration:
             return "Username was taken during registration. Please try again."
+        case .generalError(let stringError):
+            return stringError
+        case .firestoreServiceError(let error):
+            return "Firestore service error: \(error.localizedDescription)"
         }
     }
 }

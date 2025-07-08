@@ -16,15 +16,25 @@ class UserMockTransaction: TransactionProtocol {
     var capturedUpdateData: [String: [AnyHashable: Any]] = [:]
     var capturedDeleteDocument: [String] = []
     var getDocumentShouldThrow: Error?
+    var getDocumentErrors: [String: Error] = [:]
     
     func configureGetDocument(path: String, exists: Bool, data: [String: Any]? = nil) {
         mockGetDocuments[path] = UserMockDocumentSnapshot(documentID: URL(fileURLWithPath: path).lastPathComponent, exists: exists, data: data)
     }
     
+    func configureGetDocumentError(path: String, error: Error) {
+        getDocumentErrors[path] = error
+    }
+    
     func getDocument(_ documentRef: DocumentReference) throws -> DocumentSnapshotProtocol {
+        if let error = getDocumentErrors[documentRef.path] {
+            throw error
+        }
+        
         if let error = getDocumentShouldThrow {
             throw error
         }
+        
         return mockGetDocuments[documentRef.path] ?? UserMockDocumentSnapshot(documentID: documentRef.documentID, exists: false)
     }
     

@@ -15,7 +15,7 @@ struct RegistrationView: View {
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.dismiss) var dismiss
     
-    init(isNewUser: Binding<Bool>, viewModelBuilder: @escaping () -> RegistrationViewModel = { RegistrationViewModel(userCreate: AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService(firestoreInstance: FirestoreAdapter()))))
+    init(isNewUser: Binding<Bool>, viewModelBuilder: @escaping () -> RegistrationViewModel = { RegistrationViewModel(userCreate: AuthCreateService(createUserService: CreateUserFirebase(firestoreService: FirestoreCreateUserService(firestoreInstance: FirestoreAdapter())), authService: FirebaseAuthCreateService()))
     }) {
         
         self._isNewUser = isNewUser

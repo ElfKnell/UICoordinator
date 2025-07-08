@@ -7,15 +7,18 @@
 
 import Foundation
 import Firebase
-import FirebaseFirestoreSwift
+import FirebaseAuth
 
 class AuthCreateService: AuthCreateServiceProtocol {
     
     private var createUserService: CreateUserProtocol
+    private var authService: AuthProtocol
     
-    init(createUserService: CreateUserProtocol) {
+    init(createUserService: CreateUserProtocol,
+         authService: AuthProtocol) {
         
         self.createUserService = createUserService
+        self.authService = authService
     }
     
     func createUser(withEmail email: String,
@@ -23,31 +26,38 @@ class AuthCreateService: AuthCreateServiceProtocol {
                     fullname: String,
                     username: String) async throws {
         
-        var result: AuthDataResult?
+        var authDataResult: AuthDataResultProtocol?
         
         do {
-            result = try await Auth.auth().createUser(withEmail: email, password: password)
+            authDataResult = try await authService.createUser(withEmail: email, password: password)
             
-            guard let result else {
+            guard let result = authDataResult else {
                 throw UserError.userCreateNil
             }
             
-            try await createUserService.uploadUserData(id: result.user.uid,
-                                            withEmail: email,
-                                            fullname: fullname,
-                                            username: username)
+            try await createUserService.uploadUserData(id: result.firebaseUser.uid,
+                                                       withEmail: result.firebaseUser.email ?? email,
+                                                       fullname: fullname,
+                                                       username: username)
             
             
         } catch let authError as NSError {
             
-            if let user = result?.user {
+            if let user = authDataResult?.firebaseUser {
                 try? await user.delete()
             }
             
-            throw UserError.authCreationFailed(authError)
+            if authError.domain == AuthErrorDomain {
+                throw UserError.authCreationFailed(authError)
+            } else if authError.domain == "FirestoreErrorDomain" {
+                throw UserError.unknownError(authError)
+            } else {
+                throw UserError.unknownError(authError)
+            }
+            
         } catch {
             
-            if let user = result?.user {
+            if let user = authDataResult?.firebaseUser {
                 try? await user.delete()
             }
             
