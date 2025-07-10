@@ -17,11 +17,12 @@ class FirestoreAdapter: FirestoreProtocol {
         self.firestore = firestore
     }
     
-    func collection(_ collectionPath: String) -> CollectionReference {
-        firestore.collection(collectionPath)
+    func collection(_ collectionPath: String) -> CollectionReferenceProtocol {
+        return CollectionReferenceAdapter(collection: firestore.collection(collectionPath))
     }
     
     func runTransaction(_ updateBlock: @escaping (any TransactionProtocol, NSErrorPointer) -> Any?) async throws {
+        
         _ = try await firestore.runTransaction{ (realTransaction, errorPointer) -> Any? in
             let adapterTransaction = TransactionAdapter(transaction: realTransaction, firestoreInstance: self.firestore)
             return updateBlock(adapterTransaction, errorPointer)

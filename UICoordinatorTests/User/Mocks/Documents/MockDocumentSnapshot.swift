@@ -42,10 +42,13 @@ class MockDocumentSnapshot: DocumentSnapshotProtocol {
                   let isDelete = data["isDelete"] as? Bool else {
                 throw UserError.invalidType
             }
+            let profileImageURL = data["profileImageURL"] as? String
+            
             return User(id: id,
                         fullname: fullname,
                         username: username,
                         email: email,
+                        profileImageURL: profileImageURL,
                         isDelete: isDelete) as! T
         } else if type == UniqueUsernameEntry.self {
             guard let userId = data["userId"] as? String else {

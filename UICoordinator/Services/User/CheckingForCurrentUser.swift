@@ -8,9 +8,9 @@
 import SwiftUI
 import Firebase
 
-class CheckingForCurrentUser: CheckingForCurrentUserProtocol {
+class CheckingForCurrentUser {
     
-    func isOwnerCurrentUser(_ ownerUid: String, currentUser: User?) -> Bool {
+    static func isOwnerCurrentUser(_ ownerUid: String, currentUser: User?) -> Bool {
         guard let currentUser else { return false }
         return currentUser.id == ownerUid
     }

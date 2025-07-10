@@ -11,7 +11,7 @@ import FirebaseFirestoreSwift
 
 protocol FirestoreProtocol {
     
-    func collection(_ collectionPath: String) -> CollectionReference
+    func collection(_ collectionPath: String) -> CollectionReferenceProtocol
     
     func runTransaction(_ updateBlock: @escaping (TransactionProtocol, NSErrorPointer) -> Any?) async throws
 }

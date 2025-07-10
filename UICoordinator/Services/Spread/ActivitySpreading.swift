@@ -78,7 +78,7 @@ class ActivitySpreading: SpreadingActivityProtocol {
                 let ownerUser = users.first(where: { $0.id == spreads[i].ownerUid })
                 spreads[i].ownerUser = ownerUser
                 
-                let user = await userServise.fetchUser(withUid: userId)
+                let user = try await userServise.fetchUser(withUid: userId)
                 spreads[i].user = user
             }
             

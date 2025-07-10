@@ -9,6 +9,6 @@ import Foundation
 
 protocol UserServiceProtocol {
     
-    func fetchUser(withUid uid: String) async -> User
+    func fetchUser(withUid uid: String) async throws -> User
     
 }

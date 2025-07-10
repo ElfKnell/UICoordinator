@@ -12,6 +12,11 @@ import FirebaseStorage
 class ImageUploader: ImageUploaderProtocol {
     
     private let maxPhotoSize: Int = 2 * 1024 * 1024
+    private let storage: StorageProtocol
+    
+    init(storage: StorageProtocol) {
+        self.storage = storage
+    }
     
     func uploadeImage(_ image: UIImage, currentUser: User) async throws -> String? {
         
@@ -24,10 +29,10 @@ class ImageUploader: ImageUploaderProtocol {
         }
         
         let filename = NSUUID().uuidString
-        let storegeRef = Storage.storage().reference(withPath: "profile_images/\(filename)")
+        let storegeRef = storage.storageReference(withPath: "profile_images/\(filename)")
         
         do {
-            let _ = try await storegeRef.putDataAsync(imageData)
+            let _ = try await storegeRef.putDataAsyncRef(imageData)
             let url = try await storegeRef.downloadURL()
             
             try await deleteImage(currentUser: currentUser)
@@ -41,8 +46,7 @@ class ImageUploader: ImageUploaderProtocol {
     func deleteImage(currentUser: User)  async throws {
         
         guard let photoURL = currentUser.profileImageURL else { return }
-        let storageRef = Storage.storage()
-            .reference(forURL: photoURL)
+        let storageRef = storage.storageReference(forURL: photoURL)
         
         try await storageRef.delete()
         

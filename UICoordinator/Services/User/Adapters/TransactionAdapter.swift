@@ -20,7 +20,7 @@ class TransactionAdapter: TransactionProtocol {
         self.firestoreInstance = firestoreInstance
     }
     
-    func getDocument(_ documentRef: DocumentReference) throws -> any DocumentSnapshotProtocol {
+    func getDocument(_ documentRef: DocumentReference) throws -> DocumentSnapshotProtocol {
         let realSnapshot = try transaction.getDocument(documentRef)
         return DocumentSnapshotAdapter(snapshot: realSnapshot)
     }

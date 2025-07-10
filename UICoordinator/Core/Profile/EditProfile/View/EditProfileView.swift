@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import FirebaseStorage
 
 struct EditProfileView: View {
     
@@ -22,7 +23,7 @@ struct EditProfileView: View {
     
     init(user: User, isSaved: Binding<Bool>,
          viewModelBilder: @escaping () -> EditProfileViewModel = {
-        EditProfileViewModel(userServiseUpdate: UserServiceUpdate(firestore: FirestoreAdapter(), imageUpload: ImageUploader()))
+        EditProfileViewModel(userServiseUpdate: UserServiceUpdate(firestore: FirestoreAdapter(), imageUpload: ImageUploader(storage: Storage.storage()), logger: SpyLogger()))
     }) {
         self.user = user
         self._isSaved = isSaved

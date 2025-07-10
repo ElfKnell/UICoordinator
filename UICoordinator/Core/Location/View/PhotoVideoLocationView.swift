@@ -11,7 +11,6 @@ struct PhotoVideoLocationView: View {
     
     let location: MapSelectionProtocol
     @EnvironmentObject var conteiner: DIContainer
-    let verificationOwner = CheckingForCurrentUser()
     
     @StateObject var viewModelPhoto: PhotoViewModel
     @StateObject var viewModelVideo: VideoViewModel
@@ -32,7 +31,7 @@ struct PhotoVideoLocationView: View {
         Group {
             VStack {
                 
-                if verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser) {
+                if CheckingForCurrentUser.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser) {
                     
                     NavigationLink {
                         PhotosWithChangingView(locationId: location.id)
@@ -63,7 +62,7 @@ struct PhotoVideoLocationView: View {
                 NavigationLink {
                     VideoView(
                         locationId: location.id,
-                        isAccessible: verificationOwner.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))
+                        isAccessible: CheckingForCurrentUser.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))
                         .environmentObject(viewModelVideo)
                 } label: {
                     Text("Choose Video")

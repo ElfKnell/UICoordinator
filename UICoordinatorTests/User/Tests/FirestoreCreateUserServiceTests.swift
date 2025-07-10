@@ -12,7 +12,7 @@ import FirebaseFirestoreSwift
 
 final class FirestoreCreateUserServiceTests: XCTestCase {
 
-    var mockFirestore: UserMockFirestore!
+    var mockFirestore: MockFirestore!
     var sut: FirestoreCreateUserService!
 
     let testUserID = "testUser123"
@@ -35,7 +35,7 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
             FirebaseApp.configure()
         }
 
-        mockFirestore = UserMockFirestore()
+        mockFirestore = MockFirestore()
         
         sut = FirestoreCreateUserService(firestoreInstance: mockFirestore)
         
@@ -60,14 +60,14 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
         XCTAssertNotNil(mockFirestore.lastExecutedTransaction, "A transaction should have been run.")
         guard let transaction = mockFirestore.lastExecutedTransaction else { return }
         
-        let userDocPath = "users/\(testUserID)"
+        let userDocPath = testUserID
         XCTAssertNotNil(transaction.capturedSetDataCodable[userDocPath],
                         "User document should have been set.")
         XCTAssertEqual(transaction.capturedSetDataCodable[userDocPath] as? User,
                        testUser,
                        "Captured user data should match expected.")
         
-        let uniqueUsernamePath = "unique_usernames/\(self.testUsername.lowercased())"
+        let uniqueUsernamePath = self.testUsername.lowercased()
         XCTAssertNotNil(transaction.capturedSetDataCodable[uniqueUsernamePath],
                         "Unique username entry document should have been set.")
         XCTAssertEqual(transaction.capturedSetDataCodable[uniqueUsernamePath] as? UniqueUsernameEntry,
@@ -85,7 +85,7 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
         
         mockFirestore.configureNextTransaction =  { mockTransaction in
             let userMockTransaction = mockTransaction
-            let uniqueUsernamePath = "unique_usernames/\(self.testUsername.lowercased())"
+            let uniqueUsernamePath = self.testUsername.lowercased()
             userMockTransaction.configureGetDocument(path: uniqueUsernamePath, exists: true)
         }
         
@@ -118,7 +118,7 @@ final class FirestoreCreateUserServiceTests: XCTestCase {
         
         mockFirestore.configureNextTransaction =  { mockTransaction in
             let userMockTransaction = mockTransaction
-            let uniqueUsernamePath = "unique_usernames/\(self.testUsername.lowercased())"
+            let uniqueUsernamePath = self.testUsername.lowercased()
             userMockTransaction.configureGetDocumentError(path: uniqueUsernamePath, error: expectedFirestoreError)
         }
         

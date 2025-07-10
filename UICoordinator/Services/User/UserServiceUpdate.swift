@@ -8,16 +8,19 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-
 class UserServiceUpdate: UserServiceUpdateProtocol {
     
     private let firestore: FirestoreProtocol
     private let imageUpload: ImageUploaderProtocol
+    private let logger: LoggerProtocol
 
-    init(firestore: FirestoreProtocol, imageUpload: ImageUploaderProtocol) {
+    init(firestore: FirestoreProtocol,
+         imageUpload: ImageUploaderProtocol,
+         logger: LoggerProtocol) {
         
         self.firestore = firestore
         self.imageUpload = imageUpload
+        self.logger = logger
         
     }
     
@@ -38,10 +41,10 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
                                                        dataUser: updatedData)
             } else {
                 
-                try await firestore
+                let userDoc = firestore
                     .collection("users")
-                    .document(user.id)
-                    .updateData(updatedData)
+                    .document(user.id) as DocumentReferenceProtocol
+                try await userDoc.updateData(updatedData)
             }
         } catch {
             throw error
@@ -52,7 +55,9 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
         
         do {
             
-            guard let userId else { throw UserError.userNotFound }
+            guard let userId else {
+                throw UserError.userNotFound
+            }
             
             try await firestore
                 .collection("users")
@@ -60,9 +65,9 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
                 .updateData(["isDelete": true])
            
         } catch UserError.userNotFound {
-            print("ERROR DELETE USER: \(UserError.userNotFound.description)")
+            logger.log("ERROR DELETE USER: \(UserError.userNotFound.description)")
         } catch {
-            print("ERROR DELETE USER: \(error.localizedDescription)")
+            logger.log("ERROR DELETE USER: \(error.localizedDescription)")
         }
     }
     

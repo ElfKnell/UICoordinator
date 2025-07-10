@@ -8,7 +8,7 @@
 import Foundation
 import Firebase
 
-class UserMockTransaction: TransactionProtocol {
+class MockTransaction: TransactionProtocol {
     
     var mockGetDocuments: [String: DocumentSnapshotProtocol] = [:]
     var capturedSetDataCodable: [String: Encodable] = [:]
@@ -18,8 +18,12 @@ class UserMockTransaction: TransactionProtocol {
     var getDocumentShouldThrow: Error?
     var getDocumentErrors: [String: Error] = [:]
     
+    var setDataShouldThrow: Error?
+    var updateDataShouldThrow: Error?
+    var deleteDocumentShouldThrow: Error?
+    
     func configureGetDocument(path: String, exists: Bool, data: [String: Any]? = nil) {
-        mockGetDocuments[path] = UserMockDocumentSnapshot(documentID: URL(fileURLWithPath: path).lastPathComponent, exists: exists, data: data)
+        mockGetDocuments[path] = MockDocumentSnapshot(documentID: URL(fileURLWithPath: path).lastPathComponent, exists: exists, data: data)
     }
     
     func configureGetDocumentError(path: String, error: Error) {
@@ -27,7 +31,7 @@ class UserMockTransaction: TransactionProtocol {
     }
     
     func getDocument(_ documentRef: DocumentReference) throws -> DocumentSnapshotProtocol {
-        if let error = getDocumentErrors[documentRef.path] {
+        if let error = getDocumentErrors[documentRef.documentID] {
             throw error
         }
         
@@ -35,26 +39,49 @@ class UserMockTransaction: TransactionProtocol {
             throw error
         }
         
-        return mockGetDocuments[documentRef.path] ?? UserMockDocumentSnapshot(documentID: documentRef.documentID, exists: false)
+        return mockGetDocuments[documentRef.documentID] ?? MockDocumentSnapshot(documentID: documentRef.documentID, exists: false)
     }
     
     func setData<T: Encodable>(from value: T, forDocument document: DocumentReference) throws {
-        capturedSetDataCodable[document.path] = value
+        
+        if let error = setDataShouldThrow {
+            throw error
+        }
+        capturedSetDataCodable[document.documentID] = value
+        
+        let encoder = JSONEncoder()
+        let jsonData = try encoder.encode(value)
+        if let dict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
+            capturedSetDataDictionary[document.documentID] = dict
+        }
     }
     
     func setData(_ data: [String : Any], forDocument document: DocumentReference) throws {
-        capturedSetDataDictionary[document.path] = data
+        
+        if let error = setDataShouldThrow {
+            throw error
+        }
+        capturedSetDataDictionary[document.documentID] = data
     }
     
     func updateData(_ fields: [AnyHashable : Any], forDocument document: DocumentReference) throws {
-        capturedUpdateData[document.path] = fields
+        
+        if let error = updateDataShouldThrow {
+            throw error
+        }
+        capturedUpdateData[document.documentID] = fields
     }
     
     func deleteDocument(_ documentRef: DocumentReference) throws {
-        capturedDeleteDocument.append(documentRef.path)
+        
+        if let error = deleteDocumentShouldThrow {
+            throw error
+        }
+        capturedDeleteDocument.append(documentRef.documentID)
     }
     
     func collection(_ collectionPath: String) -> CollectionReference {
+        
         return Firestore.firestore().collection(collectionPath)
     }
 }

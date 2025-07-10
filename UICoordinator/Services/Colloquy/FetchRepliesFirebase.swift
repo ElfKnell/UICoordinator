@@ -118,24 +118,29 @@ class FetchRepliesFirebase: FetchRepliesProtocol {
     
     private func addUserAndLocation(replies: [Colloquy], localUsers: [User]) async -> [Colloquy] {
         
-        var addReplies = replies
-        for i in 0 ..< replies.count
-        {
-            let colloquy = replies[i]
-            var colloquyUser = localUsers.first(where: { $0.id == colloquy.ownerUid })
-            if colloquyUser == nil {
-                colloquyUser = await userService.fetchUser(withUid: colloquy.ownerUid)
+        do {
+            var addReplies = replies
+            for i in 0 ..< replies.count
+            {
+                let colloquy = replies[i]
+                var colloquyUser = localUsers.first(where: { $0.id == colloquy.ownerUid })
+                if colloquyUser == nil {
+                    colloquyUser = try await userService.fetchUser(withUid: colloquy.ownerUid)
+                }
+                
+                addReplies[i].user = colloquyUser
+                
+                guard let locationId = colloquy.locationId else { continue }
+                let colloquyLocation = await fetchLocation.fetchLocation(withId: locationId)
+                
+                addReplies[i].location = colloquyLocation
             }
             
-            addReplies[i].user = colloquyUser
-            
-            guard let locationId = colloquy.locationId else { continue }
-            let colloquyLocation = await fetchLocation.fetchLocation(withId: locationId)
-            
-            addReplies[i].location = colloquyLocation
+            return addReplies
+        } catch {
+            print(error.localizedDescription)
+            return []
         }
-        
-        return addReplies
     }
     
     func reload() {

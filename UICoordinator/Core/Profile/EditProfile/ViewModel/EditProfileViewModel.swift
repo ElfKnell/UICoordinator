@@ -35,7 +35,7 @@ class EditProfileViewModel: ObservableObject {
         
         var userData: [String: Any]  = [:]
         errorMessage = nil
-        isError = true
+        isError = false
         
         let trimmedBio = bio.trimmingCharacters(in: .whitespaces)
         let trimmedLink = link.trimmingCharacters(in: .whitespaces)

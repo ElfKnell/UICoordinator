@@ -16,7 +16,7 @@ class UserService: UserServiceProtocol {
         self.firestoreUserDocument = firestoreUserDocument
     }
     
-    func fetchUser(withUid uid: String) async -> User {
+    func fetchUser(withUid uid: String) async throws -> User {
         
         do {
             
@@ -25,7 +25,7 @@ class UserService: UserServiceProtocol {
             
         } catch {
             
-            return DeveloperPreview.user
+            throw UserError.userNotFound
         }
         
     }

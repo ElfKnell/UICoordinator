@@ -12,6 +12,7 @@ import Firebase
 class ActivityViewModel: ObservableObject {
     
     @Published var activities = [Activity]()
+    @Published var errorMessage: String?
     
     private let localUserServise: LocalUserServiceProtocol
     private let userService: UserServiceProtocol
@@ -37,18 +38,22 @@ class ActivityViewModel: ObservableObject {
     func fetchLikeActivity(currentUser: User?) async {
         
         let likes = await fetchingLikes.getLikes(collectionName: .activityLikes, byField: .ownerUidField, userId: currentUser?.id)
-        
+        self.errorMessage = nil
         self.activities = []
         let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         
-        for like in likes {
-            var activity = await fetchingActivity.fetchActivity(documentId: like.colloquyId)
-            var activityUser = users.first(where: { $0.id == activity.ownerUid })
-            if activityUser == nil {
-                activityUser = await userService.fetchUser(withUid: activity.ownerUid)
+        do {
+            for like in likes {
+                var activity = await fetchingActivity.fetchActivity(documentId: like.colloquyId)
+                var activityUser = users.first(where: { $0.id == activity.ownerUid })
+                if activityUser == nil {
+                    activityUser = try await userService.fetchUser(withUid: activity.ownerUid)
+                }
+                activity.user = activityUser
+                self.activities.append(activity)
             }
-            activity.user = activityUser
-            self.activities.append(activity)
+        } catch {
+            self.errorMessage = error.localizedDescription
         }
     }
 }

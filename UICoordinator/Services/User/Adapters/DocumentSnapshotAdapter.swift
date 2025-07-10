@@ -33,5 +33,4 @@ class DocumentSnapshotAdapter: DocumentSnapshotProtocol {
         return try snapshot.data(as: type)
     }
     
-    
 }
