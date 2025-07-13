@@ -29,11 +29,5 @@ class ActivityCreateService: ActivityCreateProtocol {
             print("ERROR CREATE ACTIVITY: \(error.localizedDescription)")
         }
     }
-    
-    
-//    func uploadedActivity(_ activity: Activity) async throws {
-//        guard let activityData = try? Firestore.Encoder().encode(activity) else { return }
-//        try await Firestore.firestore().collection("Activity").addDocument(data: activityData)
-//    }
 
 }

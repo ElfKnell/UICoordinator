@@ -73,6 +73,24 @@ struct RegistrationView: View {
                     }
                     .padding()
                     
+                    Toggle(isOn: $registrationModel.isLicenseAccepted) {
+                        
+                        HStack {
+                            
+                            Link(destination: URL(string: registrationModel.privacyPolicy)!) {
+                                Text("Privacy Policy")
+                            }
+                            
+                            Text("&&")
+                            
+                            Link(destination: URL(string: registrationModel.eula)!) {
+                                Text("EULA")
+                            }
+                        }
+                    }
+                    .frame(width: 300)
+                    .padding()
+                    
                     Button {
                         
                         Task {

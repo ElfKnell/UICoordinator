@@ -17,6 +17,8 @@ class EditProfileViewModel: ObservableObject {
     @Published var isDelete = false
     @Published var isError = false
     @Published var errorMessage: String?
+    @Published var eula = "https://elfknell.github.io/Licenses/eula.html"
+    @Published var privacyPolicy = "https://elfknell.github.io/Licenses/privacy_policy.html"
     
     private var uiImage: UIImage?
     private let userServiseUpdate: UserServiceUpdateProtocol

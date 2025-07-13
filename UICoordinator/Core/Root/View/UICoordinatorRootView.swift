@@ -12,18 +12,35 @@ struct UICoordinatorRootView: View {
     @EnvironmentObject var container: DIContainer
     @State private var isLoading = false
     
+    private var appState: AppFlow {
+        if isLoading {
+            return .loading
+        } else if let user = container.currentUserService.currentUser {
+            if user.isDelete {
+                return .deleteUser
+            } else {
+                return .loggedIn(user)
+            }
+        } else {
+            return .loggedOut
+        }
+    }
+    
     var body: some View {
         
         Group {
-            if isLoading {
+            switch appState {
+            case .loading:
                 LoadingView(width: 300, height: 300)
-            } else if let user = container.currentUserService.currentUser {
+            case .loggedIn(let user):
                 CoordinatorTabView()
                     .task {
                         await container.userFollow.loadFollowersCurrentUser(userId: user.id)
                     }
-            } else {
+            case .loggedOut:
                 LoginView()
+            case .deleteUser:
+                UserRecoveryView()
             }
         }
         .task {

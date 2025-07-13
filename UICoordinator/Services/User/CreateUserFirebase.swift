@@ -24,7 +24,8 @@ class CreateUserFirebase: CreateUserProtocol {
                         fullname: fullname,
                         username: username,
                         email: email,
-                        isDelete: false)
+                        isDelete: false,
+                        isLicenseAccepted: true)
         
         try await firestoreService.createUserWithUniqueUsername(user: user, username: username)
         

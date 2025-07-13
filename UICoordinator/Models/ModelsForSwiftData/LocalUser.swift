@@ -19,8 +19,9 @@ final class LocalUser: @unchecked Sendable {
     var link: String?
     var isDelete: Bool
     var isPrivateProfile: Bool?
+    var isLicenseAccepted: Bool?
     
-    init(id: String, fullname: String, username: String, email: String, profileImageURL: String? = nil, bio: String? = nil, link: String? = nil, isDelete: Bool = false, isPrivateProfile: Bool? = nil) {
+    init(id: String, fullname: String, username: String, email: String, profileImageURL: String? = nil, bio: String? = nil, link: String? = nil, isDelete: Bool = false, isPrivateProfile: Bool? = nil, isLicenseAccepted: Bool? = nil) {
         self.id = id
         self.fullname = fullname
         self.username = username
@@ -30,6 +31,7 @@ final class LocalUser: @unchecked Sendable {
         self.link = link
         self.isDelete = isDelete
         self.isPrivateProfile = isPrivateProfile
+        self.isLicenseAccepted = isLicenseAccepted
     }
     
     var initials: String {

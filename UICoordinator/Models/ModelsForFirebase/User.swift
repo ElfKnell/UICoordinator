@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Firebase
 
 struct User: Identifiable, Codable, Hashable, Equatable {
     
@@ -18,6 +19,8 @@ struct User: Identifiable, Codable, Hashable, Equatable {
     var link: String?
     var isDelete: Bool
     var isPrivateProfile: Bool?
+    var isLicenseAccepted: Bool?
+    var deleteDate: Timestamp?
     
     var initials: String {
         

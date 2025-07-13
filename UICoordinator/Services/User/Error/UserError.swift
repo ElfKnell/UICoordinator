@@ -23,6 +23,7 @@ enum UserError: Error, LocalizedError {
     case usernameTakenDuringRegistration
     case generalError(String)
     case firestoreServiceError(Error)
+    case userNotAcceptedLicense
     
     var description: String {
         switch self {
@@ -54,6 +55,8 @@ enum UserError: Error, LocalizedError {
             return stringError
         case .firestoreServiceError(let error):
             return "Firestore service error: \(error.localizedDescription)"
+        case .userNotAcceptedLicense:
+            return "The user has not accepted the license agreement."
         }
     }
 }

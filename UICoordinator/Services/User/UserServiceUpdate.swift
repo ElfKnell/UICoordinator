@@ -62,7 +62,7 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
             try await firestore
                 .collection("users")
                 .document(userId)
-                .updateData(["isDelete": true])
+                .updateData(["isDelete": true, "deleteDate": Timestamp()])
            
         } catch UserError.userNotFound {
             logger.log("ERROR DELETE USER: \(UserError.userNotFound.description)")

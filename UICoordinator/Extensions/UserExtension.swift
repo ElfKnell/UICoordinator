@@ -18,7 +18,8 @@ extension User {
             bio: bio,
             link: link,
             isDelete: isDelete,
-            isPrivateProfile: isPrivateProfile
+            isPrivateProfile: isPrivateProfile,
+            isLicenseAccepted: isLicenseAccepted
         )
     }
 }
@@ -34,7 +35,9 @@ extension LocalUser {
             bio: bio,
             link: link,
             isDelete: isDelete,
-            isPrivateProfile: isPrivateProfile
+            isPrivateProfile: isPrivateProfile,
+            isLicenseAccepted: isLicenseAccepted,
+            deleteDate: nil
         )
     }
 }

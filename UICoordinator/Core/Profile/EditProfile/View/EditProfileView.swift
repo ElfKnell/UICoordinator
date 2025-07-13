@@ -97,6 +97,24 @@ struct EditProfileView: View {
                     Divider()
                     
                     Toggle("Private profile", isOn: $isPrivateProfile)
+                    
+                    Divider()
+                    
+                    HStack {
+                        
+                        Link(destination: URL(string: viewModel.privacyPolicy)!) {
+                            Text("Privacy Policy")
+                        }
+                        .foregroundStyle(.blue)
+                        
+                        Text("&&")
+                        
+                        Link(destination: URL(string: viewModel.eula)!) {
+                            Text("EULA")
+                        }
+                        .foregroundStyle(.blue)
+                    }
+                    
                 }
                 .font(.footnote)
                 .padding()
@@ -133,8 +151,9 @@ struct EditProfileView: View {
                     }
                 }
             } message: {
-                Text("Are you sure you want to delete your account?")
-                    .foregroundStyle(.red)
+                
+                Text("Are you sure you want to delete your account? You have 3 months to restore your account. After this period, all your data will be permanently deleted and cannot be recovered.")
+
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

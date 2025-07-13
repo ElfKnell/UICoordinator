@@ -16,6 +16,9 @@ class RegistrationViewModel: ObservableObject {
     @Published var cPassword = ""
     @Published var errorCreated: String?
     @Published var isCreateUserError = false
+    @Published var isLicenseAccepted = false
+    @Published var eula = "https://elfknell.github.io/Licenses/eula.html"
+    @Published var privacyPolicy = "https://elfknell.github.io/Licenses/privacy_policy.html"
     
     private let userCreate: AuthCreateServiceProtocol
     
@@ -30,6 +33,10 @@ class RegistrationViewModel: ObservableObject {
         isCreateUserError = false
         
         do {
+            
+            if !isLicenseAccepted {
+                throw UserError.userNotAcceptedLicense
+            }
             try await userCreate.createUser(withEmail: self.email, password: self.password, fullname: self.name, username: self.username)
             
             return true
@@ -43,4 +50,5 @@ class RegistrationViewModel: ObservableObject {
             return false
         }
     }
+    
 }

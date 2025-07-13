@@ -17,5 +17,6 @@ extension RegistrationView: AuthenticationFormProtocol {
         && registrationModel.cPassword == registrationModel.password
         && !registrationModel.name.isEmpty
         && !registrationModel.username.isEmpty
+        && registrationModel.isLicenseAccepted
     }
 }
