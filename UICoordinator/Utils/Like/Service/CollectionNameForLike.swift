@@ -16,7 +16,7 @@ enum CollectionNameForLike {
         case .likes:
             return "Likes"
         case .activityLikes:
-            return "ActivityLikes"
+            return "activity_likes"
         }
     }
 }

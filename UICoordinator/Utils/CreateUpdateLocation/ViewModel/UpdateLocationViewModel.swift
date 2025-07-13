@@ -50,7 +50,7 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
                 }
                 
                 for video in videos {
-                    try await videoService.deleteVideo(videoId: video.id)
+                    try await videoService.deleteVideo(video: video)
                 }
             }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TitleVideoView: View {
-    var vId: String
+    var video: Video
     @State var title: String
     @EnvironmentObject var viewModel: VideoViewModel
     @State private var isLoaded = true
@@ -26,7 +26,7 @@ struct TitleVideoView: View {
                 Button {
                     Task {
                         isLoaded = false
-                        await viewModel.uploadTitle(vId: vId, title: title)
+                        await viewModel.uploadTitle(vId: video.id, title: title)
                         isLoaded = true
                     }
                 } label: {
@@ -37,7 +37,7 @@ struct TitleVideoView: View {
                 
                 Button {
                     Task {
-                        await viewModel.deleteVideo(vId)
+                        await viewModel.deleteVideo(video)
                     }
                 } label: {
                     Image(systemName: "trash.circle.fill")
@@ -54,5 +54,5 @@ struct TitleVideoView: View {
 }
 
 #Preview {
-    TitleVideoView(vId: "", title: "")
+    TitleVideoView(video: DeveloperPreview.video, title: "")
 }

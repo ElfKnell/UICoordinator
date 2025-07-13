@@ -140,15 +140,7 @@ struct ActivityCell: View {
                         if viewModel.isCurrentUser(activity.ownerUid, currentUser: container.currentUserService.currentUser) {
                             
                             Button {
-                                Task {
-                                    isDelete = true
-                                    
-                                    await viewModel.markForDelete(activity)
-                                    
-                                    isDelete = false
-                                    
-                                    isUpdate.toggle()
-                                }
+                                viewModel.isRemove = true
                             } label: {
                                 Image(systemName: "trash.fill")
                                     .foregroundStyle(.red)
@@ -157,6 +149,28 @@ struct ActivityCell: View {
                     }
                 }
             }
+            .alert("Delete activity?", isPresented: $viewModel.isRemove) {
+                
+                Button("Cancel", role: .cancel) {
+                    viewModel.isRemove = false
+                }
+                
+                Button("Delete") {
+                    Task {
+                        isDelete = true
+                        
+                        await viewModel.deleteActivity(activity: activity)
+                        
+                        isDelete = false
+                        viewModel.isRemove = false
+                        isUpdate.toggle()
+                        
+                    }
+                }
+            } message: {
+                Text("Once this activity is deleted, it cannot be restored. Are you sure you want to continue?")
+            }
+
             
             Divider()
             

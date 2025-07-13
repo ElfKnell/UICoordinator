@@ -14,6 +14,7 @@ class ActivityCellViewModel: ObservableObject {
     @Published var showReplies = false
     @Published var isStread = false
     @Published var isLandscape: Bool = UIDevice.current.orientation.isLandscape
+    @Published var isRemove = false
     
     private var spreadActivity: SpreadingActivityProtocol
     private var activityUpdate: ActivityUpdateProtocol

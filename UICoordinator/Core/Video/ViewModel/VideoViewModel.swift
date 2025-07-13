@@ -89,12 +89,12 @@ class VideoViewModel: ObservableObject {
     }
     
     @MainActor
-    func deleteVideo(_ videoId: String) async {
+    func deleteVideo(_ video: Video) async {
         
         self.activeError = nil
         
         do {
-            try await videoService.deleteVideo(videoId: videoId)
+            try await videoService.deleteVideo(video: video)
             await fetchVideoByLocation()
         } catch {
             self.activeError = "ERROR DELETE VIDEO: \(error.localizedDescription)"

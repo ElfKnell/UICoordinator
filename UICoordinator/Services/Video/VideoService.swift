@@ -63,14 +63,7 @@ class VideoService: VideoServiceProtocol {
             .updateData(["title": title])
     }
     
-    func deleteVideo(videoId: String) async throws {
-        
-        let snapshot = try await Firestore.firestore()
-            .collection("Video")
-            .document(videoId)
-            .getDocument()
-        
-        let video = try snapshot.data(as: Video.self)
+    func deleteVideo(video: Video) async throws {
         
         let storageRef = Storage.storage().reference(forURL: video.videoURL)
         

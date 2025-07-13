@@ -22,7 +22,14 @@ struct ActivityCellFactory {
                 servaceDelete: FirestoreGeneralDeleteService(
                     db: FirestoreAdapter()),
                 locationDelete: DeleteLocation(),
-                likesDelete: LikesDeleteService(likeServise: LikeService(serviceCreate: FirestoreLikeCreateServise(), serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter())))))
+                likesDelete: LikesDeleteService(
+                    likeServise: LikeService(
+                        serviceCreate: FirestoreLikeCreateServise(),
+                        serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter()))),
+                spreadDelete: DeleteSpreadService(
+                    serviceDelete: FirestoreGeneralDeleteService(db: FirestoreAdapter())),
+                photoService: PhotoService(),
+                videoService: VideoService()))
         
         let viewModelLike = LikesViewModel(
             collectionName: .activityLikes,

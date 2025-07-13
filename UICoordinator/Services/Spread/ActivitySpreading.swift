@@ -10,7 +10,7 @@ import Foundation
 
 class ActivitySpreading: SpreadingActivityProtocol {
     
-    private let nameCollection = "Spread"
+    private let nameCollection = "spread"
     private var lastDocument: DocumentSnapshot?
     private var isDataLoaded = false
     private var userServise: UserServiceProtocol
@@ -47,7 +47,7 @@ class ActivitySpreading: SpreadingActivityProtocol {
             
             var query = Firestore
                 .firestore()
-                .collection("Spread")
+                .collection(nameCollection)
                 .whereField("ownerUid", in: usersId)
                 .whereField(byField, isNotEqualTo: "")
                 .limit(to: pageSize)
@@ -94,4 +94,5 @@ class ActivitySpreading: SpreadingActivityProtocol {
         self.lastDocument = nil
         self.isDataLoaded = false
     }
+
 }

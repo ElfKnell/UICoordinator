@@ -28,7 +28,7 @@ struct VideoView: View {
                                 VideoPlayer(player: AVPlayer(url: URL(string: video.videoURL)!))
                                     .frame(height: 250)
                                     
-                                TitleVideoView(vId: video.id, title: video.title ?? "")
+                                TitleVideoView(video: video, title: video.title ?? "")
                                     .environmentObject(viewModel)
                             }
                         }
