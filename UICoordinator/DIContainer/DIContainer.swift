@@ -15,7 +15,7 @@ final class DIContainer: ObservableObject {
     var currentUserService: CurrentUserServiceProtocol
     
     let userFollow: UserFollowersProtocol
-    var networkMonitor: ReachabilityProtocol
+    var networkMonitor: AppConnectivityManager
     
     init() {
         
@@ -36,7 +36,7 @@ final class DIContainer: ObservableObject {
         self.userFollow = UserFollowers(fetchingService: fetchingService,
                                         checkedFollowing: checkedFollowing)
         
-        self.networkMonitor = NetworkMonitor()
+        self.networkMonitor = AppConnectivityManager(networkMonitor: NetworkMonitor())
     }
 }
 

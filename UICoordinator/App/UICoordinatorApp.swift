@@ -31,6 +31,12 @@ struct UICoordinatorApp: App {
         WindowGroup {
             UICoordinatorRootView()
                 .environmentObject(container)
+                .onAppear {
+                    container.networkMonitor.startMonitoringForOffline()
+                }
+                .onDisappear {
+                    container.networkMonitor.stopMonitoringForOffline()
+                }
         }
     }
 }

@@ -36,17 +36,14 @@ struct SideSelectionTabBarView: View {
                         }
                         .tag(1)
                     
-                    Text("Notifications")
+                    Settings()
                         .tag(2)
                     
-                    Settings()
+                    Text("Help")
                         .tag(3)
                     
-                    Text("Help")
-                        .tag(4)
-                    
                     AboutView()
-                        .tag(5)
+                        .tag(4)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 

@@ -46,7 +46,7 @@ struct PhotoVideoLocationView: View {
                 } else {
                     
                     NavigationLink {
-                        PhotosWithChangingView(locationId: location.id)
+                        LocationPhotosView(activity: location)
                             .environmentObject(viewModelPhoto)
                         
                     } label: {

@@ -33,5 +33,5 @@ struct SideMenuRowView: View {
 }
 
 #Preview {
-    SideMenuRowView(selected: .constant(.notifications), option: .notifications)
+    SideMenuRowView(selected: .constant(.about), option: .about)
 }

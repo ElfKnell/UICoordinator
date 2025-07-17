@@ -6,10 +6,14 @@
 //
 
 import Foundation
+import Observation
 
-class AboutViewModel: ObservableObject {
+@Observable
+class AboutViewModel {
     
-    @Published var info_1 = "Introducing our innovative action application! With our platform, you can effortlessly place customizable beacons on interactive maps, marking your favorite spots or important locations with ease. Not only can you tag these beacons with personalized information, but you can also enrich them with vivid photos and captivating videos, adding depth and context to your mapped points of interest."
+    var info_1 = "Effortlessly place customizable beacons on maps to mark your favorite spots or important locations. Tag them with notes, vivid photos, or even captivating videos for rich context."
     
-    @Published var info_2 = "But that's not all! Our app takes social interaction to the next level by allowing you to share your locations in real-time chat, where fellow users can engage with your posts by commenting and liking. Whether you're exploring new destinations, organizing events, or simply sharing memorable experiences, our action application provides the perfect blend of mapping, multimedia, and social connectivity for your every need."
+    var info_2 = "Share locations instantly in a built-in chat, where users can engage by commenting and liking your posts. It’s perfect for group trips, event planning, or simply connecting over great places."
+    
+    var info_3 = "Combine mapping, multimedia, and social interaction—designed to enhance how you explore, document, and share the world around you."
 }

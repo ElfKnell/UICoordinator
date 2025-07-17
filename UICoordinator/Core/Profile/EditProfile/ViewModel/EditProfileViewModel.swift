@@ -55,7 +55,7 @@ class EditProfileViewModel: ObservableObject {
             userData["link"] = trimmedLink
         }
         
-        if trimmedUsername != user.username && !trimmedUsername.isEmpty {
+        if trimmedUsername != user.username && isValidUsername(trimmedUsername) {
             userData["username"] = trimmedUsername
         }
         
@@ -63,6 +63,9 @@ class EditProfileViewModel: ObservableObject {
             try await userServiseUpdate.updateUserProfile(user: user,
                                                       image: uiImage,
                                                       dataUser: userData)
+        } catch let error as UserError {
+            errorMessage = error.description
+            isError = true
         } catch {
             errorMessage = error.localizedDescription
             isError = true
@@ -81,6 +84,11 @@ class EditProfileViewModel: ObservableObject {
         guard let uiImage = UIImage(data: data) else { return }
         self.uiImage = uiImage
         self.profileImage = Image(uiImage: uiImage)
+    }
+    
+    private func isValidUsername(_ username: String) -> Bool {
+        let usernameRegex = #"^[A-Za-z0-9_-]+$"#
+        return NSPredicate(format: "SELF MATCHES %@", usernameRegex).evaluate(with: username)
     }
     
 }

@@ -64,9 +64,10 @@ class LocationViewModel: ObservableObject {
     func fetchMoreLocationsByCurentUser(userId: String?) {
         
         Task {
-            
-            self.locations.append(contentsOf: await fetchLocations.fetchLocations(userId))
-            
+            let fetchingLocation = await fetchLocations.fetchLocations(userId)
+            if !fetchingLocation.isEmpty {
+                self.locations.append(contentsOf: fetchingLocation)
+            }
         }
     }
     

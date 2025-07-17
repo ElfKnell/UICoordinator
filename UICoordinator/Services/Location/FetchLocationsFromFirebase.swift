@@ -10,7 +10,7 @@ import FirebaseFirestoreSwift
 
 class FetchLocationsFromFirebase: FetchLocationsProtocol {
     
-    private var isDataLoaded = false
+    var isDataLoaded = false
     private var lastDocument: DocumentSnapshot?
     
     func getLocations(userId: String, pageSize: Int) async -> [Location] {

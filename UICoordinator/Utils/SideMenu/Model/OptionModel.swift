@@ -10,7 +10,6 @@ import Foundation
 enum OptionModel: Int, CaseIterable, Identifiable {
     case mapLocations
     case profile
-    case notifications
     case settings
     case help
     case about
@@ -20,8 +19,6 @@ enum OptionModel: Int, CaseIterable, Identifiable {
         switch self {
         case .profile:
             "Profile"
-        case .notifications:
-            "Notifications"
         case .settings:
             "Settings"
         case .help:
@@ -37,8 +34,6 @@ enum OptionModel: Int, CaseIterable, Identifiable {
         switch self {
         case .profile:
             "person.crop.circle.badge.checkmark"
-        case .notifications:
-            "bell"
         case .settings:
             "gearshape"
         case .help:

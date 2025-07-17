@@ -5,25 +5,75 @@
 //  Created by Andrii Kyrychenko on 14/05/2025.
 //
 
-import Observation
 import Network
 import Foundation
 
-@Observable
 class NetworkMonitor: ReachabilityProtocol {
     
-    var isConnected = false
     private let monitor: NWPathMonitor
     private let queue: DispatchQueue
+    
+    private var networkStatusContinuation: AsyncStream<Bool>.Continuation?
+    private var wentOfflineContinuation: AsyncStream<Void>.Continuation?
+    
+    private var _currentStatus: Bool = false
+    var isConnected: Bool {
+        return _currentStatus
+    }
+    
+    lazy var networkStatusUpdates: AsyncStream<Bool> = {
+        return AsyncStream { continuation in
+            self.networkStatusContinuation = continuation
+            self.setupMonitor()
+        }
+    }()
+    
+    lazy var wentOfflineUpdates: AsyncStream<Void> = {
+        AsyncStream { continuation in
+            self.wentOfflineContinuation = continuation
+            self.setupMonitor()
+        }
+    }()
     
     init() {
         
         monitor = NWPathMonitor()
-        queue = DispatchQueue.global(qos: .background)
+        queue = DispatchQueue(label: "com.trailcraft.NetworkMonitorQueue.AsyncAwait", qos: .background)
+        
+    }
+    
+    private func setupMonitor() {
+        
+        guard monitor.pathUpdateHandler == nil else { return }
+        
         monitor.pathUpdateHandler = { [weak self] path in
-            self?.isConnected = path.status == .satisfied
+            guard let self = self else { return }
+            
+            let newStatus = path.status == .satisfied
+            
+            DispatchQueue.main.async {
+                self._currentStatus = newStatus
+                self.networkStatusContinuation?.yield(newStatus)
+                if !newStatus {
+                    self.wentOfflineContinuation?.yield(())
+                }
+            }
         }
         monitor.start(queue: self.queue)
+        
+        self.networkStatusContinuation?.onTermination = { [weak self] _ in
+            self?.handleStreamTermination()
+        }
+        self.wentOfflineContinuation?.onTermination = { [weak self] _ in
+            self?.handleStreamTermination()
+        }
     }
 
+    func handleStreamTermination() {
+        self.monitor.cancel()
+    }
+    
+    deinit {
+        monitor.cancel()
+    }
 }

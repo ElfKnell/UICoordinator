@@ -48,7 +48,7 @@ struct UICoordinatorRootView: View {
             await container.authService.checkUserSession()
             isLoading = false
         }
-        .alert("No Internet Connection", isPresented: $container.networkMonitor.isConnected) {
+        .alert("No Internet Connection", isPresented: $container.networkMonitor.isDisconected) {
             Button("OK", role: .cancel) {}
         } message: {
             HStack {

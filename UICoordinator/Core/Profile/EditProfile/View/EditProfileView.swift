@@ -15,6 +15,7 @@ struct EditProfileView: View {
     @State private var nickname = ""
     @State private var bio = ""
     @State private var link = ""
+    @State private var newPassword = ""
     @State private var isPrivateProfile = false
     @EnvironmentObject var container: DIContainer
     @Environment(\.dismiss) var dismiss

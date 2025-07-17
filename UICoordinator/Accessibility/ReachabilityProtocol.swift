@@ -9,6 +9,8 @@ import Foundation
 
 protocol ReachabilityProtocol {
     
-    var isConnected: Bool { get set }
+    var isConnected: Bool { get }
+    var networkStatusUpdates: AsyncStream<Bool> { get }
+    var wentOfflineUpdates: AsyncStream<Void> { get }
     
 }
