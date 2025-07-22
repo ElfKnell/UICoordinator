@@ -1,5 +1,50 @@
-Introducing the second version of our map management application! Our latest release offers an array of exciting new features and enhancements to elevate your mapping experience.
+# 🧭 Trailcraft – Smart Map Explorer (iOS)
 
-With our updated application, you can now navigate and interact with maps more seamlessly than ever before. Effortlessly place markers and annotations on the map, customize them with rich multimedia content, and share your creations with ease.
+**Trailcraft** is a modern iOS app built using **SwiftUI** and **Swift Concurrency** that 
+turns maps into collaborative spaces. Add rich media markers, 
+explore nearby places from Wikipedia, and communicate through integrated chat.
 
-Whether you're planning your next adventure, organizing events, or conducting research, our second version of the map management application is designed to meet your needs. Discover the possibilities and unlock new ways to explore the world around you with our latest release!
+[📄 Privacy Policy](https://github.com/ElfKnell/Licenses/blob/main/privacy_policy.html)
+
+---
+
+## 🚀 Features
+
+- 🗺️ Add markers to any location on the map  
+- 🖼 Attach **photos**, **videos**, and **descriptions** to markers using `PhotosUI` and `AVKit`
+- 🌍 Auto-fetch **nearby landmarks** using **Wikipedia API**
+- 💬 Add **messages** and **comments** to each marker via a shared chat
+- 🧩 Create and share **map sections** (e.g. trip segments or events)
+- 🔗 Share maps publicly and allow comments from others
+- 🔄 Offline persistence with **SwiftData**
+- ☁️ Firebase integration: **Firestore**, **Firebase Storage**
+
+---
+
+## 🧑‍💻 Tech Stack
+
+| Technology         | Usage                         |
+|--------------------|-------------------------------|
+| `SwiftUI`          | Declarative UI                |
+| `MapKit`           | Map rendering, annotations    |
+| `SwiftData`        | Local persistence             |
+| `Swift Concurrency`| Async APIs and network calls  |
+| `PhotosUI`         | Media picker for photo/video  |
+| `AVKit`            | Video playback                |
+| `Kingfisher`       | Image loading from URLs       |
+| `Firebase`         | Firestore DB + Media Storage  |
+| `URLSession`       | Wikipedia API integration     |
+| `MVVM + DI`        | Clean architecture            |
+
+---
+
+## 📦 Installation
+
+git clone https://github.com/ElfKnell/UICoordinator.git
+cd UICoordinator
+open Trailcraft.xcodeproj
+
+✅ Requires Xcode 15+
+✅ Supports iOS 17+
+
+📲 Enable Firebase via your own GoogleService-Info.plist
