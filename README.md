@@ -4,7 +4,7 @@
 turns maps into collaborative spaces. Add rich media markers, 
 explore nearby places from Wikipedia, and communicate through integrated chat.
 
-[📄 Privacy Policy](https://github.com/ElfKnell/Licenses/blob/main/privacy_policy.html)
+[📄 Privacy Policy](https://elfknell.github.io/Licenses/privacy_policy.html)
 
 ---
 
