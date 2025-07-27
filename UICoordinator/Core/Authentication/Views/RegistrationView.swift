@@ -39,15 +39,47 @@ struct RegistrationView: View {
                     
                     LogoView()
                     
-                    InputView(text: $registrationModel.email, title: "Email", placeholder: "name@example.com")
-                        .textInputAutocapitalization(.never)
-                    
-                    InputView(text: $registrationModel.name, title: "Full name", placeholder: "Name")
-                    
-                    InputView(text: $registrationModel.username, title: "Username", placeholder: "Username")
-                        .textInputAutocapitalization(.never)
-                    
-                    InputView(text: $registrationModel.password, title: "Password", placeholder: "password", isSecureField: true)
+                    ZStack(alignment: .leading) {
+                            
+                        VStack {
+                            
+                            InputView(text: $registrationModel.email, title: "Email", placeholder: "name@example.com")
+                                .textInputAutocapitalization(.never)
+                            
+                            InputView(text: $registrationModel.name, title: "Full name", placeholder: "Name")
+                            
+                            InputView(text: $registrationModel.username, title: "Username", placeholder: "Username")
+                                .textInputAutocapitalization(.never)
+                            
+                            InputView(text: $registrationModel.password, title: "Password", placeholder: "password", isSecureField: true)
+                            
+                        }
+                        
+                        if !registrationModel.password.isEmpty {
+                            
+                            VStack(alignment: .leading) {
+                                
+                                PasswordRuleView(text: "Minimum 8 characters", isValide: registrationModel.password.count > 7)
+                                
+                                PasswordRuleView(text: "At least one uppercase letter", isValide: registrationModel.password.range(of: "[A-Z]", options: .regularExpression) != nil)
+                                
+                                PasswordRuleView(text: "At least one lowercase letter", isValide: registrationModel.password.range(of: "[a-z]", options: .regularExpression) != nil)
+                                
+                                PasswordRuleView(text: "At least one number", isValide: registrationModel.password.range(of: "[0-9]", options: .regularExpression) != nil)
+                                
+                                PasswordRuleView(text: "(!@$&*^%#)", isValide: registrationModel.password.range(of: "[!@#$%^&*]", options: .regularExpression) != nil)
+  
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(radius: 10)
+                            .transition(.scale)
+                            
+                        }
+                    }
+                    .animation(.easeInOut,
+                               value: registrationModel.password.isEmpty)
                     
                     ZStack(alignment: .trailing) {
                         

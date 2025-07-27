@@ -17,6 +17,7 @@ class RegistrationViewModel: ObservableObject {
     @Published var errorCreated: String?
     @Published var isCreateUserError = false
     @Published var isLicenseAccepted = false
+    @Published var isPasswordCorect = false
     @Published var eula = "https://elfknell.github.io/Licenses/eula.html"
     @Published var privacyPolicy = "https://elfknell.github.io/Licenses/privacy_policy.html"
     
