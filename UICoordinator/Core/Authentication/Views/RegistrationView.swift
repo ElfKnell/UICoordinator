@@ -113,7 +113,7 @@ struct RegistrationView: View {
                                 Text("Privacy Policy")
                             }
                             
-                            Text("&&")
+                            Text("&")
                             
                             Link(destination: URL(string: registrationModel.eula)!) {
                                 Text("EULA")
@@ -156,8 +156,10 @@ struct RegistrationView: View {
                         } label: {
                             Text("Sign in")
                                 .bold()
+                                .underline()
                                 .font(.system(size: 23, design: .serif))
                                 .foregroundStyle(.black)
+                                .shadow(radius: 5, x: 0, y: 2)
                         }
                     }
                     .padding(.bottom)

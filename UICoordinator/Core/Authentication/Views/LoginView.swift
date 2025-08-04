@@ -72,15 +72,12 @@ struct LoginView: View {
                     } label: {
                         
                         ButtonLabelView(title: "Login", widthButton: 170)
+                            .padding(.bottom)
                 
                     }
                     .disabled(!formIsValid)
                     .opacity(formIsValid ? 1.0 : 0.5)
                     
-                    Spacer()
-                    if sizeClass != .compact {
-                        Spacer()
-                    }
                     
                     HStack {
                         
@@ -91,12 +88,15 @@ struct LoginView: View {
                             RegistrationView(isNewUser: $loginModel.isCreatedUser)
                                 .navigationBarBackButtonHidden(true)
                         } label: {
-                            Text("Sing up")
+                            Text("Sign up")
                                 .bold()
+                                .underline()
                                 .font(.system(size: 23, design: .serif))
                                 .foregroundStyle(.black)
+                                .shadow(radius: 5, x: 0, y: 2)
                         }
                     }
+                    .padding(.top)
                     
                     Spacer()
                   
