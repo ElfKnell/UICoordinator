@@ -18,7 +18,7 @@ protocol ActivityUpdateProtocol {
     
     func updateActivityLocations(locationsId: [String], id: String) async
     
-    func updateActivityCoordinate(region: MKCoordinateRegion, id: String) async
+    func updateActivityCoordinate(region: MKCoordinateRegion, id: String) async throws
     
     func updateActivity(_ activity: Activity) async
 }

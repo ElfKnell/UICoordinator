@@ -30,6 +30,7 @@ struct ActivityView: View {
                 ActivityCreate(nameActivyty: name)
             })
             .toolbar {
+                
                 Button {
                     isCreate.toggle()
                 } label: {

@@ -102,7 +102,7 @@ struct EditActivity: View {
             .padding()
         }
         .padding()
-        .background(Color.white .opacity(0.7))
+        .background(Color.white .opacity(0.9))
     }
 }
 

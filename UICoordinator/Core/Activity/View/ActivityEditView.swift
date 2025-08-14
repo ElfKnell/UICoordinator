@@ -61,11 +61,32 @@ struct ActivityEditView: View {
             .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
                 cameraPosition = .region(mapCameraUpdateContext.region)
             }
-            .onTapGesture(count: viewModel.isMark ? 1 : 2) { position in
+            .onTapGesture(count: 1) { position in
                 
+                if viewModel.sheetConfig != .confirmationLocation {
+                    if let coordinate = proxy.convert(position, from: .local) {
+                        viewModel.coordinate = coordinate
+                        viewModel.sheetConfig = .confirmationLocation
+                    }
+                } else {
+                    viewModel.sheetConfig = nil
+                }
+            }
+            .onTapGesture(count: 2) { position in
                 if let coordinate = proxy.convert(position, from: .local) {
-                    viewModel.coordinate = coordinate
-                    viewModel.sheetConfig = .confirmationLocation
+                    guard let region = cameraPosition.region else { return }
+                    let latitude = region.span.latitudeDelta * 0.7
+                    let longitude = region.span.longitudeDelta * 0.7
+                    
+                    let newRegion = MKCoordinateRegion(
+                        center: coordinate,
+                        span: MKCoordinateSpan(
+                            latitudeDelta: latitude,
+                            longitudeDelta: longitude))
+                    
+                    withAnimation {
+                        cameraPosition = .region(newRegion)
+                    }
                 }
             }
             .task {
@@ -93,13 +114,13 @@ struct ActivityEditView: View {
                 switch config {
                     
                 case .confirmationLocation:
-                    ConfirmationLocationView(coordinate: viewModel.coordinate, activityId: activity.id, isSave: $viewModel.isSave)
+                    ConfirmationLocationView(activityId: activity.id, coordinate: viewModel.coordinate, isSave: $viewModel.isSave, annotation: $viewModel.customAnnotation)
                         .presentationDetents([.height(340), .medium])
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
 
                 case .locationsDetail:
                     LocationsDetailView(activity: activity, mapSeliction: $viewModel.selectedPlace, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
-                        .presentationDetents([.height(340)])
+                        .presentationDetents([.medium, .large])
                         .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
                         .presentationCornerRadius(12)
                 
@@ -113,25 +134,18 @@ struct ActivityEditView: View {
                 
                 HStack {
                     
-                    VStack(alignment: .leading) {
+                    HStack {
                         
-                        HStack {
+                        ButtonBoolView(isCheck: $viewModel.isSettings, imageName: "gear")
+                        
+                        NavigationLink {
                             
-                            ButtonBoolView(isCheck: $viewModel.isSettings, imageName: "gear")
+                            InfoView(activity: activity)
                             
-                            NavigationLink {
-                                
-                                InfoView(activity: activity)
-                                
-                            } label: {
-                                Image(systemName: "camera.fill")
-                                    .imageScale(.large)
-                            }
-                            .padding(7)
-                            
+                        } label: {
+                            Image(systemName: "camera.fill")
+                                .imageScale(.large)
                         }
-                        
-                        ButtonBoolView(isCheck: $viewModel.isMark, imageName: "cursorarrow.click.2")
                         
                     }
                     
@@ -169,7 +183,7 @@ struct ActivityEditView: View {
                             
                         }
                         
-                        SearchLocationView(searchLocations: $viewModel.searchLocations, cameraPosition: cameraPosition)
+                        SearchLocationView(searchLocations: $viewModel.searchLocations, cameraPosition: $cameraPosition)
                     }
                     
                 } else if viewModel.isSettings {

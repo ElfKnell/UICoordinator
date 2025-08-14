@@ -38,3 +38,32 @@ struct Location: Identifiable, Codable, Hashable, MapSelectionProtocol {
         MKCoordinateRegion(center: coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
     }
 }
+
+extension Location {
+    
+    init(
+        ownerUid: String = "",
+        name: String,
+        description: String = "",
+        address: String? = nil,
+        timestamp: Timestamp = Timestamp(),
+        timeUpdate: Timestamp? = nil,
+        latitude: Double,
+        longitude: Double,
+        isSearch: Bool? = nil,
+        activityId: String = ""
+    ) {
+        self.locationId = nil
+        self.ownerUid = ownerUid
+        self.name = name
+        self.description = description
+        self.address = address
+        self.timestamp = timestamp
+        self.timeUpdate = timeUpdate
+        self.latitude = latitude
+        self.longitude = longitude
+        self.isSearch = isSearch
+        self.activityId = activityId
+        self.user = nil
+    }
+}

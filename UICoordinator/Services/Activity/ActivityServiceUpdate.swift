@@ -33,20 +33,15 @@ class ActivityServiceUpdate: ActivityUpdateProtocol {
         }
     }
     
-    func updateActivityCoordinate(region: MKCoordinateRegion, id: String) async {
+    func updateActivityCoordinate(region: MKCoordinateRegion, id: String) async throws {
         
-        do {
-            try await Firestore.firestore()
-                .collection(collectionName)
-                .document(id)
-                .updateData(["latitude": region.center.latitude,
-                             "longitude": region.center.longitude,
-                             "latitudeDelta": region.span.latitudeDelta,
-                             "longitudeDelta": region.span.longitudeDelta])
-
-        } catch {
-            print(error.localizedDescription)
-        }
+        try await Firestore.firestore()
+            .collection(collectionName)
+            .document(id)
+            .updateData(["latitude": region.center.latitude,
+                         "longitude": region.center.longitude,
+                         "latitudeDelta": region.span.latitudeDelta,
+                         "longitudeDelta": region.span.longitudeDelta])
     }
     
     func updateActivityLocations(locationsId: [String], id: String) async {

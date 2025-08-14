@@ -23,6 +23,8 @@ class ActivityEditViewModel: ObservableObject {
     @Published var coordinate: CLLocationCoordinate2D = .startLocation
     @Published var sheetConfig: MapSheetConfig?
     
+    @Published var customAnnotation: MKPointAnnotation?
+    
     @Published var getDirections = false
     
     @Published var routes: [MKRoute] = []
@@ -53,7 +55,7 @@ class ActivityEditViewModel: ObservableObject {
         
         guard let region = region else { return }
 
-        await activityUpdate.updateActivityCoordinate(region: region, id: activityId)
+        try await activityUpdate.updateActivityCoordinate(region: region, id: activityId)
     }
     
     func saveLocations(activityId: String) async throws {

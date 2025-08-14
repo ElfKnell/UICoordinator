@@ -10,13 +10,13 @@ import Firebase
 
 class UpdateLocationViewModel: LocationService, ObservableObject {
     
-    @Published var name = ""
-    @Published var description = ""
-    @Published var address = ""
-    
     private let deleteLocation: DeleteLocationProtocol
     private let photoService: PhotoServiceProtocol
     private let videoService: VideoServiceProtocol
+    
+    @Published var name = ""
+    @Published var description = ""
+    @Published var address = ""
     
     init(deleteLocation: DeleteLocationProtocol,
          photoService: PhotoServiceProtocol,
@@ -61,11 +61,13 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
         }
     }
     
-    func saveLocation(_ location: Location?, activityId: String?) async throws {
+    func saveLocation(_ location: Location?, activityId: String?, user: User?) async throws {
+        
+        guard let userId = user?.id else { return }
         
         if location?.locationId == nil {
             
-            try await createLocation(location: location, activityId: activityId)
+            try await createLocation(userId: userId, location: location, activityId: activityId)
             
         } else {
             
@@ -83,7 +85,7 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
         await updateNameAndDescriptionLocation(name: self.name, description: self.description, locationId: locationId)
     }
     
-    private func createLocation(location: Location?, activityId: String?) async throws {
+    private func createLocation(userId: String, location: Location?, activityId: String?) async throws {
         guard let location = location else { return }
         let newLocation = Location(ownerUid: location.ownerUid, name: name, description: description, address: address, timestamp: Timestamp(), latitude: location.latitude, longitude: location.longitude, activityId: activityId ?? "")
         await uploadLocation(newLocation)

@@ -24,6 +24,8 @@ class LocationViewModel: ObservableObject {
     @Published var getDirections = false
     @Published var sheetConfig: MapSheetConfig? = nil
     
+    @Published var customAnnotation: MKPointAnnotation?
+    
     @Published var isSave = false
     @Published var showSearch = false
     @Published var routerColor: Color = .blue
@@ -120,6 +122,7 @@ class LocationViewModel: ObservableObject {
         
     }
     
+    @MainActor
     func fetchRoute() {
         
         Task {

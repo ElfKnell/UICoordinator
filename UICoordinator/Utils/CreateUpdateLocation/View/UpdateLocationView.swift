@@ -11,11 +11,14 @@ import MapKit
 struct UpdateLocationView: View {
     
     var activityId: String?
+    
     @Binding var location: Location?
     @Binding var isSave: Bool
     
-    @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: UpdateLocationViewModel
+    
+    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var container: DIContainer
     
     init(
         activityId: String? = nil,
@@ -50,7 +53,8 @@ struct UpdateLocationView: View {
                     Divider()
                     
                     if let coordinate = location?.coordinate {
-                        CoordinateInfoView(coordinate: coordinate)
+                        CoordinateInfoView(coordinate: coordinate,
+                                           annotation: nil)
                     }
                     
                 }
@@ -100,7 +104,11 @@ struct UpdateLocationView: View {
                     Button {
                         Task {
                             
-                            try await viewModel.saveLocation(location, activityId: activityId)
+                            try await viewModel.saveLocation(
+                                location,
+                                activityId: activityId,
+                                user: container.currentUserService.currentUser)
+                            
                             location = nil
                             isSave.toggle()
                             dismiss()

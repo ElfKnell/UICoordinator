@@ -38,18 +38,21 @@ struct LocationsDetailView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 4) {
                    
                     Text(mapSeliction?.name ?? "")
                         .font(.title2)
                         .fontWeight(.semibold)
+                        .lineLimit(2)
                     
-                    Text((mapSeliction?.address ?? mapSeliction?.description) ?? "")
-                        .font(.footnote)
-                        .fontWeight(.semibold)
-                        .padding(.leading)
+                    if let address = mapSeliction?.address {
+                        Text(address)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
                    
                 }
                 
@@ -65,15 +68,35 @@ struct LocationsDetailView: View {
                         .foregroundStyle(.gray, Color(.systemGray6))
                 }
             }
+            .padding(.horizontal)
             
-            if let scene = lookAroundScene {
-                LookAroundPreview(initialScene: scene)
-                    .frame(height: 200)
-                    .cornerRadius(12)
-                    .padding()
-            } else {
-                ContentUnavailableView("No preview availible", systemImage: "eye.slash")
+            if let description = mapSeliction?.description {
+                Text(description)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
             }
+            
+            Group {
+                if let scene = lookAroundScene {
+                    LookAroundPreview(initialScene: scene)
+                        .frame(height: 200)
+                        .cornerRadius(12)
+                        .padding()
+                } else {
+                    ContentUnavailableView("No preview availible", systemImage: "eye.slash")
+                        .padding(.horizontal)
+                }
+            }
+            
+            Text("\(mapSeliction?.latitude ?? 0.0)° N; \(mapSeliction?.longitude ?? 0.0)° E")
+                .font(.title3)
+                .fontWeight(.bold)
+                .multilineTextAlignment(.center)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
             
             HStack(spacing: 24) {
                 Button {
@@ -82,8 +105,9 @@ struct LocationsDetailView: View {
                     Text("Open in map")
                         .font(.headline)
                         .foregroundStyle(.white)
-                        .frame(width: 110, height: 48)
-                        .background(.green)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(.blue)
                         .cornerRadius(12)
                 }
                 
@@ -95,8 +119,9 @@ struct LocationsDetailView: View {
                         Text(mapSeliction?.isSearch == true ? "Save" : "Update")
                             .font(.headline)
                             .foregroundStyle(.white)
-                            .frame(width: 110, height: 48)
-                            .background(.yellow)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                            .background(.orange)
                             .cornerRadius(12)
                     }
                 }
@@ -109,12 +134,14 @@ struct LocationsDetailView: View {
                         Text("Get directions")
                             .font(.headline)
                             .foregroundStyle(.white)
-                            .frame(width: 110, height: 48)
-                            .background(.blue)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                            .background(.green)
                             .cornerRadius(12)
                     }
                 }
             }
+            .padding(.horizontal)
         }
         .onAppear {
             fetchLookAroundPreview()
@@ -126,7 +153,7 @@ struct LocationsDetailView: View {
 }
 
 #Preview {
-    LocationsDetailView(mapSeliction: .constant(DeveloperPreview.location), getDirections: .constant(false), isUpdate: .constant(.locationsDetail))
+    LocationsDetailView(mapSeliction: .constant(nil), getDirections: .constant(false), isUpdate: .constant(.locationsDetail))
 }
 
 extension LocationsDetailView {

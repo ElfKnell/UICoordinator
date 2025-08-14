@@ -36,5 +36,16 @@ enum UserMapStyle: Int, Codable, CaseIterable, Identifiable {
         }
     }
     
+    var mkMapType: MKMapType {
+        switch self {
+        case .standard:
+            return .standard
+        case .hybrid:
+            return .hybrid
+        case .imagery:
+            return .satellite
+        }
+    }
+    
     var id: Int { return self.rawValue }
 }

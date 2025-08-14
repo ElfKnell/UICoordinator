@@ -10,7 +10,8 @@ import MapKit
 
 struct CoordinateInfoView: View {
     
-    let coordinate: CLLocationCoordinate2D
+    let coordinate: CLLocationCoordinate2D?
+    let annotation: MKPointAnnotation?
     
     var body: some View {
         
@@ -31,11 +32,11 @@ struct CoordinateInfoView: View {
             .padding(.horizontal)
             
             HStack {
-                Text("\(coordinate.latitude)")
+                Text("\(coordinate?.latitude ?? annotation?.coordinate.latitude ?? 0.0)")
                 
                 Spacer()
                 
-                Text("\(coordinate.longitude)")
+                Text("\(coordinate?.longitude ?? annotation?.coordinate.latitude ?? 0.0)")
                 
             }
             .font(.subheadline)
@@ -45,5 +46,5 @@ struct CoordinateInfoView: View {
 }
 
 #Preview {
-    CoordinateInfoView(coordinate: .startLocation)
+    CoordinateInfoView(coordinate: .startLocation, annotation: nil)
 }

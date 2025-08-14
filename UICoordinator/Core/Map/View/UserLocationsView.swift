@@ -72,7 +72,7 @@ struct UserLocationsView: View {
                     .presentationCornerRadius(12)
             }
             .safeAreaInset(edge: .bottom) {
-                SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: viewModel.cameraPosition)
+                SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: $viewModel.cameraPosition)
             }
         }
     }

@@ -16,14 +16,26 @@ class ConfirmationLocationViewModel: LocationService, ObservableObject {
     @Published var address = ""
     
     @MainActor
-    func uploadLocationWithCoordinate(coordinate: CLLocationCoordinate2D, activityId: String?, userUid: String?) async throws {
+    func uploadLocationWithCoordinate(coordinate: CLLocationCoordinate2D?,
+                                      activityId: String?,
+                                      annotation: MKPointAnnotation?,
+                                      userUid: String?) async throws {
+        
         var corectAddress: String?
         guard let userUid else { return }
         if self.address != "" {
             corectAddress = address
         }
+        var newCoordinate: CLLocationCoordinate2D
+        if let coordinate {
+            newCoordinate = coordinate
+        } else if let annotation {
+            newCoordinate = annotation.coordinate
+        } else {
+            return
+        }
         
-        let location = Location(ownerUid: userUid, name: self.name, description: self.description, address: corectAddress, timestamp: Timestamp(), latitude: coordinate.latitude, longitude: coordinate.longitude, activityId: activityId ?? "")
+        let location = Location(ownerUid: userUid, name: self.name, description: self.description, address: corectAddress, timestamp: Timestamp(), latitude: newCoordinate.latitude, longitude: newCoordinate.longitude, activityId: activityId ?? "")
         
         await uploadLocation(location)
     }

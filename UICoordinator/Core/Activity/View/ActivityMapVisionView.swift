@@ -12,7 +12,6 @@ struct ActivityMapVisionView: View {
     
     @State var activity: Activity
     @State private var cameraPosition: MapCameraPosition
-    @FocusState private var isSearch: Bool
     @State private var isSelected = false
     
     @StateObject var viewModel: ActivityEditViewModel
@@ -93,7 +92,7 @@ struct ActivityMapVisionView: View {
             
             if !viewModel.isMark && !viewModel.isSettings {
                 
-                SearchLocationView(searchLocations: $viewModel.searchLocations, cameraPosition: cameraPosition)
+                SearchLocationView(searchLocations: $viewModel.searchLocations, cameraPosition: $cameraPosition)
                 
             }
         }

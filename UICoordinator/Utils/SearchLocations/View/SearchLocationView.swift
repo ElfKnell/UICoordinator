@@ -10,12 +10,11 @@ import MapKit
 
 struct SearchLocationView: View {
     
-    @StateObject private var viewModel = SearchLocationViewModel()
-    @EnvironmentObject var container: DIContainer
-    @FocusState private var isSearch: Bool
     @Binding var searchLocations: [Location]
+    @Binding var cameraPosition: MapCameraPosition
     
-    var cameraPosition: MapCameraPosition
+    @StateObject private var viewModel = SearchLocationViewModel()
+    @FocusState private var isSearch: Bool
     
     var body: some View {
         VStack {
@@ -47,7 +46,7 @@ struct SearchLocationView: View {
                         
                         Task {
                             
-                            searchLocations = await viewModel.getLocations(cameraPosition, currentUserId: container.currentUserService.currentUser?.id)
+                            searchLocations = await viewModel.getLocations(cameraPosition)
                             viewModel.searctText = ""
                             
                         }
@@ -80,5 +79,5 @@ struct SearchLocationView: View {
 }
 
 #Preview {
-    SearchLocationView(searchLocations: .constant([]), cameraPosition: .region(.startRegion))
+    SearchLocationView(searchLocations: .constant([]), cameraPosition: .constant(.region(.startRegion)))
 }

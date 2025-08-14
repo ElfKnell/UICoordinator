@@ -58,7 +58,7 @@ struct ActivityCell: View {
                         
                         if viewModel.isCurrentUser(activity.ownerUid, currentUser: container.currentUserService.currentUser) {
                             
-                            ActivityEditView(activity: activity)
+                            ActivityMapEditView(activity: activity)
                                 .onDisappear {
                                     isUpdate.toggle()
                                 }

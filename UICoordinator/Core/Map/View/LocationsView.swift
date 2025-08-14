@@ -105,7 +105,7 @@ struct LocationsView: View {
                         
                         if viewModel.showSearch {
                             
-                            SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: viewModel.cameraPosition)
+                            SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: $viewModel.cameraPosition)
                         }
                         
                         HStack {
@@ -160,7 +160,7 @@ struct LocationsView: View {
                 switch config {
                 case .confirmationLocation:
                     
-                    ConfirmationLocationView(coordinate: viewModel.coordinate, isSave: $viewModel.isSave)
+                    ConfirmationLocationView(coordinate: viewModel.coordinate, isSave: $viewModel.isSave, annotation: $viewModel.customAnnotation)
                         .presentationDetents([.height(340), .medium])
 
                 case .locationsDetail:

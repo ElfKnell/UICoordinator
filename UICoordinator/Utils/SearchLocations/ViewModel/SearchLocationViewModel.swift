@@ -7,20 +7,25 @@
 
 import MapKit
 import SwiftUI
-import Firebase
 
 class SearchLocationViewModel: ObservableObject {
     
     @Published var searctText: String = ""
     
-    func getLocations(_ cameraPosition: MapCameraPosition, currentUserId: String?) async -> [Location] {
+    func getLocations(_ cameraPosition: MapCameraPosition) async -> [Location] {
         
         var searchLocations: [Location] = []
-        guard let uid = currentUserId else { return [] }
         let results = await serchPlace(region: cameraPosition.region, searchText: self.searctText)
         
         for result in results {
-            let location: Location = .init(ownerUid: uid, name: result.placemark.name ?? "no name", description: "", address: result.placemark.title, timestamp: Timestamp(), latitude: result.placemark.coordinate.latitude, longitude: result.placemark.coordinate.longitude, isSearch: true, activityId: "")
+            let location = Location(
+                name: result.placemark.name ?? "no name",
+                description: result.placemark.description
+                    .replacingOccurrences(of: "\\s*@.*", with: "", options: .regularExpression),
+                address: result.placemark.title,
+                latitude: result.placemark.coordinate.latitude,
+                longitude: result.placemark.coordinate.longitude,
+                isSearch: true)
             
             searchLocations.append(location)
         }

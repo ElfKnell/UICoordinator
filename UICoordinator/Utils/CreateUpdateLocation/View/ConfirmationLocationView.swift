@@ -9,13 +9,17 @@ import SwiftUI
 import MapKit
 
 struct ConfirmationLocationView: View {
-    let coordinate: CLLocationCoordinate2D
+    
     var activityId: String?
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var container: DIContainer
+    let coordinate: CLLocationCoordinate2D?
+    
+    @Binding var isSave: Bool
+    @Binding var annotation: MKPointAnnotation?
     
     @StateObject var viewModel = ConfirmationLocationViewModel()
-    @Binding var isSave: Bool
+    
+    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         NavigationStack {
@@ -25,11 +29,15 @@ struct ConfirmationLocationView: View {
                 
                 VStack {
                     
-                    FormInfoLocation(name: $viewModel.name, description: $viewModel.description, address: $viewModel.address)
+                    FormInfoLocation(
+                        name: $viewModel.name,
+                        description: $viewModel.description,
+                        address: $viewModel.address)
                     
                     Divider()
                     
-                    CoordinateInfoView(coordinate: coordinate)
+                    CoordinateInfoView(coordinate: coordinate,
+                                       annotation: annotation)
                     
                 }
                 .padding()
@@ -42,6 +50,7 @@ struct ConfirmationLocationView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
+                        annotation = nil
                         dismiss()
                     }
                     .font(.subheadline)
@@ -52,8 +61,13 @@ struct ConfirmationLocationView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         Task {
-                            try await viewModel.uploadLocationWithCoordinate(coordinate: coordinate, activityId: activityId, userUid: container.currentUserService.currentUser?.id)
+                            try await viewModel.uploadLocationWithCoordinate(
+                                coordinate: coordinate,
+                                activityId: activityId,
+                                annotation: annotation,
+                                userUid: container.currentUserService.currentUser?.id)
                             isSave.toggle()
+                            annotation = nil
                             
                             dismiss()
                         }
@@ -70,5 +84,5 @@ struct ConfirmationLocationView: View {
 }
 
 #Preview {
-    ConfirmationLocationView(coordinate: .startLocation, isSave: .constant(false))
+    ConfirmationLocationView(coordinate: .startLocation, isSave: .constant(false), annotation: .constant(nil))
 }
