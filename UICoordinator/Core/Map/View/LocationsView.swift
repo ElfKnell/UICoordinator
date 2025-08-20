@@ -27,32 +27,21 @@ struct LocationsView: View {
         
         NavigationStack {
             
-            ZStack{
+            MapReader { proxy in
                 
-                Map(position: $viewModel.cameraPosition, selection: $viewModel.mapSelection) {
+                Map(position: $viewModel.cameraPosition,
+                    selection: $viewModel.mapSelection) {
                     
-                    ForEach(viewModel.locations) { location in
-                        Annotation("", coordinate: location.coordinate) {
+                    ForEach(viewModel.locations, id: \.self) { item in
+                        
+                        Annotation("", coordinate: item.coordinate) {
                             
-                            NavigationLink {
-                                
-                                LocationEditView(location: location)
-                                    .environmentObject(viewModel)
-                                
-                            } label: {
-                                
-                                MarkerView(name: location.name)
-                                    
-                            }
-                            .contextMenu {
-                                Button("Preview") {
-                                    viewModel.mapSelection = location
+                            MarkerView(
+                                name: item.name,
+                                isSelected: .constant(viewModel.mapSelection?.id == item.id)) {
+                                    viewModel.mapSelection = item
                                 }
-                                
-                                Button("Update") {
-                                    viewModel.updateLocation(location)
-                                }
-                            }
+                            
                         }
                     }
                     
@@ -60,11 +49,6 @@ struct LocationsView: View {
                     
                     ForEach(viewModel.searchLoc, id: \.self) { item in
                         Marker(item.name, coordinate: item.coordinate)
-                    }
-                    
-                    if let route = viewModel.route {
-                        MapPolyline(route.polyline)
-                            .stroke(viewModel.routerColor, lineWidth: 5)
                     }
                     
                 }
@@ -81,25 +65,59 @@ struct LocationsView: View {
                     viewModel.fetchMoreLocationsByCurentUser(userId: container.currentUserService.currentUser?.id)
                     
                 }
-                
-                SightView()
-                
-                VStack {
+                .onTapGesture(count: 1) { position in
                     
-                    HStack {
-                        
-                        Button {
-                            viewModel.clean()
-                        } label: {
-                            Image(systemName: "arrow.triangle.2.circlepath")
+                    if let coordinate = proxy.convert(position, from: .local) {
+                        if viewModel.mapSelection == nil {
+                            viewModel.handleTap(on: coordinate)
                         }
-                        .padding()
-                        .font(.title2)
-                        
-                        Spacer()
                     }
-                    
-                    Spacer()
+                }
+                .onTapGesture(count: 2) { position in
+                    if let coordinate = proxy.convert(position, from: .local) {
+                        guard let region = viewModel.cameraPosition.region else { return }
+                        let latitude = region.span.latitudeDelta * 0.7
+                        let longitude = region.span.longitudeDelta * 0.7
+                        
+                        let newRegion = MKCoordinateRegion(
+                            center: coordinate,
+                            span: MKCoordinateSpan(
+                                latitudeDelta: latitude,
+                                longitudeDelta: longitude))
+                        
+                        withAnimation {
+                            viewModel.cameraPosition = .region(newRegion)
+                        }
+                    }
+                }
+                .task {
+                    await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
+                }
+                .onChange(of: viewModel.getDirections, { oldValue, newValue in
+                    if newValue {
+                        viewModel.fetchRoute()
+                    }
+                })
+                .onChange(of: viewModel.mapSelection) { oldValue, newValue in
+
+                    if let selectedPlace = viewModel.mapSelection {
+
+                        viewModel.mapSelection = viewModel.verifyLocation(selectedLocation: selectedPlace)
+                        
+                    } else {
+                        viewModel.sheetConfig = nil
+                    }
+                }
+                
+            }
+            .navigationTitle("Map Locations")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(item: $viewModel.navigatedLocation, destination: { location in
+                LocationEditView(location: location)
+                    .environmentObject(viewModel)
+            })
+            .safeAreaInset(edge: .bottom) {
+                HStack {
                     
                     VStack {
                         
@@ -109,73 +127,88 @@ struct LocationsView: View {
                         }
                         
                         HStack {
+                            
                             Button {
                                 viewModel.showSearch.toggle()
                             } label: {
                                 Image(systemName: viewModel.showSearch ? "xmark.circle" : "magnifyingglass.circle")
-                                    .font(.largeTitle)
-                                    .padding(.bottom)
+                                    .font(.title)
+                                    .foregroundStyle(.primary)
+                                    .padding(10)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
                             }
                             
                             Spacer()
                             
                             Button {
-                                viewModel.sheetConfig = .confirmationLocation
+                                viewModel.clean()
                             } label: {
-                                Image(systemName: "plus.circle")
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .imageScale(.large)
+                                    .foregroundStyle(.primary)
+                                    .padding(10)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
                             }
-                            .font(.largeTitle)
-                            .padding(.bottom)
                         }
-                        .padding()
+                        
                     }
-                }
-            }
-            .navigationTitle("Map Locations")
-            .navigationBarTitleDisplayMode(.inline)
-            .task {
-                await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
-            }
-            .onChange(of: viewModel.isSave) {
-                Task {
-                    await viewModel.addLocation(userId: container.authService.userSession?.uid)
-                }
-            }
-            .onChange(of: viewModel.getDirections, { oldValue, newValue in
-                if newValue {
-                    viewModel.fetchRoute()
-                }
-            })
-            .onChange(of: viewModel.mapSelection, { oldValue, newValue in
-
-                if let selectedPlace = viewModel.mapSelection {
-
-                    viewModel.mapSelection = viewModel.verifyLocation(selectedLocation: selectedPlace)
                     
-                } else {
-                    viewModel.sheetConfig = nil
                 }
-            })
+                .padding()
+            }
             .sheet(item: $viewModel.sheetConfig) { config in
                 switch config {
                 case .confirmationLocation:
                     
-                    ConfirmationLocationView(coordinate: viewModel.coordinate, isSave: $viewModel.isSave, annotation: $viewModel.customAnnotation)
+                    ConfirmationLocationView(
+                        handleSave: {
+                            viewModel.addLocation(
+                                userId: container.authService.userSession?.uid)
+                        },
+                        annotation: $viewModel.customAnnotation
+                    )
                         .presentationDetents([.height(340), .medium])
 
                 case .locationsDetail:
                     
-                    LocationsDetailView(mapSeliction: $viewModel.mapSelection, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
-                        .presentationDetents([.height(340)])
-                        .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
+                    LocationsDetailView(
+                        getDirectionsAction: {
+                            if let selected = viewModel.mapSelection {
+                                viewModel.sheetConfig = nil
+                                
+                                DispatchQueue.main.asyncAfter(
+                                    deadline: .now() + 0.35
+                                ) {
+                                    withAnimation {
+                                        viewModel.navigatedLocation = selected
+                                    }
+                                }
+                            }
+                        },
+                        mapSeliction: $viewModel.mapSelection,
+                        isUpdate: $viewModel.sheetConfig
+                    )
+                        .presentationDetents([.medium])
+                        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                         .presentationCornerRadius(12)
                
                 case .locationUpdateOrSave:
                     
-                    UpdateLocationView(location: $viewModel.mapSelection, isSave: $viewModel.isSave)
+                    UpdateLocationView(
+                        handleUpdate: {
+                            viewModel.updateOrDeleteLocation(
+                                userId: container.authService.userSession?.uid)
+                        },
+                        location: $viewModel.mapSelection
+                    )
                         .presentationDetents([.height(350), .medium])
                         
                 }
+
             }
         }
     }

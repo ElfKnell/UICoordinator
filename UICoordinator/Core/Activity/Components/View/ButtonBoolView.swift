@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ButtonBoolView: View {
     
-    @Binding var isCheck: Bool
     var imageName: String
+    @Binding var isCheck: Bool
     
     var body: some View {
         
@@ -30,5 +30,5 @@ struct ButtonBoolView: View {
 }
 
 #Preview {
-    ButtonBoolView(isCheck: .constant(false), imageName: "")
+    ButtonBoolView(imageName: "", isCheck: .constant(false))
 }

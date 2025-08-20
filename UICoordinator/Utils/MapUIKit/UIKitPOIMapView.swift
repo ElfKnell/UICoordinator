@@ -39,7 +39,6 @@ struct UIKitPOIMapView: UIViewRepresentable {
         mapView.isScrollEnabled = true
         
         mapView.setRegion(region, animated: true)
-        //mapView.mapType = mapType
         
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleMapTap(_:)))
         tapGesture.numberOfTapsRequired = 1
@@ -118,8 +117,16 @@ struct UIKitPOIMapView: UIViewRepresentable {
             }
         }
         
-        for route in routes {
+        for (index, route) in routes.enumerated() {
             uiView.addOverlay(route.polyline)
+            
+            let midPoint = route.polyline.points()[route.polyline.pointCount / 2].coordinate
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = midPoint
+            annotation.title = "\(index + 1)"
+            uiView.addAnnotation(annotation)
+            
+            context.coordinator.routeColors[route.polyline] = Coordinator.color(for: index)
         }
     }
 }

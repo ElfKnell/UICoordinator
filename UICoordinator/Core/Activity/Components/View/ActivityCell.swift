@@ -11,13 +11,13 @@ struct ActivityCell: View {
     
     let activity: Activity
     
+    @Binding var isDelete: Bool
+    @Binding var isUpdate: Bool
+    
     @StateObject var viewModel: ActivityCellViewModel
     @StateObject var viewModelLike: LikesViewModel
     
     @EnvironmentObject var container: DIContainer
-    
-    @Binding var isDelete: Bool
-    @Binding var isUpdate: Bool
     
     var body: some View {
         VStack {

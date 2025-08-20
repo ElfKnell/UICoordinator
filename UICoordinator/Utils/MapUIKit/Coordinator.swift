@@ -12,6 +12,8 @@ class Coordinator: NSObject, MKMapViewDelegate {
     var parent: UIKitPOIMapView
     var locationMap: [CoordinateKey: Location] = [:]
     
+    var routeColors: [MKPolyline: UIColor] = [:]
+    
     init(_ parent: UIKitPOIMapView) {
         self.parent = parent
     }
@@ -88,6 +90,12 @@ class Coordinator: NSObject, MKMapViewDelegate {
             view?.annotation = annotation
         }
         
+        if let title = annotation.title ?? "", Int(title) != nil {
+            view?.markerTintColor = .black
+            view?.glyphText = title
+            view?.glyphTintColor = .white
+        }
+        
         return view
     }
     
@@ -108,11 +116,18 @@ class Coordinator: NSObject, MKMapViewDelegate {
         
         if let polyline = overlay as? MKPolyline {
             let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = .green
+            
+            renderer.strokeColor = routeColors[polyline] ?? .systemGreen
             renderer.lineWidth = 5
             return renderer
         }
         return MKOverlayRenderer(overlay: overlay)
+    }
+    
+    static func color(for index: Int) -> UIColor {
+        
+        let colors: [UIColor] = [.systemBlue, .systemRed, .systemGreen, .systemOrange, .systemPurple, .systemPink]
+        return colors[index % colors.count]
     }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {

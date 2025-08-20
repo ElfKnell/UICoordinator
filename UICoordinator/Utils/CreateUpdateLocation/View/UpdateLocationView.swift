@@ -11,9 +11,9 @@ import MapKit
 struct UpdateLocationView: View {
     
     var activityId: String?
+    var handleUpdate: () -> Void
     
     @Binding var location: Location?
-    @Binding var isSave: Bool
     
     @StateObject var viewModel: UpdateLocationViewModel
     
@@ -22,8 +22,8 @@ struct UpdateLocationView: View {
     
     init(
         activityId: String? = nil,
+        handleUpdate: @escaping () -> Void,
         location: Binding<Location?>,
-        isSave: Binding<Bool>,
         viewModelBilder: @escaping () -> UpdateLocationViewModel = {
             UpdateLocationViewModel(
                 deleteLocation: DeleteLocation(),
@@ -32,8 +32,8 @@ struct UpdateLocationView: View {
         }) {
         
         self.activityId = activityId
+        self.handleUpdate = handleUpdate
         self._location = location
-        self._isSave = isSave
         self._viewModel = StateObject(wrappedValue: viewModelBilder())
     }
     
@@ -53,8 +53,7 @@ struct UpdateLocationView: View {
                     Divider()
                     
                     if let coordinate = location?.coordinate {
-                        CoordinateInfoView(coordinate: coordinate,
-                                           annotation: nil)
+                        CoordinateInfoView(coordinate: coordinate)
                     }
                     
                 }
@@ -87,9 +86,11 @@ struct UpdateLocationView: View {
                                 
                                 Task {
                                     try await viewModel.deleteLocation(locationId: location?.id, activityId: activityId)
+                                    
+                                    handleUpdate()
                                     location = nil
-                                    isSave.toggle()
                                     dismiss()
+                                    
                                 }
                                 
                             } label: {
@@ -109,9 +110,11 @@ struct UpdateLocationView: View {
                                 activityId: activityId,
                                 user: container.currentUserService.currentUser)
                             
+                            
+                            handleUpdate()
                             location = nil
-                            isSave.toggle()
                             dismiss()
+                            
                         }
                     } label: {
                         Image(systemName: "checkmark.circle.fill")
@@ -124,5 +127,8 @@ struct UpdateLocationView: View {
 }
 
 #Preview {
-    UpdateLocationView(location: .constant(DeveloperPreview.location), isSave: .constant(false))
+    UpdateLocationView(
+        handleUpdate: { },
+        location: .constant(DeveloperPreview.location)
+    )
 }

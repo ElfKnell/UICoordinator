@@ -8,64 +8,26 @@
 import MapKit
 import SwiftUI
 
-class ActivityRouters {
+class ActivityRouters: ServiseRouterProtocol {
     
-    private var routes: [MKRoute] = []
+    let fetchingRoutes: FetchingRoutesService
+    let createRoute: RouteCreateService
     
-    func getRoutes(locations: [Location]) async throws -> [MKRoute] {
-
-        if locations.isEmpty || locations.count == 1 { return []}
+    init(fetchingRoutes: FetchingRoutesService,
+         createRoute: RouteCreateService) {
         
-        let sortedLoc = locations.sorted(by: { $0.timestamp.dateValue() < $1.timestamp.dateValue() })
-        
-        var remainingLocations = Array(sortedLoc.dropFirst())
-        
-        var currentPoint = sortedLoc[0]
-        var routes: [MKRoute] = []
-        
-        while !remainingLocations.isEmpty {
-            
-            var minRouter: MKRoute?
-            var nextPoint: Location?
-            
-            for location in remainingLocations {
-                do {
-                    if let router = try await getDirections(startingPoint: currentPoint, endPoint: location) {
-                        if minRouter == nil || router.expectedTravelTime < minRouter!.expectedTravelTime {
-                            minRouter = router
-                            nextPoint = location
-                        }
-                    }
-                } catch {
-                    print("Error calculating directions: \(error.localizedDescription)")
-                }
-            }
-                
-            if let minRouter, let nextPoint {
-                
-                routes.append(minRouter)
-                currentPoint = nextPoint
-                remainingLocations.removeAll(where: { $0 == nextPoint })
-                
-            } else {
-                break
-            }
-        }
-        
-        if locations.count >= 3, let lastRoute = try await getLastRouter(startPoint: currentPoint, endPoint: sortedLoc[0]) {
-            routes.append(lastRoute)
-        }
-        
-        return routes
+        self.fetchingRoutes = fetchingRoutes
+        self.createRoute = createRoute
     }
     
-    private func getDirections(startingPoint: Location, endPoint: Location) async throws -> MKRoute? {
+    func getDirections(startingPoint: CLLocationCoordinate2D,
+                       endPoint: CLLocationCoordinate2D) async throws -> MKRoute? {
         
         do {
             // Create and configure the request
             let request = MKDirections.Request()
-            request.source = MKMapItem(placemark: MKPlacemark(coordinate: startingPoint.coordinate))
-            request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endPoint.coordinate))
+            request.source = MKMapItem(placemark: MKPlacemark(coordinate: startingPoint))
+            request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endPoint))
             
             //request.transportType = .walking
             request.transportType = .automobile
@@ -77,22 +39,61 @@ class ActivityRouters {
         } catch let error as NSError {
             
             if error.domain == "GEOErrorDomain" && error.code == -3 {
+                
                 if let timeUntilReset = error.userInfo["timeUntilReset"] as? Int {
                         print("Throttled request. Waiting for \(timeUntilReset) seconds...")
                         
-                        try await Task.sleep(nanoseconds: UInt64(timeUntilReset + 1) * 1_000_000_000)
+                        try await Task.sleep(nanoseconds: UInt64(timeUntilReset + 1) * 3_000_000_000)
                         
                         return try await getDirections(startingPoint: startingPoint, endPoint: endPoint)
                 }
             }
             throw error
         }
+        
+    }
+    
+    func fetchRouter(activityId: String) async throws -> [MKRoute] {
+        
+        let storedRoutes = try await fetchingRoutes.fetchRoutes(activityId: activityId)
+        
+        var routes: [MKRoute] = []
+        
+        for route in storedRoutes {
+            
+            let newRoute = try await convertRoutes(route: route)
+            guard let newRoute else { continue }
+            
+            routes.append(newRoute)
+        }
+        
+        return routes
 
     }
     
-    private func getLastRouter(startPoint: Location, endPoint: Location?) async throws  -> MKRoute? {
+    func createRoute(activityId: String, route: MKRoute) async throws {
         
-        guard let endPoint = endPoint else { return nil }
-        return try await getDirections(startingPoint: startPoint, endPoint: endPoint)
+        let routeTransportType = RouteTransportType(mkTransportType: route.transportType)
+        
+        let storedRoute = StoredRoute(
+            activityId: activityId,
+            route: route,
+            transportType: routeTransportType
+        )
+        
+        try await createRoute.uploadRoute(storedRoute)
+        
     }
+    
+    private func convertRoutes(route: StoredRoute) async throws -> MKRoute? {
+        
+        let rout = try await getDirections(
+            startingPoint: route.startCoordinate.clCoordinate,
+            endPoint: route.endCoordinate.clCoordinate)
+        
+        guard let rout else { return nil }
+        return rout
+        
+    }
+    
 }

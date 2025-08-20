@@ -14,19 +14,29 @@ class UserLocationsViewModel: ObservableObject {
     @Published var locations = [Location]()
     @Published var cameraPosition: MapCameraPosition = .region(.startRegion)
     
-    @Published var mapSelection: Location?
+    @Published var navigatedLocation: Location?
+    @Published var mapSelection: Location? {
+        didSet {
+            if mapSelection != nil {
+                isSelected = true
+            } else {
+                isSelected = false
+            }
+        }
+    }
     @Published var searchLoc = [Location]()
     
     @Published var isSelected = false
     @Published var showSearch = false
-    @Published var getDirections = false
     @Published var sheetConfig: MapSheetConfig?
     
     @Published var userId: String
-    private let fetchLocationsService: FetchLocationsProtocol
-    private let pageSize = 25
     
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
+    
+    private let pageSize = 25
+    private let fetchLocationsService: FetchLocationsProtocol
+    
     
     init(userId: String, fetchLocationsService: FetchLocationsProtocol) {
         self.userId = userId

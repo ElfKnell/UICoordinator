@@ -13,24 +13,20 @@ class ActivityServiceUpdate: ActivityUpdateProtocol {
     
     private let collectionName = "Activity"
     
-    func updateActivity(_ activity: Activity) async {
+    func updateActivity(_ activity: Activity) async throws {
         
-        do {
-            guard let id = activity.activityId else { return }
-            
-            try await Firestore.firestore()
-                .collection(collectionName)
-                .document(id)
-                .updateData(["name": activity.name,
-                             "description": activity.description,
-                             "typeActivity": activity.typeActivity.id,
-                             "udateTime": Timestamp(),
-                             "status": activity.status,
-                             "mapStyle" : activity.mapStyle?.id as Any])
+        guard let id = activity.activityId else { return }
+        
+        try await Firestore.firestore()
+            .collection(collectionName)
+            .document(id)
+            .updateData(["name": activity.name,
+                         "description": activity.description,
+                         "typeActivity": activity.typeActivity.id,
+                         "udateTime": Timestamp(),
+                         "status": activity.status,
+                         "mapStyle" : activity.mapStyle?.id as Any])
 
-        } catch {
-            print(error.localizedDescription)
-        }
     }
     
     func updateActivityCoordinate(region: MKCoordinateRegion, id: String) async throws {
@@ -44,17 +40,13 @@ class ActivityServiceUpdate: ActivityUpdateProtocol {
                          "longitudeDelta": region.span.longitudeDelta])
     }
     
-    func updateActivityLocations(locationsId: [String], id: String) async {
+    func updateActivityLocations(locationsId: [String], id: String) async throws {
         
-        do {
-            try await Firestore.firestore()
-                .collection(collectionName)
-                .document(id)
-                .updateData(["locationsId": locationsId])
-
-        } catch {
-            print(error.localizedDescription)
-        }
+        try await Firestore.firestore()
+            .collection(collectionName)
+            .document(id)
+            .updateData(["locationsId": locationsId])
+        
     }
     
     func updateLikeCount(activityId: String, countLikes: Int) async {

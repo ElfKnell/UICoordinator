@@ -9,15 +9,19 @@ import SwiftUI
 
 struct ActivityContentListView: View {
     
-    @StateObject var viewModel: ActivityViewModel
     let currentUser: User?
+    
     @Binding var isCreate: Bool
+    
     @State private var selectedFilter: ActivityOwner = .allUsersActivities
-    @Namespace var animation
     @State var isDelete = false
     @State var isUpdate = false
+    
+    @StateObject var viewModel: ActivityViewModel
     @StateObject var activityAll: FetchAllActivityViewModel
     @StateObject var activityMy: FetchMyActivity
+    
+    @Namespace var animation
     
     init(currentUser: User?, isCreate: Binding<Bool>) {
         self.currentUser = currentUser
@@ -71,12 +75,14 @@ struct ActivityContentListView: View {
                         
                         ForEach(activityAll.activities) { activity in
                             ActivityCellFactory.make(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
-                                .onAppear {
+                                .task {
                                     
                                     if activity == activityAll.activities.last {
-                                        Task {
-                                            await activityAll.fetchFollowersActivity(currentUser: currentUser)
-                                        }
+                                        
+                                        await activityAll
+                                            .fetchFollowersActivity(
+                                                currentUser: currentUser)
+                                        
                                     }
                                 }
                         }
@@ -93,11 +99,13 @@ struct ActivityContentListView: View {
                             
                             ForEach(activityMy.activities) { activity in
                                 ActivityCellFactory.make(activity: activity, isDelete: $isDelete, isUpdate: $isUpdate)
-                                    .onAppear {
+                                    .task {
                                         if activity == activityMy.activities.last {
-                                            Task {
-                                                await activityMy.fetchMyActivity(currentUser: currentUser)
-                                            }
+                                            
+                                            await activityMy
+                                                .fetchMyActivity(
+                                                    currentUser: currentUser)
+                                            
                                         }
                                     }
                             }

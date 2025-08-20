@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ActivityCreate: View {
+    
     var nameActivyty: String
     
     @StateObject var viewModel: ActivityCreateViewModel
@@ -26,7 +27,7 @@ struct ActivityCreate: View {
     var body: some View {
         Group {
             if viewModel.activity != nil {
-                ActivityEditView(activity: viewModel.activity!)
+                ActivityMapEditView(activity: viewModel.activity!)
             } else {
                 LoadingView(width: 150, height: 150)
             }

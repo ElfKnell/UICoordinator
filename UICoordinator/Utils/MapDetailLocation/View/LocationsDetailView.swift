@@ -11,28 +11,30 @@ import MapKit
 struct LocationsDetailView: View {
     
     var activity: Activity?
+    var getDirectionsAction: () -> Void
+    
     @Binding var mapSeliction: Location?
-    @Binding var getDirections: Bool
     @Binding var isUpdate: MapSheetConfig?
+    
+    @State private var lookAroundScene: MKLookAroundScene?
     
     @StateObject var viewModel: LocationDetailViewModel
     
-    @State private var lookAroundScene: MKLookAroundScene?
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var container: DIContainer
     
     init(
         activity: Activity? = nil,
+        getDirectionsAction: @escaping () -> Void,
         mapSeliction: Binding<Location?>,
-        getDirections: Binding<Bool>,
         isUpdate: Binding<MapSheetConfig?>,
         viewModelBilder: @escaping () -> LocationDetailViewModel = {
             LocationDetailViewModel(fetchLocations: FetchLocationForActivity())
         }) {
         
         self.activity = activity
+        self.getDirectionsAction = getDirectionsAction
         self._mapSeliction = mapSeliction
-        self._getDirections = getDirections
         self._isUpdate = isUpdate
         self._viewModel = StateObject(wrappedValue: viewModelBilder())
     }
@@ -59,6 +61,7 @@ struct LocationsDetailView: View {
                 Spacer()
                 
                 Button {
+                    isUpdate = nil
                     mapSeliction = nil
                     dismiss()
                 } label: {
@@ -82,7 +85,7 @@ struct LocationsDetailView: View {
                     LookAroundPreview(initialScene: scene)
                         .frame(height: 200)
                         .cornerRadius(12)
-                        .padding()
+                        .padding(.horizontal)
                 } else {
                     ContentUnavailableView("No preview availible", systemImage: "eye.slash")
                         .padding(.horizontal)
@@ -126,12 +129,13 @@ struct LocationsDetailView: View {
                     }
                 }
                 
-                if isUpdate != nil && activity == nil {
+                if let userId = mapSeliction?.ownerUid, !userId.isEmpty {
+                    
                     Button {
-                        getDirections = true
-                        dismiss()
+                        getDirectionsAction()
+                        isUpdate = nil
                     } label: {
-                        Text("Get directions")
+                        Text(activity != nil ? "Get directions" : "Details")
                             .font(.headline)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
@@ -153,7 +157,7 @@ struct LocationsDetailView: View {
 }
 
 #Preview {
-    LocationsDetailView(mapSeliction: .constant(nil), getDirections: .constant(false), isUpdate: .constant(.locationsDetail))
+    LocationsDetailView(getDirectionsAction: {}, mapSeliction: .constant(nil), isUpdate: .constant(.locationsDetail))
 }
 
 extension LocationsDetailView {

@@ -87,7 +87,7 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     
     private func createLocation(userId: String, location: Location?, activityId: String?) async throws {
         guard let location = location else { return }
-        let newLocation = Location(ownerUid: location.ownerUid, name: name, description: description, address: address, timestamp: Timestamp(), latitude: location.latitude, longitude: location.longitude, activityId: activityId ?? "")
+        let newLocation = Location(ownerUid: userId, name: name, description: description, address: address, timestamp: Timestamp(), latitude: location.latitude, longitude: location.longitude, activityId: activityId ?? "")
         await uploadLocation(newLocation)
     }
     

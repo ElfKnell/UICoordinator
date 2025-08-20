@@ -7,7 +7,6 @@
 
 import Foundation
 import Firebase
-import MapKit
 
 class ActivityCreateService: ActivityCreateProtocol {
     
@@ -21,7 +20,9 @@ class ActivityCreateService: ActivityCreateProtocol {
         
         do {
             guard let activityData = try? Firestore.Encoder()
-                .encode(activity) else { throw FollowError.encodingFailed }
+                .encode(activity) else {
+                throw ErrorActivity.encodingFailed
+            }
             
             try await self.serviceCreate.addDocument(from: "Activity", data: activityData)
             

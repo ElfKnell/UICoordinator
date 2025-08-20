@@ -16,9 +16,9 @@ protocol ActivityUpdateProtocol {
     
     func updateLikeCount(activityId: String, countLikes: Int) async
     
-    func updateActivityLocations(locationsId: [String], id: String) async
+    func updateActivityLocations(locationsId: [String], id: String) async throws
     
     func updateActivityCoordinate(region: MKCoordinateRegion, id: String) async throws
     
-    func updateActivity(_ activity: Activity) async
+    func updateActivity(_ activity: Activity) async throws
 }

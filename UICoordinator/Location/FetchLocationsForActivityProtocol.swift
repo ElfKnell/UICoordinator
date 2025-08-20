@@ -9,5 +9,5 @@ import Foundation
 
 protocol FetchLocationsForActivityProtocol {
     
-    func getLocations(activityId: String) async -> [Location]
+    func getLocations(activityId: String) async throws -> [Location]
 }

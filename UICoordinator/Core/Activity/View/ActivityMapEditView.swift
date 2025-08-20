@@ -11,16 +11,20 @@ import MapKit
 struct ActivityMapEditView: View {
     
     @State var activity: Activity
-    @StateObject private var viewModel: TestMapViewModel
+    @StateObject private var viewModel: ActivityMapEditViewModel
     
     init(activity: Activity) {
         
         self._activity = State(initialValue: activity)
         
         self._viewModel = StateObject(
-            wrappedValue: TestMapViewModel(
+            
+            wrappedValue: ActivityMapEditViewModel(
                 fetchLocatins:FetchLocationsForActivity(),
                 activityUpdate: ActivityServiceUpdate(),
+                serviceRoutes: ActivityRouters(
+                    fetchingRoutes: FetchingRoutesService(),
+                    createRoute: RouteCreateService()),
                 activity: activity)
         )
 
@@ -43,13 +47,21 @@ struct ActivityMapEditView: View {
                 .edgesIgnoringSafeArea(.all)
             
         }
-        .onChange(of: viewModel.isSaved) {
-            Task {
-                await viewModel.getLocation()
+        .onChange(of: viewModel.selectedLocation) { _, newValue in
+            if let destination = newValue, viewModel.isSelectingDestination {
+                Task {
+                    await viewModel.buildRoute(to: destination)
+                }
             }
         }
         .task {
             await viewModel.getLocation()
+            await viewModel.loadRoutesIfNeeded()
+        }
+        .onDisappear {
+            Task {
+                await viewModel.saveLocations()
+            }
         }
         .sheet(item: $viewModel.sheetConfig) { config in
             switch config {
@@ -57,8 +69,11 @@ struct ActivityMapEditView: View {
             case .confirmationLocation:
                 ConfirmationLocationView(
                     activityId: activity.id,
-                    coordinate: nil,
-                    isSave: $viewModel.isSaved,
+                    handleSave: {
+                        Task {
+                            await viewModel.getLocation()
+                        }
+                    },
                     annotation: $viewModel.customAnnotation)
                     .presentationDetents([.height(340), .medium])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
@@ -66,23 +81,27 @@ struct ActivityMapEditView: View {
             case .locationsDetail:
                 LocationsDetailView(
                     activity: viewModel.activity,
+                    getDirectionsAction: viewModel.startSelectingDestination,
                     mapSeliction: $viewModel.selectedLocation,
-                    getDirections: $viewModel.getDirections,
                     isUpdate: $viewModel.sheetConfig)
                     .presentationDetents([.medium])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
             
             case .locationUpdateOrSave:
                 UpdateLocationView(
                     activityId: activity.id,
-                    location: $viewModel.selectedLocation,
-                    isSave: $viewModel.isSaved)
+                    handleUpdate: {
+                        Task {
+                            await viewModel.getLocation()
+                        }
+                    },
+                    location: $viewModel.selectedLocation)
                     .presentationDetents([.height(340), .medium])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             }
         }
-        .alert("Login problems", isPresented: $viewModel.isError) {
+        .alert("Error", isPresented: $viewModel.isError) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "unknown error")
@@ -107,6 +126,34 @@ struct ActivityMapEditView: View {
                 .padding(.top)
                 
                 Spacer()
+                
+                if viewModel.isSelectingDestination {
+                    Text("Select a location")
+                        .font(.title)
+                        .foregroundStyle(.primary)
+                        .background(.clear)
+                        .shadow(radius: 5)
+                    
+                    Spacer()
+                }
+                
+                if viewModel.isLoadingRoutes {
+                    
+                    HStack {
+                        
+                        Text("Building routes...")
+                            .font(.title)
+                            .foregroundStyle(.primary)
+                            .background(.clear)
+                            .shadow(radius: 5)
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.2)
+                    }
+                    
+                    Spacer()
+                }
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -158,6 +205,22 @@ struct ActivityMapEditView: View {
                         Spacer()
                         
                         VStack {
+                            
+                            if !viewModel.routes.isEmpty {
+                                Button {
+                                    
+                                    viewModel.clean()
+                                    
+                                } label: {
+                                    Image(systemName: "eraser.line.dashed")
+                                        .imageScale(.large)
+                                        .foregroundStyle(.primary)
+                                        .padding(10)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 5)
+                                }
+                            }
                             
                             NavigationLink {
                                 

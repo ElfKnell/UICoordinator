@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct InfoView: View {
+    
     let activity: MapSelectionProtocol
+    
     @State private var showCreatColloqy = false
     
     var body: some View {
@@ -139,9 +141,12 @@ struct InfoView: View {
             .navigationTitle(activity.name)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
-            .sheet(isPresented: $showCreatColloqy, content: {
-                CreateColloquyView(location: activity as? Location, activityId: ((activity as? Activity) != nil) ? activity.id : nil)
-            })
+            .sheet(isPresented: $showCreatColloqy) {
+                CreateColloquyView(
+                    location: activity as? Location,
+                    activityId: ((activity as? Activity) != nil) ?
+                    activity.id : nil)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackButtonView()

@@ -33,6 +33,7 @@ class ActivityMapEditViewModel: ObservableObject {
     @Published var cameraPosition: MapCameraPosition
     @Published var customAnnotation: MKPointAnnotation?
     @Published var selectedLocation: Location?
+    @Published var originLocation: Location?
     @Published var errorMessage: String?
     
     @Published var searchLocations: [Location] = []
@@ -42,22 +43,28 @@ class ActivityMapEditViewModel: ObservableObject {
     @Published var sheetConfig: MapSheetConfig?
     @Published var mapType: MKMapType = .standard
     
-    @Published var getDirections = false
     @Published var isSettings = false
-    @Published var isSaved = false
     @Published var isError = false
+    @Published var isLoadingRoutes = false
     @Published var shouldAutoSaveRegion: Bool = true
     @Published var shouldUserLocation: Bool = false
     @Published var shouldRestoreSavedRegion: Bool = false
     
+    @Published var isSelectingDestination: Bool = false
+    @Published var showClearButton: Bool = false
+    
     private let fetchLocatins: FetchLocationsForActivityProtocol
     private let activityUpdate: ActivityUpdateProtocol
+    private let serviceRoutes: ServiseRouterProtocol
     
     init(fetchLocatins: FetchLocationsForActivityProtocol,
-         activityUpdate: ActivityUpdateProtocol, activity: Activity) {
+         activityUpdate: ActivityUpdateProtocol,
+         serviceRoutes: ServiseRouterProtocol,
+         activity: Activity) {
         
         self.fetchLocatins = fetchLocatins
         self.activityUpdate = activityUpdate
+        self.serviceRoutes = serviceRoutes
         self.activity = activity
         
         let center = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
@@ -75,21 +82,32 @@ class ActivityMapEditViewModel: ObservableObject {
     @MainActor
     func getLocation() async {
         
-        self.isError = false
-        self.errorMessage = nil
+        do {
+            
+            self.savedLocations = try await fetchLocatins.getLocations(activityId: self.activity.id)
+            
+            self.customAnnotation = nil
+            
+        } catch {
+            handle(error)
+        }
+    }
+    
+    @MainActor
+    func loadRoutesIfNeeded() async {
+        
+        isLoadingRoutes = true
+        defer { isLoadingRoutes = false }
         
         do {
-            if self.activity.typeActivity == .track {
-                let locations = await fetchLocatins.getLocations(activityId: self.activity.id)
-                self.savedLocations = locations
-                let activityRouter = ActivityRouters()
-                self.routes = try await activityRouter.getRoutes(locations: savedLocations)
-            } else {
-                self.savedLocations = await fetchLocatins.getLocations(activityId: self.activity.id)
+            
+            if routes.isEmpty {
+                let newRoutes = try await serviceRoutes.fetchRouter(activityId: activity.id)
+                self.routes = newRoutes
             }
+            
         } catch {
-            self.errorMessage = error.localizedDescription
-            self.isError = true
+            handle(error)
         }
     }
     
@@ -103,15 +121,11 @@ class ActivityMapEditViewModel: ObservableObject {
     
     @MainActor
     private func saveRegion(_ region: MKCoordinateRegion) async {
-        
-        self.errorMessage = nil
-        self.isError = false
-        
+
         do {
             try await activityUpdate.updateActivityCoordinate(region: region, id: self.activity.id)
         } catch {
-            self.errorMessage = error.localizedDescription
-            self.isError = true
+            handle(error)
         }
     }
     
@@ -125,6 +139,64 @@ class ActivityMapEditViewModel: ObservableObject {
     func updateRegion(to region: MKCoordinateRegion, shouldSave: Bool = false) {
         self.shouldAutoSaveRegion = shouldSave
         self.region = region
+    }
+    
+    func startSelectingDestination() {
+        guard let origin = selectedLocation else { return }
+        originLocation = origin
+        isSelectingDestination = true
+    }
+    
+    func clean() {
+        self.routes.removeAll()
+        self.originLocation = nil
+        self.selectedLocation = nil
+    }
+    
+    @MainActor
+    func buildRoute(to destination: Location) async {
+        
+        do {
+            guard let origin = self.originLocation else {
+                throw ErrorActivity.locationNotFound
+            }
+            
+            let route = try await serviceRoutes.getDirections(
+                startingPoint: origin.coordinate,
+                endPoint: destination.coordinate)
+            
+            guard let newRoute = route else {
+                throw ErrorActivity.routeNotFound
+            }
+            
+            self.routes.append(newRoute)
+            
+            try await serviceRoutes.createRoute(activityId: activity.id, route: newRoute)
+            
+            self.isSelectingDestination = false
+            
+        } catch {
+            handle(error)
+        }
+    }
+    
+    func saveLocations() async {
+        
+        do {
+            
+            var locationId = [String]()
+            for location in self.savedLocations {
+                locationId.append(location.id)
+            }
+            
+            try await activityUpdate.updateActivityLocations(
+                locationsId: locationId,
+                id: self.activity.id
+            )
+            
+        } catch {
+            handle(error)
+        }
     }
     
     private func updateCanRestoreSavedRegion() {
@@ -145,5 +217,10 @@ class ActivityMapEditViewModel: ObservableObject {
         if let mapType = activity.mapStyle?.mkMapType {
             self.mapType = mapType
         }
+    }
+    
+    private func handle(_ error: Error) {
+        self.errorMessage = error.localizedDescription
+        self.isError = true
     }
 }

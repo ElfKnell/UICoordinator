@@ -40,9 +40,9 @@ struct ActivityCellFactory {
             activityUpdate: ActivityServiceUpdate())
         
         return ActivityCell(activity: activity,
-                            viewModel: viewModel,
-                            viewModelLike: viewModelLike,
                             isDelete: isDelete,
-                            isUpdate: isUpdate)
+                            isUpdate: isUpdate,
+                            viewModel: viewModel,
+                            viewModelLike: viewModelLike)
     }
 }

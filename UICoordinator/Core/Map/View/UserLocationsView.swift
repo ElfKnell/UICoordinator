@@ -21,59 +21,68 @@ struct UserLocationsView: View {
     
     var body: some View {
         
-        NavigationStack {
-            ZStack{
+        ZStack{
+            
+            Map(position: $viewModel.cameraPosition, selection: $viewModel.mapSelection) {
+                ForEach(viewModel.locations, id: \.self) { location in
+                    Annotation("", coordinate: location.coordinate) {
+                        
+                        MarkerView(
+                            name: location.name,
+                            isSelected: .constant(viewModel.mapSelection?.id == location.id)) {
+                                viewModel.mapSelection = location
+                            }
+                    }
+                }
                 
-                Map(position: $viewModel.cameraPosition, selection: $viewModel.mapSelection) {
-                    ForEach(viewModel.locations) { location in
-                        Annotation("", coordinate: location.coordinate) {
-                            NavigationLink {
-                                InfoView(activity: location)
-                            } label: {
-                                MarkerView(name: location.name)
-                                    
+                UserAnnotation()
+                
+                ForEach(viewModel.searchLoc, id: \.self) { item in
+                    Marker(item.name, coordinate: item.coordinate)
+                }
+                
+            }
+            .mapControls {
+                MapCompass()
+                MapPitchToggle()
+                MapUserLocationButton()
+            }
+            .mapStyle(viewModel.styleMap.value)
+            .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
+                viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
+                
+                viewModel.fetchMoreLocationsByCurentUser()
+            }
+            
+        }
+        .navigationTitle("Map Locations")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $viewModel.navigatedLocation) { location in
+            InfoView(activity: location)
+        }
+        .sheet(isPresented: $viewModel.isSelected) {
+            LocationsDetailView(
+                getDirectionsAction: {
+                    if let selected = viewModel.mapSelection {
+                        
+                        DispatchQueue.main.asyncAfter(
+                            deadline: .now() + 0.35
+                        ) {
+                            withAnimation {
+                                viewModel.navigatedLocation = selected
+                                viewModel.mapSelection = nil
                             }
                         }
                     }
-                    
-                    UserAnnotation()
-                    
-                    ForEach(viewModel.searchLoc, id: \.self) { item in
-                        Marker(item.name, coordinate: item.coordinate)
-                    }
-                    
-                }
-                .mapControls {
-                    MapCompass()
-                    MapPitchToggle()
-                    MapUserLocationButton()
-                }
-                .mapStyle(viewModel.styleMap.value)
-                .onMapCameraChange(frequency: .onEnd) { mapCameraUpdateContext in
-                    viewModel.cameraPosition = .region(mapCameraUpdateContext.region)
-                    
-                    viewModel.fetchMoreLocationsByCurentUser()
-                }
-                
-            }
-            .navigationTitle("Map Locations")
-            .navigationBarTitleDisplayMode(.inline)
-            .onChange(of: viewModel.mapSelection) { oldValue, newValue in
-                if viewModel.mapSelection != nil {
-                    viewModel.isSelected = true
-                } else {
-                    viewModel.isSelected = false
-                }
-            }
-            .sheet(isPresented: $viewModel.isSelected) {
-                LocationsDetailView(mapSeliction: $viewModel.mapSelection, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
-                    .presentationDetents([.height(340)])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
-                    .presentationCornerRadius(12)
-            }
-            .safeAreaInset(edge: .bottom) {
-                SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: $viewModel.cameraPosition)
-            }
+                },
+                mapSeliction: $viewModel.mapSelection,
+                isUpdate: $viewModel.sheetConfig)
+                .presentationDetents([.medium])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .presentationCornerRadius(12)
+        }
+        .safeAreaInset(edge: .bottom) {
+            SearchLocationView(searchLocations: $viewModel.searchLoc, cameraPosition: $viewModel.cameraPosition)
         }
     }
 }

@@ -19,15 +19,17 @@ class LocationViewModel: ObservableObject {
     @Published var cameraPosition: MapCameraPosition = .region(.startRegion)
     
     @Published var mapSelection: Location?
+    @Published var navigatedLocation: Location?
     @Published var route: MKRoute?
     
     @Published var getDirections = false
     @Published var sheetConfig: MapSheetConfig? = nil
     
     @Published var customAnnotation: MKPointAnnotation?
-    
-    @Published var isSave = false
+
     @Published var showSearch = false
+    @Published var isSave = false
+    
     @Published var routerColor: Color = .blue
     
     var coordinatePosition: CLLocationCoordinate2D?
@@ -74,23 +76,63 @@ class LocationViewModel: ObservableObject {
     }
     
     @MainActor
-    func addLocation(userId: String?) async {
+    func addLocation(userId: String?) {
         
         guard let userId = userId else { return }
+        guard let coordinate = customAnnotation?.coordinate else { return }
         
         Task {
             
-            let location = await locationService.getLocation(userId: userId, coordinate: coordinate)
+            let location = await locationService.getLocation(
+                userId: userId,
+                coordinate: coordinate
+            )
             
             if let location = location {
                 
-                if locations.isEmpty {
-                    locations.append(location)
-                } else if !locations.contains(location) {
+                if !locations.contains(where: {
+                    $0.id == location.id
+                }) {
                     locations.append(location)
                 }
                 cameraPosition = .region(location.regionCoordinate)
             }
+            
+            customAnnotation = nil
+        }
+    }
+    
+    @MainActor
+    func updateOrDeleteLocation(userId: String?) {
+        
+        guard let userId = userId else { return }
+        guard let mapSelection = mapSelection else { return }
+        
+        Task {
+            
+            switch await locationService.getLocation(
+                userId: userId,
+                coordinate: mapSelection.coordinate
+            ) {
+                
+            case let location?:
+                if let index = locations.firstIndex(where: {
+                    $0.id == location.id
+                }) {
+                    locations[index] = location
+                }
+                cameraPosition = .region(location.regionCoordinate)
+                
+            case nil:
+                if let index = locations.firstIndex(where: {
+                    $0.id == mapSelection.id
+                }) {
+                    locations.remove(at: index)
+                }
+            }
+            
+            self.mapSelection = nil
+            
         }
     }
     
@@ -152,7 +194,9 @@ class LocationViewModel: ObservableObject {
         
         if sheetConfig == .locationUpdateOrSave { return selectedLocation }
         
-        let locationVerifyId = locations.firstIndex(where: { $0.longitude == selectedLocation.longitude && $0.latitude == $0.latitude })
+        let locationVerifyId = locations.firstIndex(where: {
+            $0.id == selectedLocation.id
+        })
         
         sheetConfig = .locationsDetail
         
@@ -167,6 +211,17 @@ class LocationViewModel: ObservableObject {
     func updateLocation(_ location: Location) {
         mapSelection = location
         sheetConfig = .locationUpdateOrSave
+    }
+    
+    func handleTap(on coordinate: CLLocationCoordinate2D) {
+        
+        guard mapSelection == nil && sheetConfig == nil else { return }
+        
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = "New Location"
+        customAnnotation = annotation
+        sheetConfig = .confirmationLocation
     }
     
     private func loadColor() {

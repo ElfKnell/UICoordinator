@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct ActivityRepliesView: View {
+    
     let activity: Activity
     let user: User?
+    
     @State private var showColloquyCreate = false
+    @State var isChange = false
+    
     @StateObject var viewModel: RepliesViewModel
     @Environment(\.dismiss) var dismiss
-    @State var isChange = false
     
     init(activity: Activity, user: User?) {
         self.activity = activity

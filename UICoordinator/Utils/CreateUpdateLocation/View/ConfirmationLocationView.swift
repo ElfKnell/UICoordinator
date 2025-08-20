@@ -11,9 +11,8 @@ import MapKit
 struct ConfirmationLocationView: View {
     
     var activityId: String?
-    let coordinate: CLLocationCoordinate2D?
+    var handleSave: () -> Void
     
-    @Binding var isSave: Bool
     @Binding var annotation: MKPointAnnotation?
     
     @StateObject var viewModel = ConfirmationLocationViewModel()
@@ -36,8 +35,7 @@ struct ConfirmationLocationView: View {
                     
                     Divider()
                     
-                    CoordinateInfoView(coordinate: coordinate,
-                                       annotation: annotation)
+                    CoordinateInfoView(coordinate: annotation?.coordinate)
                     
                 }
                 .padding()
@@ -62,12 +60,11 @@ struct ConfirmationLocationView: View {
                     Button("Save") {
                         Task {
                             try await viewModel.uploadLocationWithCoordinate(
-                                coordinate: coordinate,
                                 activityId: activityId,
                                 annotation: annotation,
                                 userUid: container.currentUserService.currentUser?.id)
-                            isSave.toggle()
-                            annotation = nil
+                            
+                            handleSave()
                             
                             dismiss()
                         }
@@ -84,5 +81,6 @@ struct ConfirmationLocationView: View {
 }
 
 #Preview {
-    ConfirmationLocationView(coordinate: .startLocation, isSave: .constant(false), annotation: .constant(nil))
+    ConfirmationLocationView(handleSave: {},
+                             annotation: .constant(nil))
 }

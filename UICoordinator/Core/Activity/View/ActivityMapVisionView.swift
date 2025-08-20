@@ -12,14 +12,16 @@ struct ActivityMapVisionView: View {
     
     @State var activity: Activity
     @State private var cameraPosition: MapCameraPosition
-    @State private var isSelected = false
     
-    @StateObject var viewModel: ActivityEditViewModel
+    @StateObject var viewModel: ActivityVisionViewModel
     
-    init(activity: Activity, viewModelBilder: () -> ActivityEditViewModel =
-         { ActivityEditViewModel(
+    init(activity: Activity, viewModelBilder: () -> ActivityVisionViewModel =
+         { ActivityVisionViewModel(
             fetchLocatins: FetchLocationsForActivity(),
-            activityUpdate: ActivityServiceUpdate())
+            activityUpdate: ActivityServiceUpdate(),
+            serviceRoutes: ActivityRouters(
+                fetchingRoutes: FetchingRoutesService(),
+                createRoute: RouteCreateService()))
     } ) {
         
         self.activity = activity
@@ -44,6 +46,18 @@ struct ActivityMapVisionView: View {
 
                 Marker(item.name, coordinate: item.coordinate)
             }
+            
+            if !viewModel.routes.isEmpty {
+                ForEach(Array(viewModel.routes.enumerated()), id: \.1) { index, route in
+                    MapPolyline(route)
+                        .stroke(.green, lineWidth: 5)
+                    
+                    let midCoordinate = viewModel.midpoint(of: route.polyline)
+                    
+                    Marker("\(index + 1)", coordinate: midCoordinate)
+                        .tint(.black)
+                }
+            }
         }
         .mapControls {
             MapCompass()
@@ -54,34 +68,70 @@ struct ActivityMapVisionView: View {
             cameraPosition = .region(mapCameraUpdateContext.region)
         }
         .task {
-            await viewModel.getRoutes(activity: activity)
+            await viewModel.getLocation(activityId: activity.id)
+            await viewModel.loadRoutesIfNeeded(activityId: activity.id)
         }
-        .onChange(of: viewModel.selectedPlace, { oldValue, newValue in
+        .onChange(of: viewModel.selectedPlace) {
             if viewModel.selectedPlace != nil {
-                isSelected = true
+                viewModel.isSelected = true
             } else {
-                isSelected = false
+                viewModel.isSelected = false
             }
-        })
-        .sheet(isPresented: $isSelected, content: {
-            LocationsDetailView(activity: activity, mapSeliction: $viewModel.selectedPlace, getDirections: $viewModel.getDirections, isUpdate: $viewModel.sheetConfig)
-                .presentationDetents([.height(340)])
-                .presentationBackgroundInteraction(.enabled(upThrough: .height(340)))
+        }
+        .onChange(of: viewModel.selectedPlace) { _, newValue in
+            if let destination = newValue, viewModel.isSelectingDestination {
+                Task {
+                    await viewModel.buildRoute(to: destination)
+                }
+            }
+        }
+        .sheet(isPresented: $viewModel.isSelected, content: {
+            
+            LocationsDetailView(
+                activity: activity,
+                getDirectionsAction: viewModel.startSelectingDestination,
+                mapSeliction: $viewModel.selectedPlace,
+                isUpdate: $viewModel.sheetConfig)
+                .presentationDetents([.medium])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 .presentationCornerRadius(12)
         })
         .overlay(alignment: .top) {
             
             HStack {
                 
-                NavigationLink {
+                VStack {
                     
-                    InfoView(activity: activity)
+                    NavigationLink {
+                        
+                        InfoView(activity: activity)
+                        
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .imageScale(.large)
+                            .foregroundStyle(.primary)
+                            .padding(10)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
+                    .padding(7)
                     
-                } label: {
-                    Image(systemName: "info.circle")
-                        .imageScale(.large)
+                    Button {
+                        
+                        viewModel.clean()
+                        
+                    } label: {
+                        Image(systemName: "eraser.line.dashed")
+                            .imageScale(.large)
+                            .foregroundStyle(.primary)
+                            .padding(10)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
+                    .padding(7)
                 }
-                .padding(7)
                 
                 Spacer()
                 
