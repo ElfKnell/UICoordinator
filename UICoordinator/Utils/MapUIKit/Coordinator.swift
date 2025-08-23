@@ -12,7 +12,10 @@ class Coordinator: NSObject, MKMapViewDelegate {
     var parent: UIKitPOIMapView
     var locationMap: [CoordinateKey: Location] = [:]
     
+    var routeMap: [String: RoutePair] = [:]
     var routeColors: [MKPolyline: UIColor] = [:]
+    
+    var routeTransportTypes: [MKPolyline: MKDirectionsTransportType] = [:]
     
     init(_ parent: UIKitPOIMapView) {
         self.parent = parent
@@ -80,8 +83,37 @@ class Coordinator: NSObject, MKMapViewDelegate {
             return nil
         }
         
+        if let title = annotation.title ?? "", let number = Int(title) {
+            
+            let identifier = "routeAnnotation"
+            var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+            
+            if view == nil {
+                
+                view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view?.canShowCallout = true
+                
+            } else {
+                view?.annotation = annotation
+            }
+            
+            if let routePair = routeMap["\(number)"],
+               let transportType = routeTransportTypes[routePair.mkRoute.polyline] {
+                
+                view?.image = CustomImage.generateCustomRouteImage(
+                    number: number,
+                    transportType: transportType
+                )
+            }
+            
+            view?.centerOffset = CGPoint(x: 0, y: -15)
+            
+            return view
+        }
+        
         let identifier = "marker"
-        var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+        var view = mapView
+            .dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
         
         if view == nil {
             view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
@@ -89,19 +121,29 @@ class Coordinator: NSObject, MKMapViewDelegate {
         } else {
             view?.annotation = annotation
         }
-        
-        if let title = annotation.title ?? "", Int(title) != nil {
-            view?.markerTintColor = .black
-            view?.glyphText = title
-            view?.glyphTintColor = .white
-        }
-        
+
         return view
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
         guard let coordinate = view.annotation?.coordinate else { return }
+        
+        if let title = view.annotation?.title ?? "",
+           let routePair = routeMap[title] {
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                UIView.animate(withDuration: 0.2) {
+                    view.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+                }
+            }
+            
+            DispatchQueue.main.async {
+                self.parent.selectedRoute = routePair
+                self.parent.sheetConfig = .routeDetails
+            }
+            return
+        }
 
         let key = CoordinateKey(coordinate)
         if let location = locationMap[key] {
@@ -136,4 +178,16 @@ class Coordinator: NSObject, MKMapViewDelegate {
             self.parent.region = mapView.region
         }
     }
+    
+    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
+        
+        if let title = view.annotation?.title ?? "",
+           Int(title) != nil {
+            
+            UIView.animate(withDuration: 0.2) {
+                view.transform = CGAffineTransform.identity
+            }
+        }
+    }
+
 }

@@ -26,3 +26,11 @@ struct Coordinate: Codable, Hashable {
         self.longitude = coordinate.longitude
     }
 }
+
+extension Coordinate {
+    
+    var dictionary: [String: Double] {
+        ["latitude": latitude, "longitude": longitude]
+    }
+    
+}

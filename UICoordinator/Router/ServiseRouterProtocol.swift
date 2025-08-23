@@ -9,11 +9,10 @@ import MapKit
 
 protocol ServiseRouterProtocol {
     
-    func getDirections(startingPoint: CLLocationCoordinate2D,
-                       endPoint: CLLocationCoordinate2D) async throws -> MKRoute?
+    func createRoute(activityId: String, route: MKRoute) async throws -> StoredRoute
     
-    func fetchRouter(activityId: String) async throws -> [MKRoute]
+    func updateRoute(route: RoutePair, mkRoute: MKRoute) async throws -> RoutePair
     
-    func createRoute(activityId: String, route: MKRoute) async throws
+    func deleteRoute(_ id: String) async throws
     
 }

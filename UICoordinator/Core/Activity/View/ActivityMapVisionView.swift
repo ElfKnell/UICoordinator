@@ -17,11 +17,10 @@ struct ActivityMapVisionView: View {
     
     init(activity: Activity, viewModelBilder: () -> ActivityVisionViewModel =
          { ActivityVisionViewModel(
-            fetchLocatins: FetchLocationsForActivity(),
+            fetchLocations: FetchLocationsForActivity(),
             activityUpdate: ActivityServiceUpdate(),
-            serviceRoutes: ActivityRouters(
-                fetchingRoutes: FetchingRoutesService(),
-                createRoute: RouteCreateService()))
+            serviceRoutes: ActivityFetchingRoutes(
+                fetchingRoutes: FetchingRoutesService()))
     } ) {
         
         self.activity = activity
@@ -68,21 +67,31 @@ struct ActivityMapVisionView: View {
             cameraPosition = .region(mapCameraUpdateContext.region)
         }
         .task {
+            
             await viewModel.getLocation(activityId: activity.id)
             await viewModel.loadRoutesIfNeeded(activityId: activity.id)
+            
         }
         .onChange(of: viewModel.selectedPlace) {
+            
             if viewModel.selectedPlace != nil {
                 viewModel.isSelected = true
             } else {
                 viewModel.isSelected = false
             }
+            
         }
         .onChange(of: viewModel.selectedPlace) { _, newValue in
+            
             if let destination = newValue, viewModel.isSelectingDestination {
+                
                 Task {
-                    await viewModel.buildRoute(to: destination)
+                    await viewModel.buildRoute(
+                        to: destination,
+                        activity: activity
+                    )
                 }
+                
             }
         }
         .sheet(isPresented: $viewModel.isSelected, content: {

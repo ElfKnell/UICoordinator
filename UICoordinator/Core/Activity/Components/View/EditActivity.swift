@@ -45,11 +45,7 @@ struct EditActivity: View {
                     
                     HStack {
                         
-                        Text("Activity type")
-                        
-                        Spacer()
-                        
-                        Picker("Type", selection: $activity.typeActivity) {
+                        Picker("Activity type", selection: $activity.typeActivity) {
                             ForEach(ActivityType.allCases) { option in
                                 Text(option.description).tag(option)
                             }
@@ -59,14 +55,21 @@ struct EditActivity: View {
                     
                     HStack {
                         
-                        Text("Map Style")
-                        
-                        Spacer()
-                        
-                        Picker("Style", selection: $activity.mapStyle) {
+                        Picker("Map Style", selection: $activity.mapStyle) {
                             Text("Default").tag(nil as UserMapStyle?)
                             ForEach(UserMapStyle.allCases) { option in
                                 Text(option.description).tag(option as UserMapStyle?)
+                            }
+                        }
+                        
+                    }
+                    
+                    HStack {
+                        
+                        Picker("Transport Type", selection: $activity.transportType) {
+                            Text("Default").tag(nil as RouteTransportType?)
+                            ForEach(RouteTransportType.allCases) { option in
+                                Text(option.displayName).tag(option as RouteTransportType?)
                             }
                         }
                         

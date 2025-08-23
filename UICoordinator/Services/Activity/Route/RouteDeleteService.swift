@@ -7,7 +7,7 @@
 
 import Foundation
 
-class RouteDeleteService {
+class RouteDeleteService: RouteDeleteServiceProtocol {
     
     private let routeCollection = "Route"
     let servіceDelete: FirestoreGeneralDeleteProtocol

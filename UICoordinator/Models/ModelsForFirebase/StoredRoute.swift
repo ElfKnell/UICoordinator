@@ -31,7 +31,7 @@ struct StoredRoute: Identifiable, Codable, Hashable {
 
 extension StoredRoute {
     
-    init(activityId: String, route: MKRoute, transportType: RouteTransportType) {
+    init(routeId: String?, activityId: String, route: MKRoute, transportType: RouteTransportType) {
         var coords = [CLLocationCoordinate2D](
             repeating: kCLLocationCoordinate2DInvalid,
             count: route.polyline.pointCount)
@@ -43,7 +43,7 @@ extension StoredRoute {
                 
         let coordinateList = coords.map { Coordinate($0) }
 
-        self.routeId = nil
+        self.routeId = routeId
         self.activityId = activityId
         self.startCoordinate = Coordinate(coords.first ?? .init())
         self.endCoordinate = Coordinate(coords.last ?? .init())

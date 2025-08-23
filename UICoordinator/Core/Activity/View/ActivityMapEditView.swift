@@ -20,11 +20,17 @@ struct ActivityMapEditView: View {
         self._viewModel = StateObject(
             
             wrappedValue: ActivityMapEditViewModel(
-                fetchLocatins:FetchLocationsForActivity(),
+                fetchLocations:FetchLocationsForActivity(),
                 activityUpdate: ActivityServiceUpdate(),
                 serviceRoutes: ActivityRouters(
-                    fetchingRoutes: FetchingRoutesService(),
-                    createRoute: RouteCreateService()),
+                    createRoute: RouteCreateService(
+                        serviceCreate: FirestoreAddDocumentWithID()),
+                    updateService: RouteUpdateServise(),
+                    deleteService: RouteDeleteService(
+                        servіceDelete: FirestoreGeneralDeleteService(
+                            db: FirestoreAdapter()))),
+                activityFetchingRoutes: ActivityFetchingRoutes(
+                    fetchingRoutes: FetchingRoutesService()),
                 activity: activity)
         )
 
@@ -42,6 +48,7 @@ struct ActivityMapEditView: View {
                 searchLocations: $viewModel.searchLocations,
                 savedLocations: $viewModel.savedLocations,
                 selectedLocation: $viewModel.selectedLocation,
+                selectedRoute: $viewModel.selectedRoute,
                 routes: $viewModel.routes,
                 sheetConfig: $viewModel.sheetConfig)
                 .edgesIgnoringSafeArea(.all)
@@ -76,7 +83,9 @@ struct ActivityMapEditView: View {
                     },
                     annotation: $viewModel.customAnnotation)
                     .presentationDetents([.height(340), .medium])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .presentationBackgroundInteraction(
+                        .enabled(upThrough: .medium))
+                    .presentationCornerRadius(12)
 
             case .locationsDetail:
                 LocationsDetailView(
@@ -85,7 +94,8 @@ struct ActivityMapEditView: View {
                     mapSeliction: $viewModel.selectedLocation,
                     isUpdate: $viewModel.sheetConfig)
                     .presentationDetents([.medium])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .presentationBackgroundInteraction(
+                        .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
             
             case .locationUpdateOrSave:
@@ -98,7 +108,19 @@ struct ActivityMapEditView: View {
                     },
                     location: $viewModel.selectedLocation)
                     .presentationDetents([.height(340), .medium])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .presentationBackgroundInteraction(
+                        .enabled(upThrough: .medium))
+                    .presentationCornerRadius(12)
+                
+            case .routeDetails:
+                RouteDetailView(
+                    handleUpdate: viewModel.updateRoute,
+                    handleDetete: viewModel.deleteRoute,
+                    route: $viewModel.selectedRoute)
+                    .presentationDetents([.medium])
+                    .presentationBackgroundInteraction(
+                        .enabled(upThrough: .medium))
+                    .presentationCornerRadius(12)
             }
         }
         .alert("Error", isPresented: $viewModel.isError) {
@@ -205,22 +227,6 @@ struct ActivityMapEditView: View {
                         Spacer()
                         
                         VStack {
-                            
-                            if !viewModel.routes.isEmpty {
-                                Button {
-                                    
-                                    viewModel.clean()
-                                    
-                                } label: {
-                                    Image(systemName: "eraser.line.dashed")
-                                        .imageScale(.large)
-                                        .foregroundStyle(.primary)
-                                        .padding(10)
-                                        .background(.ultraThinMaterial)
-                                        .clipShape(Circle())
-                                        .shadow(radius: 5)
-                                }
-                            }
                             
                             NavigationLink {
                                 

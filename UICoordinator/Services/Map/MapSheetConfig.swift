@@ -11,6 +11,7 @@ enum MapSheetConfig: Int, Identifiable {
     case confirmationLocation
     case locationsDetail
     case locationUpdateOrSave
+    case routeDetails
     
     var id: Int {
         self.rawValue

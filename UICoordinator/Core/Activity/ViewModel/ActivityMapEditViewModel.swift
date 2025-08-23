@@ -34,11 +34,12 @@ class ActivityMapEditViewModel: ObservableObject {
     @Published var customAnnotation: MKPointAnnotation?
     @Published var selectedLocation: Location?
     @Published var originLocation: Location?
+    @Published var selectedRoute: RoutePair?
     @Published var errorMessage: String?
     
     @Published var searchLocations: [Location] = []
     @Published var savedLocations: [Location] = []
-    @Published var routes: [MKRoute] = []
+    @Published var routes: [RoutePair] = []
     
     @Published var sheetConfig: MapSheetConfig?
     @Published var mapType: MKMapType = .standard
@@ -53,18 +54,21 @@ class ActivityMapEditViewModel: ObservableObject {
     @Published var isSelectingDestination: Bool = false
     @Published var showClearButton: Bool = false
     
-    private let fetchLocatins: FetchLocationsForActivityProtocol
+    private let fetchLocations: FetchLocationsForActivityProtocol
     private let activityUpdate: ActivityUpdateProtocol
     private let serviceRoutes: ServiseRouterProtocol
+    private let activityFetchingRoutes: ActivityFetchingRoutesProtocol
     
-    init(fetchLocatins: FetchLocationsForActivityProtocol,
+    init(fetchLocations: FetchLocationsForActivityProtocol,
          activityUpdate: ActivityUpdateProtocol,
          serviceRoutes: ServiseRouterProtocol,
+         activityFetchingRoutes: ActivityFetchingRoutesProtocol,
          activity: Activity) {
         
-        self.fetchLocatins = fetchLocatins
+        self.fetchLocations = fetchLocations
         self.activityUpdate = activityUpdate
         self.serviceRoutes = serviceRoutes
+        self.activityFetchingRoutes = activityFetchingRoutes
         self.activity = activity
         
         let center = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
@@ -84,7 +88,7 @@ class ActivityMapEditViewModel: ObservableObject {
         
         do {
             
-            self.savedLocations = try await fetchLocatins.getLocations(activityId: self.activity.id)
+            self.savedLocations = try await fetchLocations.getLocations(activityId: self.activity.id)
             
             self.customAnnotation = nil
             
@@ -102,7 +106,7 @@ class ActivityMapEditViewModel: ObservableObject {
         do {
             
             if routes.isEmpty {
-                let newRoutes = try await serviceRoutes.fetchRouter(activityId: activity.id)
+                let newRoutes = try await activityFetchingRoutes.fetchRouter(activityId: activity.id)
                 self.routes = newRoutes
             }
             
@@ -147,12 +151,6 @@ class ActivityMapEditViewModel: ObservableObject {
         isSelectingDestination = true
     }
     
-    func clean() {
-        self.routes.removeAll()
-        self.originLocation = nil
-        self.selectedLocation = nil
-    }
-    
     @MainActor
     func buildRoute(to destination: Location) async {
         
@@ -161,17 +159,19 @@ class ActivityMapEditViewModel: ObservableObject {
                 throw ErrorActivity.locationNotFound
             }
             
-            let route = try await serviceRoutes.getDirections(
+            let route = try await activityFetchingRoutes.getDirections(
                 startingPoint: origin.coordinate,
-                endPoint: destination.coordinate)
+                endPoint: destination.coordinate,
+                transportType: activity.transportType?.mkTransportType)
             
             guard let newRoute = route else {
                 throw ErrorActivity.routeNotFound
             }
             
-            self.routes.append(newRoute)
+            let storedRoute = try await serviceRoutes
+                .createRoute(activityId: activity.id, route: newRoute)
             
-            try await serviceRoutes.createRoute(activityId: activity.id, route: newRoute)
+            self.routes.append(RoutePair(storedRoute: storedRoute, mkRoute: newRoute))
             
             self.isSelectingDestination = false
             
@@ -195,7 +195,73 @@ class ActivityMapEditViewModel: ObservableObject {
             )
             
         } catch {
-            handle(error)
+            await handle(error)
+        }
+    }
+    
+    @MainActor
+    func updateRoute() {
+        
+        Task {
+            
+            isLoadingRoutes = true
+            defer { isLoadingRoutes = false }
+            
+            do {
+                
+                guard let selected = self.selectedRoute else {
+                    throw ErrorActivity.routeNotFound
+                }
+                            
+                guard let index = self.routes.firstIndex(of: selected) else {
+                    throw ErrorActivity.noMatchingStoredRoute
+                }
+                            
+                guard let newMKRoute = try await activityFetchingRoutes.getDirections(
+                    startingPoint: selected.storedRoute.startCoordinate.clCoordinate,
+                    endPoint: selected.storedRoute.endCoordinate.clCoordinate,
+                    transportType: selected.storedRoute.transportType.mkTransportType
+                ) else {
+                    throw ErrorActivity.failedBuildRoute
+                }
+                
+                let updateRoute = try await serviceRoutes.updateRoute(
+                  route: selected,
+                  mkRoute: newMKRoute
+                )
+                
+                self.routes[index] = updateRoute
+                
+            } catch {
+                handle(error)
+            }
+        }
+        
+    }
+    
+    @MainActor
+    func deleteRoute() {
+        
+        Task {
+            
+            do {
+                
+                isLoadingRoutes = true
+                defer { isLoadingRoutes = false }
+                
+                guard let selected = self.selectedRoute,
+                      let index = self.routes.firstIndex(of: selected) else {
+                    return
+                }
+                
+                try await serviceRoutes.deleteRoute(selected.id)
+                
+                routes.remove(at: index)
+                self.selectedRoute = nil
+                
+            } catch {
+                handle(error)
+            }
         }
     }
     
@@ -219,6 +285,7 @@ class ActivityMapEditViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     private func handle(_ error: Error) {
         self.errorMessage = error.localizedDescription
         self.isError = true

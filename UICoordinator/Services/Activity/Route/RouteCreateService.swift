@@ -8,23 +8,31 @@
 import Foundation
 import Firebase
 
-class RouteCreateService {
+class RouteCreateService: CreateRouterProtocol {
     
     private let routeCollection = "Route"
-    let serviceCreate: FirestoreGeneralCreateServiseProtocol
+    let serviceCreate: FirestoreAddDocumentWithIDProtocol
     
-    init(serviceCreate: FirestoreGeneralCreateServiseProtocol = FirestoreGeneralServiceCreate()) {
+    init(serviceCreate: FirestoreAddDocumentWithIDProtocol) {
         self.serviceCreate = serviceCreate
     }
     
     func uploadRoute(_ route: StoredRoute) async throws {
+        
+        guard let storedId = route.routeId else {
+            throw ErrorActivity.idNotFound
+        }
         
         guard let activityRoute = try? Firestore.Encoder()
             .encode(route) else {
             throw ErrorActivity.encodingFailedRoute
         }
         
-        try await self.serviceCreate.addDocument(from: routeCollection, data: activityRoute)
+        try await self.serviceCreate.setDocument(
+            from: routeCollection,
+            data: activityRoute,
+            routeID: storedId)
+        
     }
     
 }

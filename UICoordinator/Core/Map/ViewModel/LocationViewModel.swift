@@ -11,6 +11,8 @@ import SwiftUI
 
 class LocationViewModel: ObservableObject {
     
+    var coordinatePosition: CLLocationCoordinate2D?
+    
     @Published var locations = [Location]()
     @Published var searchLoc = [Location]()
     
@@ -20,9 +22,7 @@ class LocationViewModel: ObservableObject {
     
     @Published var mapSelection: Location?
     @Published var navigatedLocation: Location?
-    @Published var route: MKRoute?
-    
-    @Published var getDirections = false
+
     @Published var sheetConfig: MapSheetConfig? = nil
     
     @Published var customAnnotation: MKPointAnnotation?
@@ -32,20 +32,15 @@ class LocationViewModel: ObservableObject {
     
     @Published var routerColor: Color = .blue
     
-    var coordinatePosition: CLLocationCoordinate2D?
-    
     private let locationService: FetchLocationFormFirebaseProtocol
-    private let createRouter: CreateRouterProtocol
     private let fetchLocations: FetchLocations
     
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
     init(locationService: FetchLocationFormFirebaseProtocol,
-         createRouter: CreateRouterProtocol,
          fetchLocations: FetchLocations) {
         
         self.locationService = locationService
-        self.createRouter = createRouter
         self.fetchLocations = fetchLocations
         
     }
@@ -157,40 +152,14 @@ class LocationViewModel: ObservableObject {
     func clean() {
     
         self.mapSelection = nil
-        self.getDirections = false
-        self.route = nil
+        //self.getDirections = false
+        //self.route = nil
         
         getCameraPosition()
         
     }
     
-    @MainActor
-    func fetchRoute() {
-        
-        Task {
-            
-            do {
-                
-                self.route = try await createRouter.getRouter(coordinate: self.coordinatePosition, mapSelection: self.mapSelection)
-                
-                withAnimation(.snappy) {
-                    self.sheetConfig = nil
-                    
-                    if let rect = self.route?.polyline.boundingMapRect {
-                        self.cameraPosition = .rect(rect)
-                    }
-                }
-                
-            } catch {
-                print("ERROR: \(error.localizedDescription)")
-            }
-        }
-    }
-    
     func verifyLocation(selectedLocation: Location) -> Location {
-        
-        getDirections = false
-        route = nil
         
         if sheetConfig == .locationUpdateOrSave { return selectedLocation }
         

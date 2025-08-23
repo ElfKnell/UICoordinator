@@ -15,6 +15,7 @@ struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol, LikeObje
     let ownerUid: String
     var name: String
     var typeActivity: ActivityType
+    var transportType: RouteTransportType?
     var description: String
     let time: Timestamp
     var udateTime: Timestamp?

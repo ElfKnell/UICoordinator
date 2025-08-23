@@ -8,5 +8,8 @@
 import Foundation
 
 protocol FirestoreGeneralCreateServiseProtocol {
-    func addDocument(from collection: String, data: [String: Any]) async throws
+    
+    func addDocument(
+        from collection: String,
+        data: [String: Any]) async throws
 }

@@ -17,7 +17,6 @@ struct LocationsView: View {
     init(viewModelBilder: @escaping () -> LocationViewModel = {
         LocationViewModel(
             locationService: FetchLocationFromFirebase(),
-            createRouter: CreateRouter(),
             fetchLocations: FetchLocations(fetchLocationByUser: FetchLocationsFromFirebase()))
     }) {
         self._viewModel = StateObject(wrappedValue: viewModelBilder())
@@ -93,11 +92,6 @@ struct LocationsView: View {
                 .task {
                     await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
                 }
-                .onChange(of: viewModel.getDirections, { oldValue, newValue in
-                    if newValue {
-                        viewModel.fetchRoute()
-                    }
-                })
                 .onChange(of: viewModel.mapSelection) { oldValue, newValue in
 
                     if let selectedPlace = viewModel.mapSelection {
@@ -207,6 +201,10 @@ struct LocationsView: View {
                     )
                         .presentationDetents([.height(350), .medium])
                         
+                case .routeDetails:
+                    Text("Route details view is under construction")
+                        .padding()
+                        .presentationDetents([.medium])
                 }
 
             }

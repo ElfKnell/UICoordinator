@@ -8,7 +8,7 @@
 import Firebase
 import Foundation
 
-class FetchingRoutesService {
+class FetchingRoutesService: FetchingRoutesServiceProtocol {
     
     private let routeCollection = "Route"
     

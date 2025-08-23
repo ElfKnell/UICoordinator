@@ -19,7 +19,8 @@ struct UIKitPOIMapView: UIViewRepresentable {
     @Binding var savedLocations: [Location]
     @Binding var selectedLocation: Location?
     
-    @Binding var routes: [MKRoute]
+    @Binding var selectedRoute: RoutePair?
+    @Binding var routes: [RoutePair]
     
     @Binding var sheetConfig: MapSheetConfig?
     
@@ -117,16 +118,23 @@ struct UIKitPOIMapView: UIViewRepresentable {
             }
         }
         
-        for (index, route) in routes.enumerated() {
-            uiView.addOverlay(route.polyline)
+        for (index, routePair) in routes.enumerated() {
+            let mkRoute = routePair.mkRoute
+            uiView.addOverlay(mkRoute.polyline)
             
-            let midPoint = route.polyline.points()[route.polyline.pointCount / 2].coordinate
+            let midPoint = mkRoute
+                .polyline
+                .points()[mkRoute.polyline.pointCount / 2].coordinate
+            
             let annotation = MKPointAnnotation()
             annotation.coordinate = midPoint
             annotation.title = "\(index + 1)"
+            context.coordinator.routeMap["\(index + 1)"] = routePair
+            
+            context.coordinator.routeTransportTypes[mkRoute.polyline] = mkRoute.transportType
             uiView.addAnnotation(annotation)
             
-            context.coordinator.routeColors[route.polyline] = Coordinator.color(for: index)
+            context.coordinator.routeColors[mkRoute.polyline] = Coordinator.color(for: index)
         }
     }
 }

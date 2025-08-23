@@ -9,6 +9,7 @@ import Foundation
 import MapKit
 
 protocol CreateRouterProtocol {
-    func getRouter(coordinate: CLLocationCoordinate2D?,
-                   mapSelection: Location?) async throws -> MKRoute?
+    
+    func uploadRoute(_ route: StoredRoute) async throws
+    
 }

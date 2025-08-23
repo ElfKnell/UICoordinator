@@ -12,8 +12,6 @@ enum RouteTransportType: String, Codable, CaseIterable, Identifiable {
     
     case automobile
     case walking
-    case transit
-    case bicycle
     case any
     
     var id: String { rawValue }
@@ -22,8 +20,6 @@ enum RouteTransportType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .automobile: return "Automobile"
         case .walking: return "Walking"
-        case .transit: return "Transit"
-        case .bicycle: return "Bicycle"
         case .any: return "Any"
         }
     }
@@ -32,13 +28,6 @@ enum RouteTransportType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .automobile: return .automobile
         case .walking: return .walking
-        case .transit: return .transit
-        case .bicycle:
-            if #available(iOS 14.0, *) {
-                return .walking
-            } else {
-                return .any
-            }
         case .any: return .any
         }
     }
@@ -53,8 +42,6 @@ extension RouteTransportType {
             self = .automobile
         case .walking:
             self = .walking
-        case .transit:
-            self = .transit
         case .any:
             self = .any
         default:

@@ -8,7 +8,7 @@
 import MapKit
 import SwiftUI
 
-class CreateRouter: CreateRouterProtocol {
+class CreateRouter {
     
     @AppStorage("typeMap") private var typeMap: MapTransportType = .automobile
     

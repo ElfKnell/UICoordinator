@@ -28,15 +28,15 @@ class ActivityVisionViewModel: ObservableObject {
     
     @Published var sheetConfig: MapSheetConfig?
     
-    private let fetchLocatins: FetchLocationsForActivityProtocol
+    private let fetchLocations: FetchLocationsForActivityProtocol
     private let activityUpdate: ActivityUpdateProtocol
-    private let serviceRoutes: ServiseRouterProtocol
+    private let serviceRoutes: ActivityFetchingRoutesProtocol
     
-    init(fetchLocatins: FetchLocationsForActivityProtocol,
+    init(fetchLocations: FetchLocationsForActivityProtocol,
          activityUpdate: ActivityUpdateProtocol,
-         serviceRoutes: ServiseRouterProtocol) {
+         serviceRoutes: ActivityFetchingRoutesProtocol) {
        
-        self.fetchLocatins = fetchLocatins
+        self.fetchLocations = fetchLocations
         self.activityUpdate = activityUpdate
         self.serviceRoutes = serviceRoutes
     }
@@ -46,7 +46,7 @@ class ActivityVisionViewModel: ObservableObject {
         
         do {
             
-            self.locations = try await fetchLocatins.getLocations(activityId: activityId)
+            self.locations = try await fetchLocations.getLocations(activityId: activityId)
             
         } catch {
             handle(error)
@@ -63,7 +63,7 @@ class ActivityVisionViewModel: ObservableObject {
             
             if routes.isEmpty {
                 let newRoutes = try await serviceRoutes.fetchRouter(activityId: activityId)
-                self.routes = newRoutes
+                self.routes = newRoutes.map { $0.mkRoute }
             }
             
         } catch {
@@ -116,7 +116,7 @@ class ActivityVisionViewModel: ObservableObject {
     }
     
     @MainActor
-    func buildRoute(to destination: Location) async {
+    func buildRoute(to destination: Location, activity: Activity) async {
         
         do {
             guard let origin = self.originLocation else {
@@ -125,7 +125,8 @@ class ActivityVisionViewModel: ObservableObject {
             
             let route = try await serviceRoutes.getDirections(
                 startingPoint: origin.coordinate,
-                endPoint: destination.coordinate)
+                endPoint: destination.coordinate,
+                transportType: activity.transportType?.mkTransportType)
             
             guard let newRoute = route else {
                 throw ErrorActivity.routeNotFound
