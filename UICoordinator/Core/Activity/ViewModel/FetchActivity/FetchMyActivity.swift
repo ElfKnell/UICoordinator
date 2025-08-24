@@ -17,9 +17,7 @@ class FetchMyActivity: ObservableObject {
     init(currentUser: User?, fetchingActivities: FetchingActivitiesProtocol) {
         
         self.fetchingActivities = fetchingActivities
-        Task {
-            await fetchMyActivity(currentUser: currentUser)
-        }
+
     }
     
     @MainActor

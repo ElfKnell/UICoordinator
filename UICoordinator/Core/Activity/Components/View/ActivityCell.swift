@@ -163,7 +163,6 @@ struct ActivityCell: View {
                         
                         isDelete = false
                         viewModel.isRemove = false
-                        isUpdate.toggle()
                         
                     }
                 }

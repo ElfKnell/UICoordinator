@@ -11,10 +11,12 @@ import Firebase
 
 class ActivityVisionViewModel: ObservableObject {
     
+    private var routesNew: [MKRoute] = []
+    
     @Published var locations = [Location]()
     @Published var searchLocations = [Location]()
     @Published var routes: [MKRoute] = []
-    @Published var routesNew: [MKRoute] = []
+    @Published var selectedRoute: MKRoute?
     @Published var selectedPlace: Location?
     @Published var originLocation: Location?
     @Published var errorMessage: String?
@@ -23,10 +25,9 @@ class ActivityVisionViewModel: ObservableObject {
     @Published var isLoadingRoutes = false
     @Published var isMark = false
     @Published var isSettings = false
-    @Published var isSelected = false
     @Published var isSelectingDestination = false
     
-    @Published var sheetConfig: MapSheetConfig?
+    @Published var sheetConfig: MapVisionSheetConfig?
     
     private let fetchLocations: FetchLocationsForActivityProtocol
     private let activityUpdate: ActivityUpdateProtocol
@@ -86,14 +87,6 @@ class ActivityVisionViewModel: ObservableObject {
         }
     }
     
-    func infoView() {
-        if sheetConfig == .confirmationLocation {
-            sheetConfig = nil
-        } else {
-            sheetConfig = .confirmationLocation
-        }
-    }
-    
     func verifyLocation(selectedLocation: Location) -> Location {
         
         let locationVerifyId = locations.firstIndex(where: {
@@ -112,7 +105,7 @@ class ActivityVisionViewModel: ObservableObject {
         guard let origin = selectedPlace else { return }
         originLocation = origin
         isSelectingDestination = true
-        isSelected = false
+        sheetConfig = nil
     }
     
     @MainActor

@@ -38,7 +38,9 @@ struct LocationsView: View {
                             MarkerView(
                                 name: item.name,
                                 isSelected: .constant(viewModel.mapSelection?.id == item.id)) {
+                                    viewModel.tappedOnAnnotation = true
                                     viewModel.mapSelection = item
+                                    
                                 }
                             
                         }
@@ -65,6 +67,11 @@ struct LocationsView: View {
                     
                 }
                 .onTapGesture(count: 1) { position in
+                    
+                    if viewModel.tappedOnAnnotation {
+                        viewModel.tappedOnAnnotation = false
+                        return
+                    }
                     
                     if let coordinate = proxy.convert(position, from: .local) {
                         if viewModel.mapSelection == nil {
@@ -181,6 +188,7 @@ struct LocationsView: View {
                                         viewModel.navigatedLocation = selected
                                     }
                                 }
+                                viewModel.mapSelection = nil
                             }
                         },
                         mapSeliction: $viewModel.mapSelection,

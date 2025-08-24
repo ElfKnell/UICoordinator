@@ -15,7 +15,7 @@ struct ActivityMapVisionView: View {
     
     @StateObject var viewModel: ActivityVisionViewModel
     
-    init(activity: Activity, viewModelBilder: () -> ActivityVisionViewModel =
+    init(activity: Activity, viewModelBuilder: () -> ActivityVisionViewModel =
          { ActivityVisionViewModel(
             fetchLocations: FetchLocationsForActivity(),
             activityUpdate: ActivityServiceUpdate(),
@@ -24,7 +24,7 @@ struct ActivityMapVisionView: View {
     } ) {
         
         self.activity = activity
-        let mv = viewModelBilder()
+        let mv = viewModelBuilder()
         self._viewModel = StateObject(wrappedValue: mv)
         self._cameraPosition = .init(wrappedValue: mv.initialCamera(for: activity))
     }
@@ -47,14 +47,29 @@ struct ActivityMapVisionView: View {
             }
             
             if !viewModel.routes.isEmpty {
+                
                 ForEach(Array(viewModel.routes.enumerated()), id: \.1) { index, route in
+                    
                     MapPolyline(route)
                         .stroke(.green, lineWidth: 5)
                     
                     let midCoordinate = viewModel.midpoint(of: route.polyline)
                     
-                    Marker("\(index + 1)", coordinate: midCoordinate)
-                        .tint(.black)
+                    Annotation("", coordinate: midCoordinate) {
+                        
+                        Button {
+                            viewModel.selectedRoute = route
+                            viewModel.sheetConfig = .routeDetails
+                        } label: {
+                            
+                            AnimatedRouteMarker(
+                                index: index,
+                                transportTypeRout: route.transportType
+                            )
+                            
+                        }
+                    }
+                    
                 }
             }
         }
@@ -72,12 +87,17 @@ struct ActivityMapVisionView: View {
             await viewModel.loadRoutesIfNeeded(activityId: activity.id)
             
         }
-        .onChange(of: viewModel.selectedPlace) {
+        .onChange(of: viewModel.selectedPlace) { _, newValue in
             
-            if viewModel.selectedPlace != nil {
-                viewModel.isSelected = true
+            if viewModel.selectedPlace == newValue &&
+                viewModel.selectedPlace != nil {
+                
+                viewModel.sheetConfig = .locationDetails
+                
             } else {
-                viewModel.isSelected = false
+                
+                viewModel.sheetConfig = nil
+                
             }
             
         }
@@ -94,16 +114,26 @@ struct ActivityMapVisionView: View {
                 
             }
         }
-        .sheet(isPresented: $viewModel.isSelected, content: {
-            
-            LocationsDetailView(
-                activity: activity,
-                getDirectionsAction: viewModel.startSelectingDestination,
-                mapSeliction: $viewModel.selectedPlace,
-                isUpdate: $viewModel.sheetConfig)
-                .presentationDetents([.medium])
-                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-                .presentationCornerRadius(12)
+        .sheet(item: $viewModel.sheetConfig, content: { config in
+            switch config {
+            case .locationDetails:
+                LocationsDetailView(
+                    activity: activity,
+                    getDirectionsAction: viewModel.startSelectingDestination,
+                    mapSeliction: $viewModel.selectedPlace,
+                    isUpdate: .constant(nil))
+                    .presentationDetents([.medium])
+                    .presentationBackgroundInteraction(
+                        .enabled(upThrough: .medium))
+                    .presentationCornerRadius(12)
+            case .routeDetails:
+                RouteVisionDetailView(
+                    route: $viewModel.selectedRoute)
+                    .presentationDetents([.medium])
+                    .presentationBackgroundInteraction(
+                        .enabled(upThrough: .medium))
+                    .presentationCornerRadius(12)
+            }
         })
         .overlay(alignment: .top) {
             

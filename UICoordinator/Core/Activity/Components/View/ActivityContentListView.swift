@@ -113,6 +113,11 @@ struct ActivityContentListView: View {
                             ContentUnavailableView("No Activity", systemImage: "globe.desk", description: Text("You have not set up any activity yet. Tap on the \(Image(systemName: "pencil.tip.crop.circle.badge.plus")) button in the toolbar to begin."))
                         }
                     }
+                    .task {
+                        Task {
+                            await activityMy.refresh(currentUser: currentUser)
+                        }
+                    }
                     .onChange(of: isUpdate) {
                         Task {
                             await activityMy.refresh(currentUser: currentUser)

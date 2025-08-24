@@ -38,35 +38,54 @@ struct RouteDetailView: View {
         
         NavigationStack {
             
-            VStack(alignment: .leading) {
+            Form {
                 
                 if let route {
                     
-                    Text("Route Details")
-                        .font(.headline)
-                    
-                    Text("Distance: \(route.mkRoute.distance / 1000, specifier: "%.2f") km")
-                    
-                    Text("Estimated Time: \(route.mkRoute.expectedTravelTime / 60, specifier: "%.1f") mins")
-                    
-                    HStack {
+                    Section(header: Text("Route Details")
+                        .font(.headline)) {
                         
-                        Picker("Transport Type", selection: $viewModel.selectedTransportType) {
-                            Text("Default").tag(nil as RouteTransportType?)
-                            ForEach(RouteTransportType.allCases) { option in
-                                Text(option.displayName).tag(option as RouteTransportType?)
+                        Text("Distance: \(route.mkRoute.distance / 1000, specifier: "%.2f") km")
+                        
+                        Text("Estimated Time: \(route.mkRoute.expectedTravelTime / 60, specifier: "%.1f") mins")
+                    }
+                    
+                    Section {
+                        
+                        HStack {
+                            
+                            Picker("Transport Type", selection: $viewModel.selectedTransportType) {
+                                Text("Default").tag(nil as RouteTransportType?)
+                                ForEach(RouteTransportType.allCases) { option in
+                                    Text(option.displayName).tag(option as RouteTransportType?)
+                                }
                             }
+                            
                         }
                         
                     }
                     
-                    List(route.mkRoute.steps, id: \.self) { step in
-                        Text(step.instructions)
+                    Section(header: Text("Step-by-Step Directions")
+                        .font(.headline)) {
+                        
+                        List(route.mkRoute.steps, id: \.self) { step in
+                            
+                            if step.instructions != "" {
+                                Text(step.instructions)
+                            }
+                            
+                        }
+                        
                     }
                     
                 } else {
-                    Text("Route NOT Found")
-                        .font(.headline)
+                    
+                    Section(header: Text("Route Details").font(.headline)) {
+                        
+                        Text("Route NOT Found")
+                            .font(.headline)
+                    }
+                    
                 }
             }
             .padding(.horizontal)
@@ -126,6 +145,7 @@ struct RouteDetailView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                     }
+                    .padding(.horizontal)
                     
                 }
             }

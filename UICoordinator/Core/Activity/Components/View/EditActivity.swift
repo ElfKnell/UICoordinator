@@ -32,7 +32,8 @@ struct EditActivity: View {
             
             Form {
                 
-                Section(header: Text("General Information").font(.headline)) {
+                Section(header: Text("General Information")
+                    .font(.headline)) {
                     
                     TextField("Name", text: $activity.name)
                         .padding(.vertical, 8)
@@ -41,7 +42,8 @@ struct EditActivity: View {
                         .padding(.vertical, 8)
                 }
                 
-                Section(header: Text("Activity Details").font(.headline)) {
+                Section(header: Text("Activity Details")
+                    .font(.headline)) {
                     
                     HStack {
                         

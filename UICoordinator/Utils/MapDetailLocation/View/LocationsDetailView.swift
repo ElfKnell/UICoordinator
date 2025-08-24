@@ -157,7 +157,7 @@ struct LocationsDetailView: View {
 }
 
 #Preview {
-    LocationsDetailView(getDirectionsAction: {}, mapSeliction: .constant(nil), isUpdate: .constant(.locationsDetail))
+    LocationsDetailView(getDirectionsAction: {}, mapSeliction: .constant(nil), isUpdate: .constant(nil))
 }
 
 extension LocationsDetailView {

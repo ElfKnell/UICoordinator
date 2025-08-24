@@ -64,15 +64,27 @@ struct UIKitPOIMapView: UIViewRepresentable {
             }
             
             DispatchQueue.main.async {
+                self.region = region
                 self.showUserLocation = false
             }
-        }
-        
-        uiView.mapType = mapType
-        
-        if uiView.region.center.latitude != region.center.latitude &&
-            uiView.region.center.longitude != region.center.longitude {
-            uiView.setRegion(region, animated: true)
+        } else {
+            
+            uiView.mapType = mapType
+            
+            let currentCenter = uiView.region.center
+            let newCenter = region.center
+            
+            let distance = CLLocation(
+                latitude: currentCenter.latitude,
+                longitude: currentCenter.longitude)
+                .distance(from: CLLocation(
+                    latitude: newCenter.latitude,
+                    longitude: newCenter.longitude)
+                )
+            
+            if distance > 10 {
+                uiView.setRegion(region, animated: true)
+            }
         }
         
         context.coordinator.locationMap.removeAll()

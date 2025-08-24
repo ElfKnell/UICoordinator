@@ -18,6 +18,7 @@ class EditActivityViewModel: ObservableObject {
         self.activityServise = activityServise
     }
     
+    @MainActor
     func updateActivity(_ activity: Activity) async {
         
         self.errorMessage = nil

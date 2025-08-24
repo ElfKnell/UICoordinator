@@ -29,6 +29,7 @@ class LocationViewModel: ObservableObject {
 
     @Published var showSearch = false
     @Published var isSave = false
+    @Published var tappedOnAnnotation = false
     
     @Published var routerColor: Color = .blue
     
@@ -152,8 +153,6 @@ class LocationViewModel: ObservableObject {
     func clean() {
     
         self.mapSelection = nil
-        //self.getDirections = false
-        //self.route = nil
         
         getCameraPosition()
         
