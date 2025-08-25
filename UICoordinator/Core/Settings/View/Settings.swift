@@ -57,6 +57,8 @@ struct Settings: View {
                 }
                 .foregroundColor(.blue)
             }
+            
+            SettingsSupportSectionView()
         }
         .navigationTitle("Settings")
         .onAppear {
