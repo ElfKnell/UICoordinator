@@ -14,54 +14,57 @@ struct CurrentUserProfileView: View {
     
     var body: some View {
         
-        ScrollView(showsIndicators: false) {
-            if viewModel.isLoaded {
-                LoadingView(width: 300, height: 300)
-            } else {
-                if let currentUser = container.currentUserService.currentUser {
-                    VStack(spacing: 20) {
-                        
-                        ProfileHeaderFactory.make(user: currentUser)
-                        
-                        Button {
-                            viewModel.showEditProfile.toggle()
-                        } label: {
-                            Text("Edit profile")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.black)
-                                .frame(width: 352, height: 32)
-                                .background(.white)
-                                .modifier(CornerRadiusModifier())
-                        }
-                        
-                        UserContentListView(user: currentUser)
-                    }
+        NavigationStack {
+            
+            ScrollView(showsIndicators: false) {
+                if viewModel.isLoaded {
+                    LoadingView(width: 300, height: 300)
                 } else {
-                    Text("User not found")
-                        .font(.title)
+                    if let currentUser = container.currentUserService.currentUser {
+                        VStack(spacing: 20) {
+                            
+                            ProfileHeaderFactory.make(user: currentUser)
+                            
+                            Button {
+                                viewModel.showEditProfile.toggle()
+                            } label: {
+                                Text("Edit profile")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.black)
+                                    .frame(width: 352, height: 32)
+                                    .background(.white)
+                                    .modifier(CornerRadiusModifier())
+                            }
+                            
+                            UserContentListView(user: currentUser)
+                        }
+                    } else {
+                        Text("User not found")
+                            .font(.title)
+                    }
                 }
             }
-        }
-        .onAppear {
-            
-            if let user = container.currentUserService.currentUser {
-                container.userFollow.updateFollowCounts(for: user.id)
+            .onAppear {
+                
+                if let user = container.currentUserService.currentUser {
+                    container.userFollow.updateFollowCounts(for: user.id)
+                }
+                
             }
-            
-        }
-        .onChange(of: viewModel.isSaved) {
-            
-            Task {
-                viewModel.isLoaded = true
-                try await container.currentUserService.updateCurrentUser()
-                viewModel.isLoaded = false
+            .onChange(of: viewModel.isSaved) {
+                
+                Task {
+                    viewModel.isLoaded = true
+                    try await container.currentUserService.updateCurrentUser()
+                    viewModel.isLoaded = false
+                }
+                
             }
-            
-        }
-        .sheet(isPresented: $viewModel.showEditProfile) {
-            if let currentUser = container.currentUserService.currentUser {
-                EditProfileView(user: currentUser, isSaved: $viewModel.isSaved)
+            .sheet(isPresented: $viewModel.showEditProfile) {
+                if let currentUser = container.currentUserService.currentUser {
+                    EditProfileView(user: currentUser, isSaved: $viewModel.isSaved)
+                }
             }
         }
     }

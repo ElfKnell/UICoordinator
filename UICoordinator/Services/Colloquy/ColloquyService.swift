@@ -13,11 +13,14 @@ class ColloquyService: ColloquyServiceProtocol {
     
     private let serviceDetete: FirestoreGeneralDeleteProtocol
     private let repliesFetchingService: FetchRepliesProtocol
+    private let deleteLikes: LikesDeleteServiceProtocol
     
     init(serviceDetete: FirestoreGeneralDeleteProtocol,
-         repliesFetchingService: FetchRepliesProtocol) {
+         repliesFetchingService: FetchRepliesProtocol,
+         deleteLikes: LikesDeleteServiceProtocol) {
         self.serviceDetete = serviceDetete
         self.repliesFetchingService = repliesFetchingService
+        self.deleteLikes = deleteLikes
     }
     
     func uploadeColloquy(_ colloquy: Colloquy) async {
@@ -64,16 +67,20 @@ class ColloquyService: ColloquyServiceProtocol {
     
     func deleteColloquy(_ colloquy: Colloquy) async {
         
+        let collectionName = "colloquies"
+        
         do {
             if colloquy.repliesCount ?? 0 > 0 {
                 let replies = try await repliesFetchingService.getRepliesByColloquy(colloquyId: colloquy.id)
                 
                 for reply in replies {
-                    try await serviceDetete.deleteDocument(from: "colloquies", documentId: reply.id)
+                    try await serviceDetete.deleteDocument(from: collectionName, documentId: reply.id)
+                    await deleteLikes.likesDelete(objectId: reply.id, collectionName: .likes)
                 }
             }
             
-            try await serviceDetete.deleteDocument(from: "colloquies", documentId: colloquy.id)
+            await deleteLikes.likesDelete(objectId: colloquy.id, collectionName: .likes)
+            try await serviceDetete.deleteDocument(from: collectionName, documentId: colloquy.id)
             
         } catch {
             print("ERROR Delete colloquy \(error.localizedDescription)")

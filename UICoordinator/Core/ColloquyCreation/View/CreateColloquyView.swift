@@ -30,7 +30,12 @@ struct CreateColloquyView: View {
                 serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter()),
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
-                    userService: UserService())),
+                    userService: UserService()),
+                deleteLikes: LikesDeleteService(
+                    likeServise: LikeService(
+                        serviceCreate: FirestoreLikeCreateServise(),
+                        serviceDetete: FirestoreGeneralDeleteService(
+                            db: FirestoreAdapter())))),
             activityUpdate: ActivityServiceUpdate())
     }) {
         
@@ -79,7 +84,7 @@ struct CreateColloquyView: View {
                 
             }
             .padding()
-            .navigationTitle("\(location?.name ?? "Reply") Colloquy")
+            .navigationTitle("\(location?.name ?? self.activityId != nil ? "Reply" : "") Colloquy")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 

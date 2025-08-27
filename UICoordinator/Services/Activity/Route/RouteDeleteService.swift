@@ -11,9 +11,12 @@ class RouteDeleteService: RouteDeleteServiceProtocol {
     
     private let routeCollection = "Route"
     let servіceDelete: FirestoreGeneralDeleteProtocol
+    let fetchingRoutes: FetchingRoutesServiceProtocol
     
-    init(servіceDelete: FirestoreGeneralDeleteProtocol) {
+    init(servіceDelete: FirestoreGeneralDeleteProtocol,
+         fetchingRoutes: FetchingRoutesServiceProtocol) {
         self.servіceDelete = servіceDelete
+        self.fetchingRoutes = fetchingRoutes
     }
     
     func deleteRoute(_ id: String) async throws {
@@ -22,6 +25,16 @@ class RouteDeleteService: RouteDeleteServiceProtocol {
             from: routeCollection,
             documentId: id
         )
+        
+    }
+    
+    func deleteByActivity(activityId: String) async throws {
+        
+        let routes = try await fetchingRoutes.fetchRoutes(activityId: activityId)
+        
+        for route in routes {
+            try await deleteRoute(route.id)
+        }
         
     }
 }

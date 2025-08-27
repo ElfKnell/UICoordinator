@@ -11,4 +11,6 @@ protocol RouteDeleteServiceProtocol {
     
     func deleteRoute(_ id: String) async throws
     
+    func deleteByActivity(activityId: String) async throws
+    
 }

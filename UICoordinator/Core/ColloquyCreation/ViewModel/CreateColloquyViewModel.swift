@@ -26,6 +26,8 @@ class CreateColloquyViewModel: ObservableObject {
         
         guard let uid = userId else { return }
         
+        if caption.isEmpty { return }
+        
         let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
         
         await colloquyService.uploadeColloquy(colloquy)

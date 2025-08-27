@@ -86,7 +86,12 @@ struct ProfileHeaderView: View {
             
             await userLikes.fetchLikes(userId: user.id)
             
-            await followToUser.fetchFollowsToUsers(usersFollowing: container.userFollow.followingIdsForCurrentUser, curretnUser: container.currentUserService.currentUser)
+            await followToUser.fetchFollowsToUsers(
+                usersFollowing: container
+                    .userFollow
+                    .followersIdsForCurrentUser,
+                curretnUser: container
+                    .currentUserService.currentUser)
         }
     }
 }

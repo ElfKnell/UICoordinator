@@ -88,7 +88,6 @@ struct UpdateLocationView: View {
                                     try await viewModel.deleteLocation(locationId: location?.id, activityId: activityId)
                                     
                                     handleUpdate()
-                                    location = nil
                                     dismiss()
                                     
                                 }
@@ -112,7 +111,6 @@ struct UpdateLocationView: View {
                             
                             
                             handleUpdate()
-                            location = nil
                             dismiss()
                             
                         }

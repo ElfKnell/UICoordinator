@@ -28,7 +28,8 @@ struct ActivityMapEditView: View {
                     updateService: RouteUpdateServise(),
                     deleteService: RouteDeleteService(
                         servіceDelete: FirestoreGeneralDeleteService(
-                            db: FirestoreAdapter()))),
+                            db: FirestoreAdapter()),
+                        fetchingRoutes: FetchingRoutesService())),
                 activityFetchingRoutes: ActivityFetchingRoutes(
                     fetchingRoutes: FetchingRoutesService()),
                 activity: activity)
@@ -104,6 +105,7 @@ struct ActivityMapEditView: View {
                     handleUpdate: {
                         Task {
                             await viewModel.getLocation()
+                            viewModel.selectedLocation = nil
                         }
                     },
                     location: $viewModel.selectedLocation)

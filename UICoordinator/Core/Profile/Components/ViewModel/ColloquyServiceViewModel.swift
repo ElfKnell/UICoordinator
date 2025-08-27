@@ -14,9 +14,9 @@ class ColloquyServiceViewModel: ObservableObject {
         self.colloquyServise = colloquyServise
     }
     
-    func deleteColloquy(_ colloquyId: String) {
+    func deleteColloquy(_ colloquy: Colloquy) {
         Task {
-            await colloquyServise.markForDelete(colloquyId)
+            await colloquyServise.deleteColloquy(colloquy)
         }
     }
 }

@@ -18,7 +18,7 @@ class UserFollowers: UserFollowersProtocol {
     
     var followingIdsForCurrentUser: [String] = []
     
-    private var followersIdsForCurrentUser: [String] = []
+    var followersIdsForCurrentUser: [String] = []
     var followersCurrentUsers: [Follow] = []
     
     private let checkedFollowing: CheckedLocalUsersByFollowingProtocol
@@ -37,16 +37,23 @@ class UserFollowers: UserFollowersProtocol {
         let followers = await fetchingService.fetchFollow(uid: currentUserId, byField: .followerField)
         
         if followers.isEmpty {
+            
             self.followersCurrentUsers = []
             self.followingIdsForCurrentUser = []
             await clearLocalUsers()
+            
         } else {
+            
             self.followersCurrentUsers = followers
             self.followingIdsForCurrentUser = followers.map({ $0.following })
-            await loadFollowingCurrentUser(userId: currentUserId)
-            await checkedFollowing.addLocalUsersByFollowingToStore(follows: self.followingIdsForCurrentUser)
-            await checkedFollowing.removeUnfollowedLocalUsers(follows: self.followingIdsForCurrentUser)
+            
+            await checkedFollowing
+                .addLocalUsersByFollowingToStore(follows: self.followingIdsForCurrentUser)
+            await checkedFollowing
+                .removeUnfollowedLocalUsers(follows: self.followingIdsForCurrentUser)
+            
         }
+        await loadFollowingCurrentUser(userId: currentUserId)
     }
     
     func clearLocalUsers() async {

@@ -30,34 +30,30 @@ class UserContentListViewModel: ObservableObject {
         self.localUserServise = localUserServise
         self.user = user
         
-        Task {
-            await loadDate(currentUser: user)
-        }
     }
     
     @MainActor
-    func loadDate(currentUser: User?) async {
+    func startLoadColloquies() async {
         
         self.isLoading = true
         
         fetchColloquies.reload()
-        fetchReplies.reload()
         self.colloquies.removeAll()
-        self.replies.removeAll()
-        
         await fetchColloquies()
-        await fetchReplies(currentUser: currentUser)
         
         self.isLoading = false
-        
     }
     
     @MainActor
-    private func fetchColloquies() async {
+    func startReplies(currentUser: User?) async {
         
-        let items = await fetchColloquies.getUserColloquies(user: user, pageSize: pageSize)
-        self.colloquies.append(contentsOf: items)
+        self.isLoading = true
         
+        fetchReplies.reload()
+        self.replies.removeAll()
+        await fetchReplies(currentUser: currentUser)
+        
+        self.isLoading = false
     }
     
     @MainActor
@@ -71,14 +67,6 @@ class UserContentListViewModel: ObservableObject {
         
     }
     
-    @MainActor
-    private func fetchReplies(currentUser: User?) async {
-        
-        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
-        let items = await fetchReplies.getReplies(userId: user.id, localUsers: users, pageSize: pageSize)
-        self.replies.append(contentsOf: items)
-    
-    }
 
     @MainActor
     func fetchNextReplies(currentUser: User?) async {
@@ -88,6 +76,23 @@ class UserContentListViewModel: ObservableObject {
         await fetchReplies(currentUser: currentUser)
         
         self.isLoading = false
+        
+    }
+    
+    @MainActor
+    private func fetchReplies(currentUser: User?) async {
+        
+        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
+        let items = await fetchReplies.getReplies(userId: user.id, localUsers: users, pageSize: pageSize)
+        self.replies.append(contentsOf: items)
+    
+    }
+    
+    @MainActor
+    private func fetchColloquies() async {
+        
+        let items = await fetchColloquies.getUserColloquies(user: user, pageSize: pageSize)
+        self.colloquies.append(contentsOf: items)
         
     }
 }

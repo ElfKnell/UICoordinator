@@ -25,7 +25,12 @@ struct CreateReplyView: View {
                     db: FirestoreAdapter()),
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
-                    userService: UserService())),
+                    userService: UserService()),
+                deleteLikes: LikesDeleteService(
+                    likeServise: LikeService(
+                        serviceCreate: FirestoreLikeCreateServise(),
+                        serviceDetete: FirestoreGeneralDeleteService(
+                            db: FirestoreAdapter())))),
             increment: ColloquyInteractionCounterService())
     }) {
         

@@ -13,6 +13,7 @@ protocol UserFollowersProtocol {
     var countFollowers: Int { get set }
     var countFollowing: Int { get set }
     var followingIdsForCurrentUser: [String] { get }
+    var followersIdsForCurrentUser: [String] { get }
     var followersCurrentUsers: [Follow] { get }
 
     func loadFollowersCurrentUser(userId: String?) async

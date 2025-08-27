@@ -40,7 +40,7 @@ struct ColloquyCellForCurrentUser: View {
                             .foregroundStyle(Color(.systemGray3))
                         
                         Button {
-                            colloquyService.deleteColloquy(colloquy.id)
+                            colloquyService.deleteColloquy(colloquy)
                             isDeleted.toggle()
                         } label: {
                             Image(systemName: "trash.circle")

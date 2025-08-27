@@ -97,9 +97,17 @@ struct UserContentListView: View {
                     }
                 }
                 .task {
+                    
+                    await viewModel.startLoadColloquies()
+                    
                     UIDevice.current.beginGeneratingDeviceOrientationNotifications()
                     NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
                         isLandscape = UIDevice.current.orientation.isLandscape
+                    }
+                }
+                .onChange(of: isDeleted) {
+                    Task {
+                        await viewModel.startLoadColloquies()
                     }
                 }
             } else {
@@ -132,6 +140,8 @@ struct UserContentListView: View {
                 .padding(.horizontal)
                 .task {
                     
+                    await viewModel.startReplies(currentUser: container.currentUserService.currentUser)
+                    
                     UIDevice.current.beginGeneratingDeviceOrientationNotifications()
                     NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { _ in
                         isLandscape = UIDevice.current.orientation.isLandscape
@@ -140,11 +150,7 @@ struct UserContentListView: View {
             }
         }
         .padding(.vertical, 8)
-        .onChange(of: isDeleted) {
-            Task {
-                await viewModel.loadDate(currentUser: container.currentUserService.currentUser)
-            }
-        }
+        
     }
 }
 
