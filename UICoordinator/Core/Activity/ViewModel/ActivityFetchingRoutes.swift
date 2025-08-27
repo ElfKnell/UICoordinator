@@ -23,6 +23,11 @@ class ActivityFetchingRoutes: ActivityFetchingRoutesProtocol {
                        endPoint: CLLocationCoordinate2D,
                        transportType: MKDirectionsTransportType?) async throws -> MKRoute? {
         
+        if startingPoint.latitude == endPoint.latitude &&
+            startingPoint.longitude == endPoint.longitude {
+            return nil
+        }
+        
         return try await retry(maxRetries: 3, delay: 3) {
             
             let request = MKDirections.Request()
