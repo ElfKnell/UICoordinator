@@ -8,15 +8,18 @@
 import Foundation
 
 class ColloquyServiceViewModel: ObservableObject {
+    
+    @Published var isRemove = false
+    
     let colloquyServise: ColloquyServiceProtocol
     
     init(colloquyServise: ColloquyServiceProtocol) {
         self.colloquyServise = colloquyServise
     }
     
-    func deleteColloquy(_ colloquy: Colloquy) {
-        Task {
-            await colloquyServise.deleteColloquy(colloquy)
-        }
+    func deleteColloquy(_ colloquy: Colloquy) async {
+        
+        await colloquyServise.deleteColloquy(colloquy)
+        
     }
 }

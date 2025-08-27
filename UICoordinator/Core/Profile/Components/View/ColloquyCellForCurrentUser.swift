@@ -40,8 +40,7 @@ struct ColloquyCellForCurrentUser: View {
                             .foregroundStyle(Color(.systemGray3))
                         
                         Button {
-                            colloquyService.deleteColloquy(colloquy)
-                            isDeleted.toggle()
+                            colloquyService.isRemove = true
                         } label: {
                             Image(systemName: "trash.circle")
                                 .foregroundStyle(.red)
@@ -103,6 +102,25 @@ struct ColloquyCellForCurrentUser: View {
         .padding([.horizontal, .top])
         .task {
             await viewModel.isLike(cid: colloquy.id, currentUserId: user.id)
+        }
+        .alert("Delete colloquy?", isPresented: $colloquyService.isRemove) {
+            
+            Button("Cancel", role: .cancel) {
+                colloquyService.isRemove = false
+            }
+            
+            Button("Delete") {
+                Task {
+                    
+                    await colloquyService.deleteColloquy(colloquy)
+                    
+                    isDeleted.toggle()
+                    colloquyService.isRemove = false
+                    
+                }
+            }
+        } message: {
+            Text("Once this colloquy is deleted, it cannot be restored. Are you sure you want to continue?")
         }
         .sheet(item: $sheetStatus) { status in
             switch status {
