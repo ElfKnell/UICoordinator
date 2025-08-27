@@ -11,4 +11,6 @@ protocol FetchLocationsProtocol {
     
     func getLocations(userId: String, pageSize: Int) async -> [Location]
     
+    func reload()
+    
 }

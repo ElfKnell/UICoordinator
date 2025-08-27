@@ -49,4 +49,11 @@ class FetchLocationsFromFirebase: FetchLocationsProtocol {
             
         }
     }
+    
+    func reload() {
+        
+        self.lastDocument = nil
+        self.isDataLoaded = false
+
+    }
 }

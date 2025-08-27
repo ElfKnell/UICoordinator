@@ -11,6 +11,8 @@ import SwiftUI
 
 class LocationViewModel: ObservableObject {
     
+    private let pageSize = 20
+    
     var coordinatePosition: CLLocationCoordinate2D?
     
     @Published var locations = [Location]()
@@ -29,17 +31,18 @@ class LocationViewModel: ObservableObject {
 
     @Published var showSearch = false
     @Published var isSave = false
+    @Published var isDeleted = false
     @Published var tappedOnAnnotation = false
     
     @Published var routerColor: Color = .blue
     
     private let locationService: FetchLocationFormFirebaseProtocol
-    private let fetchLocations: FetchLocations
+    private let fetchLocations: FetchLocationsProtocol
     
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
     init(locationService: FetchLocationFormFirebaseProtocol,
-         fetchLocations: FetchLocations) {
+         fetchLocations: FetchLocationsProtocol) {
         
         self.locationService = locationService
         self.fetchLocations = fetchLocations
@@ -49,9 +52,10 @@ class LocationViewModel: ObservableObject {
     @MainActor
     func fetchLocationsByCurrentUser(userId: String?) async {
         
-        if self.locations.isEmpty {
+        if let userId = userId, self.locations.isEmpty {
             
-            self.locations = await fetchLocations.fetchLocations(userId)
+            fetchLocations.reload()
+            self.locations = await fetchLocations.getLocations(userId: userId, pageSize: pageSize)
             
             getCameraPosition()
             
@@ -61,13 +65,25 @@ class LocationViewModel: ObservableObject {
     }
     
     @MainActor
+    func updateLocationsByCurrentUser(userId: String?) async {
+        
+        guard let userId else { return }
+        fetchLocations.reload()
+        self.locations = await fetchLocations.getLocations(userId: userId, pageSize: pageSize)
+        
+    }
+    
+    @MainActor
     func fetchMoreLocationsByCurentUser(userId: String?) {
         
         Task {
-            let fetchingLocation = await fetchLocations.fetchLocations(userId)
+            
+            guard let userId else { return }
+            let fetchingLocation = await fetchLocations.getLocations(userId: userId, pageSize: pageSize)
             if !fetchingLocation.isEmpty {
                 self.locations.append(contentsOf: fetchingLocation)
             }
+            
         }
     }
     
@@ -124,6 +140,7 @@ class LocationViewModel: ObservableObject {
                     $0.id == mapSelection.id
                 }) {
                     locations.remove(at: index)
+                    isDeleted.toggle()
                 }
             }
             

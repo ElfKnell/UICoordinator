@@ -17,7 +17,7 @@ struct LocationsView: View {
     init(viewModelBilder: @escaping () -> LocationViewModel = {
         LocationViewModel(
             locationService: FetchLocationFromFirebase(),
-            fetchLocations: FetchLocations(fetchLocationByUser: FetchLocationsFromFirebase()))
+            fetchLocations: FetchLocationsFromFirebase())
     }) {
         self._viewModel = StateObject(wrappedValue: viewModelBilder())
     }
@@ -97,13 +97,19 @@ struct LocationsView: View {
                     }
                 }
                 .task {
-                    await viewModel.fetchLocationsByCurrentUser(userId: container.authService.userSession?.uid)
+                    await viewModel
+                        .fetchLocationsByCurrentUser(
+                            userId: container
+                                .authService
+                                .userSession?.uid)
                 }
                 .onChange(of: viewModel.mapSelection) { oldValue, newValue in
 
                     if let selectedPlace = viewModel.mapSelection {
 
-                        viewModel.mapSelection = viewModel.verifyLocation(selectedLocation: selectedPlace)
+                        viewModel.mapSelection = viewModel
+                            .verifyLocation(
+                                selectedLocation: selectedPlace)
                         
                     } else {
                         viewModel.sheetConfig = nil
@@ -113,10 +119,20 @@ struct LocationsView: View {
             }
             .navigationTitle("Map Locations")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(item: $viewModel.navigatedLocation, destination: { location in
+            .navigationDestination(item: $viewModel.navigatedLocation) { location in
                 LocationEditView(location: location)
                     .environmentObject(viewModel)
-            })
+            }
+            .onChange(of: viewModel.isDeleted) {
+                Task {
+                    
+                    await viewModel
+                        .updateLocationsByCurrentUser(
+                            userId: container
+                                .authService
+                                .userSession?.uid)
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 HStack {
                     
