@@ -10,7 +10,7 @@ import Firebase
 
 class RouteCreateService: CreateRouterProtocol {
     
-    private let routeCollection = "Route"
+    private let routeCollection = "route"
     let serviceCreate: FirestoreAddDocumentWithIDProtocol
     
     init(serviceCreate: FirestoreAddDocumentWithIDProtocol) {

@@ -37,7 +37,7 @@ class VideoService: VideoServiceProtocol {
                 .encode(video) else { return }
             
             try await Firestore.firestore()
-                .collection("Video")
+                .collection("video")
                 .addDocument(data: videoData)
         } catch {
             print("ERROR WHILE UPLOADING VIDEO: \(error.localizedDescription)")
@@ -48,7 +48,7 @@ class VideoService: VideoServiceProtocol {
         
         let snapshot = try await Firestore
             .firestore()
-            .collection("Video")
+            .collection("video")
             .whereField("locationUid", isEqualTo: locationId)
             .getDocuments()
         let videos = snapshot.documents.compactMap({ try? $0.data(as: Video.self)})
@@ -58,7 +58,7 @@ class VideoService: VideoServiceProtocol {
     func updatTitle(vId:String, title: String) async throws {
         
         try await Firestore.firestore()
-            .collection("Video")
+            .collection("video")
             .document(vId)
             .updateData(["title": title])
     }
@@ -70,7 +70,7 @@ class VideoService: VideoServiceProtocol {
         try await storageRef.delete()
         
         try await Firestore.firestore()
-            .collection("Video")
+            .collection("video")
             .document(video.id).delete()
         
     }

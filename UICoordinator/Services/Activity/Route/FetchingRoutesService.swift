@@ -10,7 +10,7 @@ import Foundation
 
 class FetchingRoutesService: FetchingRoutesServiceProtocol {
     
-    private let routeCollection = "Route"
+    private let routeCollection = "route"
     
     func fetchRoutes(activityId: String) async throws -> [StoredRoute] {
         

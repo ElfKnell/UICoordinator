@@ -17,6 +17,7 @@ class ActivityDelete: ActivityDeleteProtocol {
     let photoService: PhotoServiceProtocol
     let videoService: VideoServiceProtocol
     let routesServise: RouteDeleteServiceProtocol
+    let colloquyService: ColloquyServiceProtocol
     
     init(servaceDelete: FirestoreGeneralDeleteProtocol,
          locationDelete: DeleteLocationProtocol,
@@ -24,7 +25,8 @@ class ActivityDelete: ActivityDeleteProtocol {
          spreadDelete: DeleteSpreadServiceProtocol,
          photoService: PhotoServiceProtocol,
          videoService: VideoServiceProtocol,
-         routesServise: RouteDeleteServiceProtocol) {
+         routesServise: RouteDeleteServiceProtocol,
+         colloquyService: ColloquyServiceProtocol) {
         
         self.servaceDelete = servaceDelete
         self.locationDelete = locationDelete
@@ -33,6 +35,7 @@ class ActivityDelete: ActivityDeleteProtocol {
         self.photoService = photoService
         self.videoService = videoService
         self.routesServise = routesServise
+        self.colloquyService = colloquyService
     }
     
     func markActivityForDelete(activityId: String) async {
@@ -69,6 +72,8 @@ class ActivityDelete: ActivityDeleteProtocol {
             }
             
             try await routesServise.deleteByActivity(activityId: activity.id)
+            
+            await colloquyService.deleteColloquy(activity)
             
             await locationDelete.deleteLocations(with: activity.locationsId)
             

@@ -10,7 +10,7 @@ import Firebase
 
 class FetchingRouteService: FetchingRouteServiceProtocol {
     
-    private let routeCollection = "Route"
+    private let routeCollection = "route"
     private let db = Firestore.firestore()
     
     func fetchStoredRoute(_ id: String) async throws -> StoredRoute? {

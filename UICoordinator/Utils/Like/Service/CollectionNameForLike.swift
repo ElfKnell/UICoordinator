@@ -14,7 +14,7 @@ enum CollectionNameForLike {
     var value: String {
         switch self {
         case .likes:
-            return "Likes"
+            return "likes"
         case .activityLikes:
             return "activity_likes"
         }

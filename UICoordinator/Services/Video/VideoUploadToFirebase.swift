@@ -50,7 +50,7 @@ class VideoUploadToFirebase: VideoUploadToFirebaseProtocol {
             }
             
             try await Firestore.firestore()
-                .collection("Video")
+                .collection("video")
                 .addDocument(data: videoData)
         } catch let encodingError as EncodingError {
             throw VideoServiceError.firestoreEncodingFailed(encodingError)

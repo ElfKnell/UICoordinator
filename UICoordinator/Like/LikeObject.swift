@@ -9,6 +9,9 @@ import Foundation
 
 protocol LikeObject: Identifiable {
     
+    var id: String { get }
     var ownerUid: String { get }
     var likes: Int { get }
+    var repliesCount: Int? { get }
+    
 }

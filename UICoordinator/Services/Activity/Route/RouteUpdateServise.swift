@@ -11,7 +11,7 @@ import Firebase
 
 class RouteUpdateServise: RouteUpdateServiseProtocol {
     
-    private let routeCollection = "Route"
+    private let routeCollection = "route"
     
     func updateRoute(_ route: RoutePair) async throws {
         

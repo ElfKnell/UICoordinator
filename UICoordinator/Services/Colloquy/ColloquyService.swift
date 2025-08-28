@@ -65,7 +65,7 @@ class ColloquyService: ColloquyServiceProtocol {
         }
     }
     
-    func deleteColloquy(_ colloquy: Colloquy) async {
+    func deleteColloquy(_ colloquy: any LikeObject) async {
         
         let collectionName = "colloquies"
         
@@ -74,8 +74,7 @@ class ColloquyService: ColloquyServiceProtocol {
                 let replies = try await repliesFetchingService.getRepliesByColloquy(colloquyId: colloquy.id)
                 
                 for reply in replies {
-                    try await serviceDetete.deleteDocument(from: collectionName, documentId: reply.id)
-                    await deleteLikes.likesDelete(objectId: reply.id, collectionName: .likes)
+                    await deleteColloquy(reply)
                 }
             }
             

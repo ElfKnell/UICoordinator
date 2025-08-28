@@ -17,7 +17,7 @@ class FirestoreFollowService: FirestoreFollowServiceProtocol {
         }
         
         let snapshot = try await Firestore.firestore()
-            .collection("Follow")
+            .collection("follow")
             .whereField(followField.value, isEqualTo: uid)
             .getDocuments()
         
@@ -34,7 +34,7 @@ class FirestoreFollowService: FirestoreFollowServiceProtocol {
         }
         
         let query = Firestore.firestore()
-            .collection("Follow")
+            .collection("follow")
             .whereField(followField.value, isEqualTo: uid)
         
         let snapshot = try await query.count.getAggregation(source: .server)

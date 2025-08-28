@@ -33,14 +33,26 @@ struct ActivityCellFactory {
                 routesServise: RouteDeleteService(
                     servіceDelete: FirestoreGeneralDeleteService(
                         db: FirestoreAdapter()),
-                    fetchingRoutes: FetchingRoutesService()))
+                    fetchingRoutes: FetchingRoutesService()),
+                colloquyService: ColloquyService(
+                    serviceDetete: FirestoreGeneralDeleteService(
+                        db: FirestoreAdapter()),
+                    repliesFetchingService: FetchRepliesFirebase(
+                        fetchLocation: FetchLocationFromFirebase(),
+                        userService: UserService()),
+                    deleteLikes: LikesDeleteService(
+                        likeServise: LikeService(
+                            serviceCreate: FirestoreLikeCreateServise(),
+                            serviceDetete: FirestoreGeneralDeleteService(
+                                db: FirestoreAdapter())))))
         )
         
         let viewModelLike = LikesViewModel(
             collectionName: .activityLikes,
             likeCount: ColloquyInteractionCounterService(),
             likeService: LikeService(serviceCreate: FirestoreLikeCreateServise(),
-                                     serviceDetete: FirestoreGeneralDeleteService(db: FirestoreAdapter())),
+                                     serviceDetete: FirestoreGeneralDeleteService(
+                                        db: FirestoreAdapter())),
             fethingLike: FetchLikesService(likeRepository: FirestoreLikeRepository()),
             activityUpdate: ActivityServiceUpdate()
         )

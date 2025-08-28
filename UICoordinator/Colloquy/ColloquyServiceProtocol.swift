@@ -15,6 +15,6 @@ protocol ColloquyServiceProtocol {
     
     func unmarkForDelete(_ colloquyId: String) async
     
-    func deleteColloquy(_ colloquy: Colloquy) async
+    func deleteColloquy(_ colloquy: any LikeObject) async
     
 }

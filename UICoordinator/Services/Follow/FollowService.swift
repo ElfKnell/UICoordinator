@@ -10,7 +10,7 @@ import FirebaseFirestoreSwift
 
 class FollowService: FollowServiceProtocol {
     
-    private let nameCollection = "Follow"
+    private let nameCollection = "follow"
     let serviceCreate: FirestoreGeneralCreateServiseProtocol
     let servaceDelete: FirestoreGeneralDeleteProtocol
     
