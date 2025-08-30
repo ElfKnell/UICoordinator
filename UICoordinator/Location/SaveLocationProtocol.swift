@@ -8,5 +8,7 @@
 import Foundation
 
 protocol SaveLocationProtocol {
-    func uploadLocation(_ location: Location) async
+    
+    func uploadLocation(_ location: Location) async throws
+    
 }

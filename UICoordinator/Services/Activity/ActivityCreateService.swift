@@ -16,19 +16,15 @@ class ActivityCreateService: ActivityCreateProtocol {
         self.serviceCreate = serviceCreate
     }
     
-    func uploadedActivity(_ activity: Activity) async {
+    func uploadedActivity(_ activity: Activity) async throws {
         
-        do {
-            guard let activityData = try? Firestore.Encoder()
-                .encode(activity) else {
-                throw ErrorActivity.encodingFailed
-            }
-            
-            try await self.serviceCreate.addDocument(from: "Activity", data: activityData)
-            
-        } catch {
-            print("ERROR CREATE ACTIVITY: \(error.localizedDescription)")
+        guard let activityData = try? Firestore.Encoder()
+            .encode(activity) else {
+            throw ErrorActivity.encodingFailed
         }
+        
+        try await self.serviceCreate.addDocument(from: "Activity", data: activityData)
+        
     }
 
 }

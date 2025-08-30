@@ -11,9 +11,9 @@ protocol FetchLikesServiceProtocol {
     
     func getLikes(collectionName: CollectionNameForLike,
                   byField field: FieldToFetchingLike,
-                  userId id: String?) async -> [Like]
+                  userId id: String?) async throws -> [Like]
     
     func getLikeByColloquyAndUser(collectionName: CollectionNameForLike,
                                   colloquyId: String,
-                                  userId: String?) async -> String?
+                                  userId: String?) async throws -> String?
 }

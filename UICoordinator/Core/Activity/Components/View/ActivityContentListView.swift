@@ -90,6 +90,11 @@ struct ActivityContentListView: View {
                     .task {
                         await activityAll.refresh(currentUser: currentUser)
                     }
+                    .alert("Fetching error", isPresented: $activityAll.isError) {
+                        Button("Ok", role: .cancel) {}
+                    } message: {
+                        Text(activityAll.errorMessage ?? "not discription")
+                    }
                     
                 } else if selectedFilter == .currentUserActivities {
 
@@ -127,6 +132,11 @@ struct ActivityContentListView: View {
                         Task {
                             await activityMy.refresh(currentUser: currentUser)
                         }
+                    }
+                    .alert("Fetching error", isPresented: $activityMy.isError) {
+                        Button("Ok", role: .cancel) {}
+                    } message: {
+                        Text(activityMy.errorMessage ?? "not discription")
                     }
                     
                 } else {

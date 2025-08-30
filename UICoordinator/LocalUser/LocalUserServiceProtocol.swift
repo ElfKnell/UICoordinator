@@ -8,7 +8,7 @@
 import Foundation
 
 protocol LocalUserServiceProtocol {
-    func fetchLocalUsers() async -> [LocalUser]
+    func fetchLocalUsers() async throws -> [LocalUser]
     
-    func fetchUsersbyLocalUsers(currentUser: User?) async -> [User]
+    func fetchUsersbyLocalUsers(currentUser: User?) async throws -> [User]
 }

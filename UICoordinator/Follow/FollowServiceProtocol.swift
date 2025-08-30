@@ -9,8 +9,8 @@ import Foundation
 
 protocol FollowServiceProtocol {
     
-    func uploadeFollow(_ follow: Follow) async
+    func uploadeFollow(_ follow: Follow) async throws
     
-    func deleteFollow(followId: String) async
+    func deleteFollow(followId: String) async throws
     
 }

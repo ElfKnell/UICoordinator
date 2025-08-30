@@ -124,11 +124,11 @@ struct EditProfileView: View {
                 .padding()
                 .foregroundStyle(.black)
             }
-            .alert("Udate error", isPresented: $viewModel.isError, actions: {
+            .alert("Delete error", isPresented: $viewModel.isError) {
                 Button("Ok", role: .cancel) {}
-            }, message: {
+            } message: {
                 Text(viewModel.errorMessage ?? "not discription")
-            })
+            }
             .navigationTitle("Edit Profile")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {

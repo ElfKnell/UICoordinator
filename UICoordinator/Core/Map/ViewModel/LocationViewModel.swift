@@ -8,6 +8,7 @@
 import Firebase
 import MapKit
 import SwiftUI
+import FirebaseCrashlytics
 
 class LocationViewModel: ObservableObject {
     
@@ -24,6 +25,8 @@ class LocationViewModel: ObservableObject {
     
     @Published var mapSelection: Location?
     @Published var navigatedLocation: Location?
+    
+    @Published var messageError: String?
 
     @Published var sheetConfig: MapSheetConfig? = nil
     
@@ -32,6 +35,7 @@ class LocationViewModel: ObservableObject {
     @Published var showSearch = false
     @Published var isSave = false
     @Published var isDeleted = false
+    @Published var isError = false
     @Published var tappedOnAnnotation = false
     
     @Published var routerColor: Color = .blue
@@ -52,14 +56,26 @@ class LocationViewModel: ObservableObject {
     @MainActor
     func fetchLocationsByCurrentUser(userId: String?) async {
         
-        if let userId = userId, self.locations.isEmpty {
+        self.isError = false
+        self.messageError = nil
+        
+        do {
             
-            fetchLocations.reload()
-            self.locations = await fetchLocations.getLocations(userId: userId, pageSize: pageSize)
+            if let userId = userId, self.locations.isEmpty {
+                
+                fetchLocations.reload()
+                self.locations = try await fetchLocations
+                    .getLocations(userId: userId, pageSize: pageSize)
+                
+                getCameraPosition()
+                
+                loadColor()
+            }
             
-            getCameraPosition()
-            
-            loadColor()
+        } catch {
+            self.isError = true
+            self.messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
         
     }
@@ -67,10 +83,21 @@ class LocationViewModel: ObservableObject {
     @MainActor
     func updateLocationsByCurrentUser(userId: String?) async {
         
-        guard let userId else { return }
-        fetchLocations.reload()
-        self.locations = await fetchLocations.getLocations(userId: userId, pageSize: pageSize)
+        self.isError = false
+        self.messageError = nil
         
+        do {
+            
+            guard let userId else { return }
+            fetchLocations.reload()
+            self.locations = try await fetchLocations
+                .getLocations(userId: userId, pageSize: pageSize)
+            
+        } catch {
+            self.isError = true
+            self.messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
     
     @MainActor
@@ -78,39 +105,61 @@ class LocationViewModel: ObservableObject {
         
         Task {
             
-            guard let userId else { return }
-            let fetchingLocation = await fetchLocations.getLocations(userId: userId, pageSize: pageSize)
-            if !fetchingLocation.isEmpty {
-                self.locations.append(contentsOf: fetchingLocation)
-            }
+            self.isError = false
+            self.messageError = nil
             
+            do {
+                
+                guard let userId else { return }
+                let fetchingLocation = try await fetchLocations
+                    .getLocations(userId: userId, pageSize: pageSize)
+                if !fetchingLocation.isEmpty {
+                    self.locations.append(contentsOf: fetchingLocation)
+                }
+                
+            } catch {
+                self.isError = true
+                self.messageError = error.localizedDescription
+                Crashlytics.crashlytics().record(error: error)
+            }
         }
     }
     
     @MainActor
     func addLocation(userId: String?) {
         
+        self.isError = false
+        self.messageError = nil
+        
         guard let userId = userId else { return }
         guard let coordinate = customAnnotation?.coordinate else { return }
         
         Task {
             
-            let location = await locationService.getLocation(
-                userId: userId,
-                coordinate: coordinate
-            )
-            
-            if let location = location {
+            do {
                 
-                if !locations.contains(where: {
-                    $0.id == location.id
-                }) {
-                    locations.append(location)
+                let location = try await locationService.getLocation(
+                    userId: userId,
+                    coordinate: coordinate
+                )
+                
+                if let location = location {
+                    
+                    if !locations.contains(where: {
+                        $0.id == location.id
+                    }) {
+                        locations.append(location)
+                    }
+                    cameraPosition = .region(location.regionCoordinate)
                 }
-                cameraPosition = .region(location.regionCoordinate)
+                
+                customAnnotation = nil
+                
+            } catch {
+                self.isError = true
+                self.messageError = error.localizedDescription
+                Crashlytics.crashlytics().record(error: error)
             }
-            
-            customAnnotation = nil
         }
     }
     
@@ -119,29 +168,39 @@ class LocationViewModel: ObservableObject {
         
         guard let userId = userId else { return }
         guard let mapSelection = mapSelection else { return }
+        self.isError = false
+        self.messageError = nil
         
         Task {
             
-            switch await locationService.getLocation(
-                userId: userId,
-                coordinate: mapSelection.coordinate
-            ) {
+            do {
                 
-            case let location?:
-                if let index = locations.firstIndex(where: {
-                    $0.id == location.id
-                }) {
-                    locations[index] = location
+                switch try await locationService.getLocation(
+                    userId: userId,
+                    coordinate: mapSelection.coordinate
+                ) {
+                    
+                case let location?:
+                    if let index = locations.firstIndex(where: {
+                        $0.id == location.id
+                    }) {
+                        locations[index] = location
+                    }
+                    cameraPosition = .region(location.regionCoordinate)
+                    
+                case nil:
+                    if let index = locations.firstIndex(where: {
+                        $0.id == mapSelection.id
+                    }) {
+                        locations.remove(at: index)
+                        isDeleted.toggle()
+                    }
                 }
-                cameraPosition = .region(location.regionCoordinate)
                 
-            case nil:
-                if let index = locations.firstIndex(where: {
-                    $0.id == mapSelection.id
-                }) {
-                    locations.remove(at: index)
-                    isDeleted.toggle()
-                }
+            } catch {
+                self.isError = true
+                self.messageError = error.localizedDescription
+                Crashlytics.crashlytics().record(error: error)
             }
             
             self.mapSelection = nil

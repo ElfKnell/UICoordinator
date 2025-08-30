@@ -7,6 +7,7 @@
 
 import MapKit
 import SwiftUI
+import FirebaseCrashlytics
 
 class SearchLocationViewModel: ObservableObject {
     
@@ -35,13 +36,25 @@ class SearchLocationViewModel: ObservableObject {
 
     private func serchPlace(region: MKCoordinateRegion?, searchText: String) async -> [MKMapItem] {
         
-        guard let region = region else { return [] }
+        guard let region = region else {
+            Crashlytics.crashlytics().log("Search failed: region is nil")
+            return []
+        }
+        
         let request = MKLocalSearch.Request()
         
         request.naturalLanguageQuery = searchText
         request.region = region
         
-        let result = try? await MKLocalSearch(request: request).start()
-        return result?.mapItems ?? []
+        do {
+            
+            let result = try await MKLocalSearch(request: request).start()
+            return result.mapItems
+            
+        } catch {
+            Crashlytics.crashlytics().record(error: error)
+            Crashlytics.crashlytics().log("Search failed for text: \(searchText)")
+            return []
+        }
     }
 }

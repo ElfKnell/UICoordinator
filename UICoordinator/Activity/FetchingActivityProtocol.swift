@@ -10,8 +10,8 @@ import Foundation
 
 protocol FetchingActivityProtocol {
     
-    func fetchActivity(documentId: String) async -> Activity
+    func fetchActivity(documentId: String) async throws -> Activity
     
-    func fetchActivity(time: Timestamp, userId: String) async -> Activity?
+    func fetchActivity(time: Timestamp, userId: String) async throws -> Activity?
     
 }

@@ -15,89 +15,79 @@ class FetchingActivitiesService: FetchingActivitiesProtocol {
     private var lastDocumentByUser: DocumentSnapshot?
     private var isDataLoadedByUser = false
     
-    func fetchActivities(users: [User], pageSize: Int) async -> [Activity] {
+    func fetchActivities(users: [User], pageSize: Int) async throws -> [Activity] {
         
-        do {
-            if users.isEmpty { return [] }
-            if isDataLoaded { return [] }
-            let usersId = users.map({ $0.id })
-            
-            var query = Firestore
-                .firestore()
-                .collection("Activity")
-                .whereField("ownerUid", in: usersId)
-                .whereField("isDelete", isNotEqualTo: true)
-                .order(by: "time", descending: true)
-                .limit(to: pageSize)
-            
-            if let lastDoc = lastDocument {
-                query = query.start(afterDocument: lastDoc)
-            }
-            
-            let snapshot = try await query.getDocuments()
-            
-            if snapshot.documents.isEmpty {
-                isDataLoaded = true
-                return []
-            }
-            
-            self.lastDocument = snapshot.documents.last
-            
-            var activitys = snapshot.documents.compactMap({ try? $0.data(as: Activity.self)})
-            
-            for i in 0 ..< activitys.count
-            {
-                let ownerUser = users.first(where: { $0.id == activitys[i].ownerUid })
-                activitys[i].user = ownerUser
-            }
-            
-            return activitys
-            
-        } catch {
-            print("ERROR FETCHING ACTIVITIES: \(error.localizedDescription)")
+        if users.isEmpty { return [] }
+        if isDataLoaded { return [] }
+        let usersId = users.map({ $0.id })
+        
+        var query = Firestore
+            .firestore()
+            .collection("Activity")
+            .whereField("ownerUid", in: usersId)
+            .whereField("isDelete", isNotEqualTo: true)
+            .order(by: "time", descending: true)
+            .limit(to: pageSize)
+        
+        if let lastDoc = lastDocument {
+            query = query.start(afterDocument: lastDoc)
+        }
+        
+        let snapshot = try await query.getDocuments()
+        
+        if snapshot.documents.isEmpty {
+            isDataLoaded = true
             return []
         }
+        
+        self.lastDocument = snapshot.documents.last
+        
+        var activitys = snapshot.documents.compactMap({ try? $0.data(as: Activity.self)})
+        
+        for i in 0 ..< activitys.count
+        {
+            let ownerUser = users.first(where: { $0.id == activitys[i].ownerUid })
+            activitys[i].user = ownerUser
+        }
+        
+        return activitys
+        
     }
     
-    func fetchActivitiesByUser(user: User, pageSize: Int) async -> [Activity] {
+    func fetchActivitiesByUser(user: User, pageSize: Int) async throws -> [Activity] {
         
-        do {
-            if isDataLoadedByUser { return [] }
-            
-            var query = Firestore
-                .firestore()
-                .collection("Activity")
-                .whereField("ownerUid", isEqualTo: user.id)
-                .whereField("isDelete", isNotEqualTo: true)
-                .order(by: "time", descending: true)
-                .limit(to: pageSize)
-            
-            if let lastDoc = lastDocumentByUser {
-                query = query.start(afterDocument: lastDoc)
-            }
-            
-            let snapshot = try await query.getDocuments()
-            
-            if snapshot.documents.isEmpty {
-                isDataLoadedByUser = true
-                return []
-            }
-            
-            self.lastDocumentByUser = snapshot.documents.last
-            
-            var activities = snapshot.documents.compactMap({ try? $0.data(as: Activity.self)})
-            
-            for i in 0 ..< activities.count
-            {
-                activities[i].user = user
-            }
-            
-            return activities
-            
-        } catch {
-            print("ERROR FETCHING ACTIVITIES BY USER: \(error.localizedDescription)")
+        if isDataLoadedByUser { return [] }
+        
+        var query = Firestore
+            .firestore()
+            .collection("Activity")
+            .whereField("ownerUid", isEqualTo: user.id)
+            .whereField("isDelete", isNotEqualTo: true)
+            .order(by: "time", descending: true)
+            .limit(to: pageSize)
+        
+        if let lastDoc = lastDocumentByUser {
+            query = query.start(afterDocument: lastDoc)
+        }
+        
+        let snapshot = try await query.getDocuments()
+        
+        if snapshot.documents.isEmpty {
+            isDataLoadedByUser = true
             return []
         }
+        
+        self.lastDocumentByUser = snapshot.documents.last
+        
+        var activities = snapshot.documents.compactMap({ try? $0.data(as: Activity.self)})
+        
+        for i in 0 ..< activities.count
+        {
+            activities[i].user = user
+        }
+        
+        return activities
+        
     }
     
     func clean() {

@@ -61,6 +61,11 @@ struct FeedView: View {
                         await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                     }
                 }
+                .alert("Fetching error", isPresented: $viewModel.isError) {
+                    Button("Ok", role: .cancel) {}
+                } message: {
+                    Text(viewModel.messageError ?? "not discription")
+                }
                 .navigationTitle("Colloquies")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {

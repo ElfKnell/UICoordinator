@@ -10,12 +10,6 @@ import SwiftUI
 
 class LocationDetailViewModel: ObservableObject {
 
-    private let fetchLocations: FetchLocationForActivityProtocol
-    
-    init(fetchLocations: FetchLocationForActivityProtocol) {
-        self.fetchLocations = fetchLocations
-    }
-
     func openMap(mapSeliction: Location?) {
         if let mapSeliction {
             let mapToOpen: MKMapItem = .init(placemark: .init(coordinate: mapSeliction.coordinate))

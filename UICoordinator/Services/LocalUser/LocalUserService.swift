@@ -12,47 +12,38 @@ class LocalUserService: LocalUserServiceProtocol {
     
     private var userActor: UserDataActor?
     
-    func fetchLocalUsers() async -> [LocalUser] {
+    func fetchLocalUsers() async throws -> [LocalUser] {
         
-        do {
-            var users = [LocalUser]()
-            
-            try await ensureActorReady()
-            
-            let allUsers = try await userActor?.fetchAllUsers()
-            
-            if let allUsers = allUsers {
-                users = allUsers
-            }
-            return users
-            
-        } catch {
-            print("ERROR fetch users by localUsers: \(error.localizedDescription)")
-            return []
+        var users = [LocalUser]()
+        
+        try await ensureActorReady()
+        
+        let allUsers = try await userActor?.fetchAllUsers()
+        
+        if let allUsers = allUsers {
+            users = allUsers
         }
+        return users
+        
     }
     
-    func fetchUsersbyLocalUsers(currentUser: User?) async -> [User] {
+    func fetchUsersbyLocalUsers(currentUser: User?) async throws -> [User] {
         
-        do {
-            var users = [User]()
-            guard let currentUser else { return [] }
-            users.append(currentUser)
-            
-            try await ensureActorReady()
-            
-            let allUsers = try await userActor?.fetchAllUsers()
-            
-            if let allUsers = allUsers {
-                for userLocat in allUsers {
-                    users.append(userLocat.toFirebaseUser())
-                }
+        var users = [User]()
+        guard let currentUser else { return [] }
+        users.append(currentUser)
+        
+        try await ensureActorReady()
+        
+        let allUsers = try await userActor?.fetchAllUsers()
+        
+        if let allUsers = allUsers {
+            for userLocat in allUsers {
+                users.append(userLocat.toFirebaseUser())
             }
-            return users
-        } catch {
-            print("ERROR fetch users by localUsers: \(error.localizedDescription)")
-            return []
         }
+        return users
+        
     }
     
     private func ensureActorReady() async throws {

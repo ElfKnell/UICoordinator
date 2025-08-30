@@ -93,6 +93,11 @@ struct CreateReplyView: View {
                 }
         }
         .padding(.horizontal)
+        .alert("Create error", isPresented: $viewModel.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(viewModel.messageError ?? "not discription")
+        }
     }
 }
 

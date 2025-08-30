@@ -9,7 +9,7 @@ import Foundation
 
 protocol VideoServiceProtocol {
     
-    func uploadVideoStorage(withData videoData: Data, locationId: String) async
+    func uploadVideoStorage(withData videoData: Data, locationId: String) async throws
     
     func fetchVideosByLocation(_ locationId: String) async throws -> [Video]
     

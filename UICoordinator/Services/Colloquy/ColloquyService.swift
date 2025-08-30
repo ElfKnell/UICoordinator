@@ -23,66 +23,31 @@ class ColloquyService: ColloquyServiceProtocol {
         self.deleteLikes = deleteLikes
     }
     
-    func uploadeColloquy(_ colloquy: Colloquy) async {
+    func uploadeColloquy(_ colloquy: Colloquy) async throws {
         
-        do {
-            guard let colloquyData = try? Firestore.Encoder()
-                .encode(colloquy) else { return }
-            
-            try await Firestore.firestore()
-                .collection("colloquies")
-                .addDocument(data: colloquyData)
-        } catch {
-            print("ERROR \(error.localizedDescription)")
-        }
+        guard let colloquyData = try? Firestore.Encoder()
+            .encode(colloquy) else { return }
+        
+        try await Firestore.firestore()
+            .collection("colloquies")
+            .addDocument(data: colloquyData)
+        
     }
     
-    func markForDelete(_ colloquyId: String) async {
-        
-        do {
-                
-            try await Firestore.firestore()
-                .collection("colloquies")
-                .document(colloquyId)
-                .updateData(["isDelete": true])
-            
-        } catch {
-            print("ERROR Mark for Delete colloquy \(error.localizedDescription)")
-        }
-    }
-    
-    func unmarkForDelete(_ colloquyId: String) async {
-        
-        do {
-            
-            try await Firestore.firestore()
-                .collection("colloquies")
-                .document(colloquyId)
-                .updateData(["isDelete": false])
-            
-        } catch {
-            print("ERROR Mark for Delete colloquy \(error.localizedDescription)")
-        }
-    }
-    
-    func deleteColloquy(_ colloquy: any LikeObject) async {
+    func deleteColloquy(_ colloquy: any LikeObject) async throws {
         
         let collectionName = "colloquies"
         
-        do {
-            if colloquy.repliesCount ?? 0 > 0 {
-                let replies = try await repliesFetchingService.getRepliesByColloquy(colloquyId: colloquy.id)
-                
-                for reply in replies {
-                    await deleteColloquy(reply)
-                }
+        if colloquy.repliesCount ?? 0 > 0 {
+            let replies = try await repliesFetchingService.getRepliesByColloquy(colloquyId: colloquy.id)
+            
+            for reply in replies {
+                try await deleteColloquy(reply)
             }
-            
-            await deleteLikes.likesDelete(objectId: colloquy.id, collectionName: .likes)
-            try await serviceDetete.deleteDocument(from: collectionName, documentId: colloquy.id)
-            
-        } catch {
-            print("ERROR Delete colloquy \(error.localizedDescription)")
         }
+        
+        try await deleteLikes.likesDelete(objectId: colloquy.id, collectionName: .likes)
+        try await serviceDetete.deleteDocument(from: collectionName, documentId: colloquy.id)
+        
     }
 }

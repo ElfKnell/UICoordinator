@@ -8,6 +8,7 @@
 import Firebase
 import MapKit
 import SwiftUI
+import FirebaseCrashlytics
 
 class UserLocationsViewModel: ObservableObject {
     
@@ -28,9 +29,11 @@ class UserLocationsViewModel: ObservableObject {
     
     @Published var isSelected = false
     @Published var showSearch = false
+    @Published var isError = false
     @Published var sheetConfig: MapSheetConfig?
     
     @Published var userId: String
+    @Published var messageError: String?
     
     @AppStorage("styleMap") var styleMap: UserMapStyle = .standard
     
@@ -74,10 +77,24 @@ class UserLocationsViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     private func fetchLocations() async -> [Location] {
         
-        let locations = await fetchLocationsService.getLocations(userId: self.userId, pageSize: pageSize)
-
-        return locations
+        self.isError = false
+        self.messageError = nil
+        
+        do {
+            
+            let locations = try await fetchLocationsService
+                .getLocations(userId: self.userId, pageSize: pageSize)
+            
+            return locations
+            
+        } catch {
+            self.isError = true
+            self.messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+            return []
+        }
     }
 }

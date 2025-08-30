@@ -60,6 +60,11 @@ struct UserLocationsView: View {
         .navigationDestination(item: $viewModel.navigatedLocation) { location in
             InfoView(activity: location)
         }
+        .alert("Fetching error", isPresented: $viewModel.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(viewModel.messageError ?? "not discription")
+        }
         .sheet(isPresented: $viewModel.isSelected) {
             LocationsDetailView(
                 getDirectionsAction: {

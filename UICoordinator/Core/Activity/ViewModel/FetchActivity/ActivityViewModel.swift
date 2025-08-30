@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 
 @MainActor
 class ActivityViewModel: ObservableObject {
@@ -35,16 +36,23 @@ class ActivityViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func fetchLikeActivity(currentUser: User?) async {
         
-        let likes = await fetchingLikes.getLikes(collectionName: .activityLikes, byField: .ownerUidField, userId: currentUser?.id)
         self.errorMessage = nil
         self.activities = []
-        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
         
         do {
+            
+            let likes = try await fetchingLikes
+                .getLikes(collectionName: .activityLikes,
+                          byField: .ownerUidField,
+                          userId: currentUser?.id)
+            
+            let users = try await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
+            
             for like in likes {
-                var activity = await fetchingActivity.fetchActivity(documentId: like.colloquyId)
+                var activity = try await fetchingActivity.fetchActivity(documentId: like.colloquyId)
                 var activityUser = users.first(where: { $0.id == activity.ownerUid })
                 if activityUser == nil {
                     activityUser = try await userService.fetchUser(withUid: activity.ownerUid)
@@ -52,8 +60,10 @@ class ActivityViewModel: ObservableObject {
                 activity.user = activityUser
                 self.activities.append(activity)
             }
+            
         } catch {
             self.errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
     }
 }

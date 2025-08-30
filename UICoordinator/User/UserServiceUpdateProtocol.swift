@@ -13,6 +13,6 @@ protocol UserServiceUpdateProtocol {
     
     func updateUserProfile(user: User, image: UIImage?, dataUser: [String: Any]) async throws
     
-    func deleteUser(userId: String?) async
+    func deleteUser(userId: String?) async throws
     
 }

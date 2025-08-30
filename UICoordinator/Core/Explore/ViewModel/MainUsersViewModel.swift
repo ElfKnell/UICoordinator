@@ -6,9 +6,13 @@
 //
 
 import Foundation
+import FirebaseCrashlytics
 
 class MainUsersViewModel: ObservableObject {
+    
     @Published var users = [User]()
+    @Published var isError = false
+    @Published var errorMessage: String? = nil
     
     private let fetchUsers: FetchingUsersServiceProtocol
     
@@ -19,8 +23,20 @@ class MainUsersViewModel: ObservableObject {
     @MainActor
     func featchUsers(userId: String?) async {
         
-        guard let currentUserId = userId else { return }
-        self.users = await fetchUsers.fetchUsers(withId: currentUserId)
+        isError = false
+        errorMessage = nil
+        
+        do {
+            
+            guard let currentUserId = userId else { return }
+            self.users = try await fetchUsers.fetchUsers(withId: currentUserId)
+            
+        } catch {
+            isError = true
+            errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
+        
         
     }
 }

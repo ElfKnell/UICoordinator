@@ -86,6 +86,11 @@ struct CreateColloquyView: View {
             .padding()
             .navigationTitle("\(location?.name ?? self.activityId != nil ? "Reply" : "") Colloquy")
             .navigationBarTitleDisplayMode(.inline)
+            .alert("Create error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.errorMessage ?? "not discription")
+            }
             .toolbar {
                 
                 ToolbarItem(placement: .topBarLeading) {

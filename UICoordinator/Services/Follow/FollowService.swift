@@ -20,26 +20,18 @@ class FollowService: FollowServiceProtocol {
         self.servaceDelete = servaceDelete
     }
     
-    func uploadeFollow(_ follow: Follow) async {
+    func uploadeFollow(_ follow: Follow) async throws {
         
-        do {
-            guard let followData = try? Firestore.Encoder()
-                .encode(follow) else { throw FollowError.encodingFailed }
-            
-            try await self.serviceCreate.addDocument(from: nameCollection, data: followData)
-        } catch {
-            print("ERROR CREATE FOLLOW: \(error.localizedDescription)")
-        }
+        guard let followData = try? Firestore.Encoder()
+            .encode(follow) else { throw FollowError.encodingFailed }
+        
+        try await self.serviceCreate.addDocument(from: nameCollection, data: followData)
+
     }
     
-    func deleteFollow(followId: String) async {
+    func deleteFollow(followId: String) async throws {
         
-        do {
-            
-            try await self.servaceDelete.deleteDocument(from: nameCollection, documentId: followId)
-            
-        } catch {
-            print("ERROR DELETE FOLLOW: \(error.localizedDescription)")
-        }
+        try await self.servaceDelete.deleteDocument(from: nameCollection, documentId: followId)
+        
     }
 }

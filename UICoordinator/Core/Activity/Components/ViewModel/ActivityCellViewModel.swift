@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseCrashlytics
 import Foundation
 
 class ActivityCellViewModel: ObservableObject {
@@ -15,6 +16,8 @@ class ActivityCellViewModel: ObservableObject {
     @Published var isStread = false
     @Published var isLandscape: Bool = UIDevice.current.orientation.isLandscape
     @Published var isRemove = false
+    @Published var isError = false
+    @Published var errorMessage: String?
     
     private var spreadActivity: SpreadingActivityProtocol
     private var activityUpdate: ActivityUpdateProtocol
@@ -29,13 +32,19 @@ class ActivityCellViewModel: ObservableObject {
         self.deleteActivity = deleteActivity
     }
     
-    func markForDelete(_ activity: Activity) async {
-        await deleteActivity.markActivityForDelete(activityId: activity.id)
-    }
-    
+    @MainActor
     func deleteActivity(activity: Activity) async {
         
-        await deleteActivity.deleteActivity(activity: activity)
+        isError = false
+        errorMessage = nil
+        
+        do {
+            try await deleteActivity.deleteActivity(activity: activity)
+        } catch {
+            isError = true
+            errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
     
     func isCurrentUser(_ userActivityId: String, currentUser: User?) -> Bool {
@@ -46,14 +55,27 @@ class ActivityCellViewModel: ObservableObject {
     @MainActor
     func spreadActivity(_ activity: Activity, userId: String?) async {
         
-        guard let userId else { return }
+        isError = false
+        errorMessage = nil
         
-        let spread = Spread(ownerUid: userId, userId: activity.ownerUid, activityId: activity.id, colloquyId: "", time: Timestamp())
-        await spreadActivity.createSpread(spread)
-        
-        await activityUpdate.sreadActivity(activity, userId: userId)
-        
-        isStread = true
+        do {
+            
+            guard let userId else {
+                throw UserError.userIdNil
+            }
+            
+            let spread = Spread(ownerUid: userId, userId: activity.ownerUid, activityId: activity.id, colloquyId: "", time: Timestamp())
+            try await spreadActivity.createSpread(spread)
+            
+            try await activityUpdate.sreadActivity(activity, userId: userId)
+            
+            isStread = true
+            
+        } catch {
+            isError = true
+            errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
     
     func isStread(_ activity: Activity, user: User?) {

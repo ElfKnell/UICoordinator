@@ -133,6 +133,11 @@ struct LocationsView: View {
                                 .userSession?.uid)
                 }
             }
+            .alert("Locations error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.messageError ?? "not discription")
+            }
             .safeAreaInset(edge: .bottom) {
                 HStack {
                     

@@ -9,9 +9,9 @@ import Foundation
 
 protocol FetchingActivitiesProtocol {
     
-    func fetchActivities(users: [User], pageSize: Int) async -> [Activity]
+    func fetchActivities(users: [User], pageSize: Int) async throws -> [Activity]
     
-    func fetchActivitiesByUser(user: User, pageSize: Int) async -> [Activity]
+    func fetchActivitiesByUser(user: User, pageSize: Int) async throws -> [Activity]
     
     func clean()
 }

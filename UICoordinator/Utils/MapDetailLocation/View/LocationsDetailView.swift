@@ -29,7 +29,7 @@ struct LocationsDetailView: View {
         mapSeliction: Binding<Location?>,
         isUpdate: Binding<MapSheetConfig?>,
         viewModelBilder: @escaping () -> LocationDetailViewModel = {
-            LocationDetailViewModel(fetchLocations: FetchLocationForActivity())
+            LocationDetailViewModel()
         }) {
         
         self.activity = activity

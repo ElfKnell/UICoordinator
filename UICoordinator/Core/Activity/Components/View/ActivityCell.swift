@@ -189,6 +189,11 @@ struct ActivityCell: View {
             await viewModelLike.isLike(cid: activity.id, currentUserId: container.currentUserService.currentUser?.id)
             
         }
+        .alert("Spread error", isPresented: $viewModel.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "not discription")
+        }
         .sheet(isPresented: $viewModel.showReplies, content: {
             ActivityRepliesView(activity: activity, user: container.currentUserService.currentUser)
         })

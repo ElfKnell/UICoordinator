@@ -9,7 +9,11 @@ import MapKit
 
 protocol FetchLocationFormFirebaseProtocol {
     
-    func getLocation(userId: String, coordinate: CLLocationCoordinate2D) async -> Location?
+    func getLocation(
+        userId: String,
+        coordinate: CLLocationCoordinate2D
+    ) async throws -> Location?
     
-    func fetchLocation(withId id: String) async -> Location
+    func fetchLocation(withId id: String) async throws -> Location
+    
 }

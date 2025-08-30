@@ -7,8 +7,12 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 
 class CreateReplyViewModel: ObservableObject {
+    
+    @Published var isError = false
+    @Published var messageError: String?
     
     var text: String
     
@@ -21,17 +25,29 @@ class CreateReplyViewModel: ObservableObject {
         self.increment = increment
     }
     
+    @MainActor
     func saveColloquy(_ colloquyId: String, userId: String?) async {
         
-        guard let userId else { return }
-        if self.text.isEmpty { return }
+        isError = false
+        messageError = nil
         
-        let caption = self.text
-        let reply = Colloquy(ownerUid: userId, caption: caption, timestamp: Timestamp(), likes: 0, locationId: nil, ownerColloquy: colloquyId, isDelete: false)
-        
-        self.text = ""
-        
-        await colloquyService.uploadeColloquy(reply)
-        await increment.incrementRepliesCount(colloquyId: colloquyId)
+        do {
+            
+            guard let userId else { return }
+            if self.text.isEmpty { return }
+            
+            let caption = self.text
+            let reply = Colloquy(ownerUid: userId, caption: caption, timestamp: Timestamp(), likes: 0, locationId: nil, ownerColloquy: colloquyId, isDelete: false)
+            
+            self.text = ""
+            
+            try await colloquyService.uploadeColloquy(reply)
+            try await increment.incrementRepliesCount(colloquyId: colloquyId)
+            
+        } catch {
+            isError = true
+            messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
 }

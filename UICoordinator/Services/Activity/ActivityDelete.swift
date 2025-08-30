@@ -38,54 +38,35 @@ class ActivityDelete: ActivityDeleteProtocol {
         self.colloquyService = colloquyService
     }
     
-    func markActivityForDelete(activityId: String) async {
+    func deleteActivity(activity: Activity) async throws {
         
-        do {
-            
-            try await Firestore.firestore()
-                .collection("Activity")
-                .document(activityId)
-                .updateData(["isDelete": true])
-            
-        } catch {
-            print("ERROR spreading activity: \(error.localizedDescription)")
-        }
-    }
-    
-    func deleteActivity(activity: Activity) async {
+        let photos = try await photoService.fetchPhotosByLocation(activity.id)
+        let videos = try await videoService.fetchVideosByLocation(activity.id)
         
-        do {
-            
-            let photos = try await photoService.fetchPhotosByLocation(activity.id)
-            let videos = try await videoService.fetchVideosByLocation(activity.id)
-            
-            if !photos.isEmpty {
-                for photo in photos {
-                    try await photoService.deletePhoto(photo: photo)
-                }
+        if !photos.isEmpty {
+            for photo in photos {
+                try await photoService.deletePhoto(photo: photo)
             }
-            
-            if !videos.isEmpty {
-                for video in videos {
-                    try await videoService.deleteVideo(video: video)
-                }
-            }
-            
-            try await routesServise.deleteByActivity(activityId: activity.id)
-            
-            await colloquyService.deleteColloquy(activity)
-            
-            await locationDelete.deleteLocations(with: activity.locationsId)
-            
-            await likesDelete.likesDelete(objectId: activity.id, collectionName: .activityLikes)
-            
-            try await spreadDelete.removeSpreads(activity.id, withType: .activity)
-            
-            try await self.servaceDelete.deleteDocument(from: "Activity", documentId: activity.id)
-            
-        } catch {
-            print("ERROR DELETE FOLLOW: \(error.localizedDescription)")
         }
+        
+        if !videos.isEmpty {
+            for video in videos {
+                try await videoService.deleteVideo(video: video)
+            }
+        }
+        
+        try await routesServise.deleteByActivity(activityId: activity.id)
+        
+        try await colloquyService.deleteColloquy(activity)
+        
+        try await locationDelete.deleteLocations(with: activity.locationsId)
+        
+        try await likesDelete.likesDelete(objectId: activity.id, collectionName: .activityLikes)
+        
+        try await spreadDelete.removeSpreads(activity.id, withType: .activity)
+        
+        try await self.servaceDelete.deleteDocument(from: "Activity", documentId: activity.id)
+        
     }
     
     

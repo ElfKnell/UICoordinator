@@ -9,11 +9,9 @@ import Foundation
 
 protocol FetchColloquiesProtocol {
     
-    func getColloquies(users: [User], pageSize: Int) async -> [Colloquy]
+    func getColloquies(users: [User], pageSize: Int) async throws -> [Colloquy]
     
-    func getUserColloquies(user: User, pageSize: Int) async -> [Colloquy]
-    
-    func getDeletedColloquies(user: User, pageSize: Int) async -> [Colloquy]
+    func getUserColloquies(user: User, pageSize: Int) async throws -> [Colloquy]
     
     func reload()
 }

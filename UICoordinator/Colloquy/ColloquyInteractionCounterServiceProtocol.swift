@@ -9,8 +9,8 @@ import Foundation
 
 protocol ColloquyInteractionCounterServiceProtocol {
     
-    func updateLikeCount(colloquyId: String, countLikes: Int) async
+    func updateLikeCount(colloquyId: String, countLikes: Int) async throws
     
-    func incrementRepliesCount(colloquyId: String) async
+    func incrementRepliesCount(colloquyId: String) async throws
     
 }

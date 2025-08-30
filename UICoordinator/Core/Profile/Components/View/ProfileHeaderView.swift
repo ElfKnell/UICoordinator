@@ -93,6 +93,16 @@ struct ProfileHeaderView: View {
                 curretnUser: container
                     .currentUserService.currentUser)
         }
+        .alert("Upload error", isPresented: $followToUser.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(followToUser.errorMessage ?? "not discription")
+        }
+        .alert("Like error", isPresented: $userLikes.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(userLikes.errorMessage ?? "not discription")
+        }
     }
 }
 

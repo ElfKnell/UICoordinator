@@ -46,25 +46,20 @@ actor UserDataActor {
         try modelContext.save()
     }
     
-    func update(user updatedUser: LocalUser) {
+    func update(user updatedUser: LocalUser) throws {
         
-        do {
-            
-            guard let existingUser = try findUserById(updatedUser.id) else {
-                throw NSError(domain: "UserDataActor", code: 404,
-                              userInfo: [NSLocalizedDescriptionKey: "User not found"])
-            }
-            
-            existingUser.username = updatedUser.username
-            existingUser.bio = updatedUser.bio
-            existingUser.link = updatedUser.link
-            existingUser.profileImageURL = updatedUser.profileImageURL
-            
-            try modelContext.save()
-            
-        } catch {
-            print("ERROR UPDATE LOCAL USER: \(error.localizedDescription)")
+        guard let existingUser = try findUserById(updatedUser.id) else {
+            throw NSError(domain: "UserDataActor", code: 404,
+                          userInfo: [NSLocalizedDescriptionKey: "User not found"])
         }
+        
+        existingUser.username = updatedUser.username
+        existingUser.bio = updatedUser.bio
+        existingUser.link = updatedUser.link
+        existingUser.profileImageURL = updatedUser.profileImageURL
+        
+        try modelContext.save()
+        
     }
 }
 

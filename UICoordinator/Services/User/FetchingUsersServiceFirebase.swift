@@ -16,28 +16,14 @@ class FetchingUsersServiceFirebase: FetchingUsersServiceProtocol {
             self.repository = repository
         }
     
-    func fetchUsers(withId currentUserId: String) async -> [User] {
+    func fetchUsers(withId currentUserId: String) async throws -> [User] {
         
-        do {
-            
-            return try await repository.fetchAllUsers(excluding: currentUserId)
-            
-        } catch {
-            print("ERROR FETCH USERS: \(error.localizedDescription)")
-            return []
-        }
+        return try await repository.fetchAllUsers(excluding: currentUserId)
     }
     
-    func fetchUsersByIds(at ids: [String]) async -> [User] {
+    func fetchUsersByIds(at ids: [String]) async throws -> [User] {
         
-        do {
-            
-            return try await repository.fetchUsersByIds(ids)
-            
-        } catch {
-            
-            print("ERROR FETCH USERS at ids: \(error.localizedDescription)")
-            return []
-        }
+        return try await repository.fetchUsersByIds(ids)
+        
     }
 }

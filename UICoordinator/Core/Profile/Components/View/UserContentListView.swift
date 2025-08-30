@@ -150,6 +150,11 @@ struct UserContentListView: View {
             }
         }
         .padding(.vertical, 8)
+        .alert("Fetching error", isPresented: $viewModel.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(viewModel.messageError ?? "not discription")
+        }
         
     }
 }

@@ -25,48 +25,41 @@ class CheckedLocalUsersByFollowing: CheckedLocalUsersByFollowingProtocol {
             self.containerProvider = containerProvider
         }
     
-    func addLocalUsersByFollowingToStore(follows: [String]) async {
+    func addLocalUsersByFollowingToStore(follows: [String]) async throws {
         
-        do {
-            let users = await localUserService.fetchLocalUsers()
-            
-            try await ensureActorReady()
-            
-            for follower in follows {
-                if !users.contains(where: { $0.id == follower }) {
-                    
-                    let user = try await userService.fetchUser(withUid: follower)
-                    
-                    try await userActor?.save(user: user.toLocalUser())
-                }
+        let users = try await localUserService.fetchLocalUsers()
+        
+        try await ensureActorReady()
+        
+        for follower in follows {
+            if !users.contains(where: { $0.id == follower }) {
+                
+                let user = try await userService.fetchUser(withUid: follower)
+                
+                try await userActor?.save(user: user.toLocalUser())
             }
-        } catch {
-            print("ERROR checking followers: \(error.localizedDescription)")
         }
+        
     }
     
-    func removeUnfollowedLocalUsers(follows: [String]) async {
-        do {
-            let users = await localUserService.fetchLocalUsers()
-            try await ensureActorReady()
+    func removeUnfollowedLocalUsers(follows: [String]) async throws {
+        
+        let users = try await localUserService.fetchLocalUsers()
+        try await ensureActorReady()
 
-            for localUser in users {
-                if !follows.contains(localUser.id) {
-                    try await userActor?.delete(user: localUser)
-                }
+        for localUser in users {
+            if !follows.contains(localUser.id) {
+                try await userActor?.delete(user: localUser)
             }
-        } catch {
-            print("ERROR removing unfollowed users: \(error.localizedDescription)")
         }
+        
     }
     
-    func clearAllLocalUsers() async {
-        do {
-            try await ensureActorReady()
-            try await userActor?.deleteAllUsers()
-        } catch {
-            print("ERROR clearing local users: \(error.localizedDescription)")
-        }
+    func clearAllLocalUsers() async throws {
+        
+        try await ensureActorReady()
+        try await userActor?.deleteAllUsers()
+        
     }
     
     private func ensureActorReady() async throws {

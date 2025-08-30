@@ -9,8 +9,8 @@ import Foundation
 
 protocol FetchingUsersServiceProtocol {
     
-    func fetchUsers(withId currentUserId: String) async -> [User]
+    func fetchUsers(withId currentUserId: String) async throws -> [User]
     
-    func fetchUsersByIds(at ids: [String]) async -> [User]
+    func fetchUsersByIds(at ids: [String]) async throws -> [User]
     
 }

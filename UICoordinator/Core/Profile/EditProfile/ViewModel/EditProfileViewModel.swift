@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import FirebaseCrashlytics
 
 class EditProfileViewModel: ObservableObject {
     
@@ -66,15 +67,27 @@ class EditProfileViewModel: ObservableObject {
         } catch let error as UserError {
             errorMessage = error.description
             isError = true
+            Crashlytics.crashlytics().record(error: error)
         } catch {
             errorMessage = error.localizedDescription
             isError = true
+            Crashlytics.crashlytics().record(error: error)
         }
         
     }
     
     func deleteCurrentUser(userId: String?) async {
-        await userServiseUpdate.deleteUser(userId: userId)
+        
+        errorMessage = nil
+        isError = false
+        
+        do {
+            try await userServiseUpdate.deleteUser(userId: userId)
+        } catch {
+            errorMessage = error.localizedDescription
+            isError = true
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
     
     @MainActor

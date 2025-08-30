@@ -12,31 +12,21 @@ class ColloquyInteractionCounterService: ColloquyInteractionCounterServiceProtoc
     
     private let db = Firestore.firestore()
     
-    func updateLikeCount(colloquyId: String, countLikes: Int) async {
+    func updateLikeCount(colloquyId: String, countLikes: Int) async throws {
         
-        do {
-            try await db
-                .collection("colloquies")
-                .document(colloquyId)
-                .updateData(["likes": countLikes])
-
-        } catch {
-            print("ERROR Update count Likes \(error.localizedDescription)")
-        }
+        try await db
+            .collection("colloquies")
+            .document(colloquyId)
+            .updateData(["likes": countLikes])
+        
     }
     
-    func incrementRepliesCount(colloquyId: String) async {
+    func incrementRepliesCount(colloquyId: String) async throws {
         
-        do {
-            try await db
-                .collection("colloquies")
-                .document(colloquyId)
-                .updateData(["repliesCount": FieldValue.increment(Int64(1)) ])
-
-        } catch {
-            print("ERROR increment replies \(error.localizedDescription)")
-        }
+        try await db
+            .collection("colloquies")
+            .document(colloquyId)
+            .updateData(["repliesCount": FieldValue.increment(Int64(1)) ])
+        
     }
-    
-    
 }

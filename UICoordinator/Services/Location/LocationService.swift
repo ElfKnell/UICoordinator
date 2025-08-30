@@ -12,42 +12,32 @@ class LocationService: SaveLocationProtocol, UpdateLocationProtocol {
     
     private var firebase = Firestore.firestore()
     
-    func uploadLocation(_ location: Location) async {
+    func uploadLocation(_ location: Location) async throws {
     
-        do {
-            
-            guard let locationData = try? Firestore.Encoder().encode(location) else { return }
-            try await firebase.collection("locations").addDocument(data: locationData)
-            
-        } catch {
-            print("ERROR save location: \(error.localizedDescription)")
-        }
+        let locationData = try Firestore.Encoder().encode(location)
+        
+        try await firebase.collection("locations").addDocument(data: locationData)
     
     }
     
-    func updateNameAndDescriptionLocation(name: String, description: String, locationId: String) async {
+    func updateNameAndDescriptionLocation(
+        name: String,
+        description: String,
+        locationId: String) async throws {
         
-        do {
-            try await firebase
-                .collection("locations")
-                .document(locationId)
-                .updateData(["description": description, "name": name, "timeUpdate": Timestamp()])
-
-        } catch {
-            print("ERROR update location: \(error.localizedDescription)")
-        }
+        try await firebase
+            .collection("locations")
+            .document(locationId)
+            .updateData(["description": description, "name": name, "timeUpdate": Timestamp()])
+        
     }
     
-    func updateAddressLocation(address: String, locationId: String) async {
+    func updateAddressLocation(address: String, locationId: String) async throws {
         
-        do {
-            try await firebase
-                .collection("locations")
-                .document(locationId)
-                .updateData(["address": address])
-
-        } catch {
-            print("ERROR update address location: \(error.localizedDescription)")
-        }
+        try await firebase
+            .collection("locations")
+            .document(locationId)
+            .updateData(["address": address])
+        
     }
 }

@@ -9,12 +9,8 @@ import Foundation
 
 protocol ColloquyServiceProtocol {
     
-    func uploadeColloquy(_ colloquy: Colloquy) async
+    func uploadeColloquy(_ colloquy: Colloquy) async throws
     
-    func markForDelete(_ colloquyId: String) async
-    
-    func unmarkForDelete(_ colloquyId: String) async
-    
-    func deleteColloquy(_ colloquy: any LikeObject) async
+    func deleteColloquy(_ colloquy: any LikeObject) async throws
     
 }

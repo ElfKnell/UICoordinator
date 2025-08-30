@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import FirebaseCrashlytics
 
 class FetchMyActivity: ObservableObject {
     
+    @Published var isError = false
+    @Published var errorMessage: String?
     @Published var activities: [Activity] = []
     
     private let pageSize = 7
@@ -30,10 +33,21 @@ class FetchMyActivity: ObservableObject {
     @MainActor
     func fetchMyActivity(currentUser: User?) async {
         
-        guard let currentUser else { return }
-        let activities = await fetchingActivities.fetchActivitiesByUser(user: currentUser,
-                                                                         pageSize: pageSize)
-        self.activities.append(contentsOf: activities)
+        self.isError = false
+        self.errorMessage = nil
         
+        do {
+            
+            guard let currentUser else { return }
+            let activities = try await fetchingActivities
+                .fetchActivitiesByUser(user: currentUser,
+                                       pageSize: pageSize)
+            self.activities.append(contentsOf: activities)
+            
+        } catch {
+            self.isError = true
+            self.errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
 }

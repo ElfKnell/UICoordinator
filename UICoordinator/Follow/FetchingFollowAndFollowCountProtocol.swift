@@ -9,7 +9,7 @@ import Foundation
 
 protocol FetchingFollowAndFollowCountProtocol {
     
-    func fetchFollow(uid: String, byField: FieldToFetchingFollow) async -> [Follow]
+    func fetchFollow(uid: String, byField: FieldToFetchingFollow) async throws -> [Follow]
     
-    func fetchFollowCount(uid: String, byField: FieldToFetchingFollow) async -> Int
+    func fetchFollowCount(uid: String, byField: FieldToFetchingFollow) async throws -> Int
 }

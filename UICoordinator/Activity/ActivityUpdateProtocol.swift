@@ -10,11 +10,11 @@ import Foundation
 
 protocol ActivityUpdateProtocol {
     
-    func sreadActivity(_ activity: Activity, userId: String) async
+    func sreadActivity(_ activity: Activity, userId: String) async throws
     
-    func incrementRepliesCount(activityId: String) async
+    func incrementRepliesCount(activityId: String) async throws
     
-    func updateLikeCount(activityId: String, countLikes: Int) async
+    func updateLikeCount(activityId: String, countLikes: Int) async throws
     
     func updateActivityLocations(locationsId: [String], id: String) async throws
     

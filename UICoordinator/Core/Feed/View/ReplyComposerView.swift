@@ -55,6 +55,11 @@ struct ReplyComposerView: View {
                     await viewModel.fetchRepliesRefresh(colloquy.id, currentUser: user)
                 }
             }
+            .alert("Fetching error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.messageError ?? "not discription")
+            }
         }
         .padding(.top)
         .safeAreaInset(edge: .bottom) {

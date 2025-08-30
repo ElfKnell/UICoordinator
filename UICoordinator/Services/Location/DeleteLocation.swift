@@ -10,25 +10,22 @@ import FirebaseFirestoreSwift
 
 class DeleteLocation: DeleteLocationProtocol {
     
-    func deleteLocation(at locationId: String) async {
+    func deleteLocation(at locationId: String) async throws {
         
-        do {
-            try await Firestore
-                .firestore()
-                .collection("locations")
-                .document(locationId)
-                .delete()
-        } catch {
-            print("ERROR delete location: \(error.localizedDescription)")
-        }
+        try await Firestore
+            .firestore()
+            .collection("locations")
+            .document(locationId)
+            .delete()
+        
     }
     
-    func deleteLocations(with locationsId: [String]) async {
+    func deleteLocations(with locationsId: [String]) async throws {
         
         if locationsId.isEmpty { return }
         
         for id in locationsId {
-            await deleteLocation(at: id)
+            try await deleteLocation(at: id)
         }
     }
 }

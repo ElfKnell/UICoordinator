@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 
 class LikesDeleteService: LikesDeleteServiceProtocol {
     
@@ -16,26 +17,21 @@ class LikesDeleteService: LikesDeleteServiceProtocol {
         self.likeServise = likeServise
     }
     
-    func likesDelete(objectId: String, collectionName: CollectionNameForLike) async {
+    func likesDelete(objectId: String, collectionName: CollectionNameForLike) async throws {
         
-        do {
-            
-            let snapshot = try await Firestore
-                .firestore()
-                .collection(collectionName.value)
-                .whereField("colloquyId", isEqualTo: objectId)
-                .getDocuments()
-            
-            let likes = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-            
-            if likes.isEmpty { return }
-            
-            for like in likes {
-                await likeServise.deleteLike(likeId: like.id, collectionName: collectionName)
-            }
-            
-        } catch {
-            print("ERROR DELETE LIKES BY IDs: \(error.localizedDescription)")
+        let snapshot = try await Firestore
+            .firestore()
+            .collection(collectionName.value)
+            .whereField("colloquyId", isEqualTo: objectId)
+            .getDocuments()
+        
+        let likes = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
+        
+        if likes.isEmpty { return }
+        
+        for like in likes {
+            try await likeServise.deleteLike(likeId: like.id, collectionName: collectionName)
         }
-    } 
+        
+    }
 }

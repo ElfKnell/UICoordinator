@@ -7,6 +7,7 @@
 
 import MapKit
 import SwiftUI
+import FirebaseCrashlytics
 
 class ActivityMapEditViewModel: ObservableObject {
     
@@ -180,6 +181,7 @@ class ActivityMapEditViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func saveLocations() async {
         
         do {
@@ -195,7 +197,7 @@ class ActivityMapEditViewModel: ObservableObject {
             )
             
         } catch {
-            await handle(error)
+            handle(error)
         }
     }
     
@@ -289,5 +291,6 @@ class ActivityMapEditViewModel: ObservableObject {
     private func handle(_ error: Error) {
         self.errorMessage = error.localizedDescription
         self.isError = true
+        Crashlytics.crashlytics().record(error: error)
     }
 }

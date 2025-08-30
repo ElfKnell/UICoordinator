@@ -6,10 +6,14 @@
 //
 
 import Foundation
+import FirebaseCrashlytics
 
 class FollowsToUsers: ObservableObject {
+    
     @Published var followingUsers = [User]()
     @Published var followerUsers = [User]()
+    @Published var isError = false
+    @Published var errorMessage: String? = nil
     
     private var localUserServise: LocalUserServiceProtocol
     private var fetchUsers: FetchingUsersServiceProtocol
@@ -23,14 +27,25 @@ class FollowsToUsers: ObservableObject {
     @MainActor
     func fetchFollowsToUsers(usersFollowing: [String], curretnUser: User?) async {
         
-        self.followingUsers.removeAll()
-        self.followerUsers.removeAll()
+        isError = false
+        errorMessage = nil
         
-        self.followingUsers = await fetchUsers.fetchUsersByIds(at: usersFollowing)
-
-        var users = await localUserServise.fetchUsersbyLocalUsers(currentUser: curretnUser)
-        users.removeAll(where: { $0.id == curretnUser?.id })
-        self.followerUsers = users
+        do {
+            
+            self.followingUsers.removeAll()
+            self.followerUsers.removeAll()
+            
+            self.followingUsers = try await fetchUsers.fetchUsersByIds(at: usersFollowing)
+            
+            var users = try await localUserServise.fetchUsersbyLocalUsers(currentUser: curretnUser)
+            users.removeAll(where: { $0.id == curretnUser?.id })
+            self.followerUsers = users
+            
+        } catch {
+            isError = true
+            errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
 
     }
 }

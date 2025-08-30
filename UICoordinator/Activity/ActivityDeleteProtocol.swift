@@ -9,7 +9,6 @@ import Foundation
 
 protocol ActivityDeleteProtocol {
     
-    func markActivityForDelete(activityId: String) async
+    func deleteActivity(activity: Activity) async throws
     
-    func deleteActivity(activity: Activity) async
 }

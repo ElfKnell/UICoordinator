@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 
 class UpdateLocationViewModel: LocationService, ObservableObject {
     
@@ -17,6 +18,9 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     @Published var name = ""
     @Published var description = ""
     @Published var address = ""
+    
+    @Published var messageError: String?
+    @Published var isError = false
     
     init(deleteLocation: DeleteLocationProtocol,
          photoService: PhotoServiceProtocol,
@@ -36,7 +40,11 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
         }
     }
     
-    func deleteLocation(locationId: String?, activityId: String?) async throws {
+    @MainActor
+    func deleteLocation(locationId: String?, activityId: String?) async {
+        
+        messageError = nil
+        isError = false
         
         do {
             guard let locationId = locationId else { return }
@@ -54,25 +62,39 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
                 }
             }
 
-            await deleteLocation.deleteLocation(at: locationId)
+            try await deleteLocation.deleteLocation(at: locationId)
             
         } catch {
-            print("DEBUGE: error delete - \(error.localizedDescription)")
+            isError = true
+            messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
     }
     
-    func saveLocation(_ location: Location?, activityId: String?, user: User?) async throws {
+    @MainActor
+    func saveLocation(_ location: Location?, activityId: String?, user: User?) async {
         
-        guard let userId = user?.id else { return }
+        messageError = nil
+        isError = false
         
-        if location?.locationId == nil {
+        do {
             
-            try await createLocation(userId: userId, location: location, activityId: activityId)
+            guard let userId = user?.id else { return }
             
-        } else {
+            if location?.locationId == nil {
+                
+                try await createLocation(userId: userId, location: location, activityId: activityId)
+                
+            } else {
+                
+                try await updateLocation(locationId: location?.id)
+                
+            }
             
-            try await updateLocation(locationId: location?.id)
-            
+        } catch {
+            isError = true
+            messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
     }
     
@@ -80,15 +102,17 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
         
         guard let locationId = locationId else { return }
         if !self.address.isEmpty {
-            await updateAddressLocation(address: self.address, locationId: locationId)
+            try await updateAddressLocation(address: self.address, locationId: locationId)
         }
-        await updateNameAndDescriptionLocation(name: self.name, description: self.description, locationId: locationId)
+        try await updateNameAndDescriptionLocation(name: self.name, description: self.description, locationId: locationId)
     }
     
     private func createLocation(userId: String, location: Location?, activityId: String?) async throws {
+        
         guard let location = location else { return }
         let newLocation = Location(ownerUid: userId, name: name, description: description, address: address, timestamp: Timestamp(), latitude: location.latitude, longitude: location.longitude, activityId: activityId ?? "")
-        await uploadLocation(newLocation)
+        try await uploadLocation(newLocation)
+        
     }
     
 }

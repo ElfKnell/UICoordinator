@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import FirebaseCrashlytics
 
 class RepliesViewModel: ObservableObject {
     
     @Published var replies = [Colloquy]()
     @Published var isLoading = false
+    @Published var isError = false
+    @Published var messageError: String?
     
     let isOrdering: Bool
     private let pageSize = 20
@@ -55,10 +58,20 @@ class RepliesViewModel: ObservableObject {
     @MainActor
     func fetchRepliesData(cid: String, currentUser: User?) async {
         
-        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
-        let items = await fetchRepliesFirebase.getReplies(colloquyId: cid, localUsers: users, pageSize: pageSize, ordering: isOrdering)
-        self.replies.append(contentsOf: items)
-
+        self.isError = false
+        self.messageError = nil
+        
+        do {
+            
+            let users = try await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
+            let items = try await fetchRepliesFirebase.getReplies(colloquyId: cid, localUsers: users, pageSize: pageSize, ordering: isOrdering)
+            self.replies.append(contentsOf: items)
+            
+        } catch {
+            self.isError = true
+            self.messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
 
 }

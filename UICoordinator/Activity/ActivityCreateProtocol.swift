@@ -8,5 +8,5 @@
 import Foundation
 
 protocol ActivityCreateProtocol {
-    func uploadedActivity(_ activity: Activity) async
+    func uploadedActivity(_ activity: Activity) async throws
 }

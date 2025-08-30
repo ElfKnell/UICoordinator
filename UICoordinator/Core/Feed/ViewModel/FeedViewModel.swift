@@ -8,11 +8,14 @@
 import SwiftUI
 import Firebase
 import SwiftData
+import FirebaseCrashlytics
 
 class FeedViewModel: ObservableObject {
     
     @Published var colloquies = [Colloquy]()
     @Published var isLoading = false
+    @Published var isError = false
+    @Published var messageError: String?
     
     private let localUserServise: LocalUserServiceProtocol
     private let fetchColloquies: FetchColloquiesProtocol
@@ -51,9 +54,21 @@ class FeedViewModel: ObservableObject {
     @MainActor
     private func fetchColloquiesFirebase(currentUser: User?) async {
         
-        let users = await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
-        let items = await fetchColloquies.getColloquies(users: users, pageSize: pageSize)
-        self.colloquies.append(contentsOf: items)
-
+        self.isError = false
+        self.messageError = nil
+        
+        do {
+            
+            let users = try await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
+            let items = try await fetchColloquies.getColloquies(users: users, pageSize: pageSize)
+            self.colloquies.append(contentsOf: items)
+            
+        } catch {
+            
+            self.isError = true
+            self.messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+            
+        }
     }
 }

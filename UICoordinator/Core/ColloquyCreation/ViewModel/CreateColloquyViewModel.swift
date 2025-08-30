@@ -6,10 +6,14 @@
 //
 
 import Firebase
+import FirebaseCrashlytics
 
 class CreateColloquyViewModel: ObservableObject {
     
     @Published var errorUpload: String?
+    @Published var errorMessage: String?
+    @Published var isError = false
+    
     private let likeCount: ColloquyInteractionCounterServiceProtocol
     private let colloquyService: ColloquyServiceProtocol
     private let activityUpdate: ActivityUpdateProtocol
@@ -24,16 +28,31 @@ class CreateColloquyViewModel: ObservableObject {
     @MainActor
     func uploadColloquy(userId: String?, caption: String, locatioId: String?, activityId: String?) async {
         
-        guard let uid = userId else { return }
+        self.isError = false
+        self.errorMessage = nil
         
-        if caption.isEmpty { return }
-        
-        let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
-        
-        await colloquyService.uploadeColloquy(colloquy)
-        
-        if let activityId = activityId {
-            await activityUpdate.incrementRepliesCount(activityId: activityId)
+        do {
+            
+            guard let uid = userId else {
+                throw UserError.userNotFound
+            }
+            
+            if caption.isEmpty {
+                throw ColloquyError.captionIsEmpty
+            }
+            
+            let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
+            
+            try await colloquyService.uploadeColloquy(colloquy)
+            
+            if let activityId = activityId {
+                try await activityUpdate.incrementRepliesCount(activityId: activityId)
+            }
+            
+        } catch {
+            self.isError = true
+            self.errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
     }
 }

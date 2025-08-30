@@ -23,10 +23,13 @@ struct MainUsersView: View {
     
     var body: some View {
         ExploreView(users: viewModel.users)
-            .onAppear {
-                Task {
-                    await viewModel.featchUsers(userId: container.authService.userSession?.uid)
-                }
+            .task {
+                await viewModel.featchUsers(userId: container.authService.userSession?.uid)
+            }
+            .alert("Upload error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.errorMessage ?? "not discription")
             }
     }
 }

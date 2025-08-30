@@ -6,10 +6,13 @@
 //
 
 import Foundation
+import FirebaseCrashlytics
 
 class ColloquyServiceViewModel: ObservableObject {
     
     @Published var isRemove = false
+    @Published var isError = false
+    @Published var messageError: String?
     
     let colloquyServise: ColloquyServiceProtocol
     
@@ -17,9 +20,18 @@ class ColloquyServiceViewModel: ObservableObject {
         self.colloquyServise = colloquyServise
     }
     
+    @MainActor
     func deleteColloquy(_ colloquy: Colloquy) async {
         
-        await colloquyServise.deleteColloquy(colloquy)
+        isError = false
+        messageError = nil
         
+        do {
+            try await colloquyServise.deleteColloquy(colloquy)
+        } catch {
+            isError = true
+            messageError = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
+        }
     }
 }

@@ -8,7 +8,9 @@
 import Foundation
 
 protocol DeleteLocationProtocol {
-    func deleteLocation(at locationId: String) async
     
-    func deleteLocations(with locationsId: [String]) async
+    func deleteLocation(at locationId: String) async throws
+    
+    func deleteLocations(with locationsId: [String]) async throws
+    
 }

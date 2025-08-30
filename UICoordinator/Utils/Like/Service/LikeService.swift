@@ -21,33 +21,22 @@ class LikeService: LikeServiceProtocol {
         
     }
     
-    func uploadLike(_ like: Like, collectionName: CollectionNameForLike) async {
+    func uploadLike(_ like: Like, collectionName: CollectionNameForLike) async throws {
         
-        do {
-            
-            guard let likeDate = try? Firestore
-                .Encoder()
-                .encode(like) else { return }
-            
-            try await serviceCreate.addDocument(collectionName: collectionName,
-                                                data: likeDate)
-            
-        } catch {
-            print("ERROR Create like in collection \(collectionName.value): \(error.localizedDescription)")
-        }
+        let likeDate = try Firestore
+            .Encoder()
+            .encode(like)
+        
+        try await serviceCreate.addDocument(collectionName: collectionName,
+                                            data: likeDate)
         
     }
     
-    func deleteLike(likeId: String, collectionName: CollectionNameForLike) async {
+    func deleteLike(likeId: String, collectionName: CollectionNameForLike) async throws {
         
-        do {
-            
-            try await serviceDetete.deleteDocument(from: collectionName.value,
-                                                   documentId: likeId)
-            
-        } catch {
-            print("ERROR Delete like in collection \(collectionName.value): \(error.localizedDescription)")
-        }
+        try await serviceDetete
+            .deleteDocument(from: collectionName.value,
+                                               documentId: likeId)
         
     }
 }

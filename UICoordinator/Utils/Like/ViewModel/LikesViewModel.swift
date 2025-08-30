@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import Swift
 
 class LikesViewModel: ObservableObject {
@@ -34,21 +35,49 @@ class LikesViewModel: ObservableObject {
     
     func doLike<T: Identifiable>(userId: String, currentUserId: String?,  likeToObject:T) async {
         
-        if self.likeId == nil {
-            guard let currentUserId else { return }
-            await createLike( userId: userId, currentUserId: currentUserId, colloquyId: likeToObject.id as! String)
-            await addLikeToObject(likeToObject)
-        } else {
-            await deleteLike()
-            await subtractLikeToObject(likeToObject)
+        do {
+            
+            if self.likeId == nil {
+                
+                guard let currentUserId else {
+                    throw UserError.userIdNil
+                }
+                
+                try await createLike(
+                    userId: userId,
+                    currentUserId: currentUserId,
+                    colloquyId: likeToObject.id as! String
+                )
+                
+                try await addLikeToObject(likeToObject)
+                
+            } else {
+                
+                try await deleteLike()
+                try await subtractLikeToObject(likeToObject)
+                
+            }
+            
+        } catch {
+            Crashlytics.crashlytics()
+                .setCustomValue("\(T.self)", forKey: "like_object_type")
+            
+            Crashlytics.crashlytics()
+                .setCustomValue(userId, forKey: "target_user_id")
+            
+            Crashlytics.crashlytics()
+                .setCustomValue(currentUserId ?? "nil", forKey: "current_user_id")
+            
+            Crashlytics.crashlytics().record(error: error)
         }
+        
     }
     
-    private func createLike(userId: String, currentUserId: String, colloquyId: String) async {
+    private func createLike(userId: String, currentUserId: String, colloquyId: String) async throws {
         
         let like = Like(ownerUid: currentUserId, userId: userId, colloquyId: colloquyId, time: Timestamp())
         
-        await likeService.uploadLike(like, collectionName: collectionName)
+        try await likeService.uploadLike(like, collectionName: collectionName)
         await isLike(cid: colloquyId, currentUserId: currentUserId)
         
     }
@@ -56,54 +85,48 @@ class LikesViewModel: ObservableObject {
     @MainActor
     func isLike(cid: String, currentUserId: String?) async {
         
-        let id = await fethingLike.getLikeByColloquyAndUser(collectionName: collectionName, colloquyId: cid, userId: currentUserId)
-        self.likeId = id
+        do {
+            let id = try await fethingLike.getLikeByColloquyAndUser(collectionName: collectionName, colloquyId: cid, userId: currentUserId)
+            self.likeId = id
+        } catch {
+            Crashlytics.crashlytics().record(error: error)
+        }
         
     }
     
     @MainActor
-    private func deleteLike() async {
+    private func deleteLike() async throws {
         
         if let likeId = self.likeId {
-            await likeService.deleteLike(likeId: likeId, collectionName: collectionName)
+            try await likeService.deleteLike(likeId: likeId, collectionName: collectionName)
             self.likeId = nil
         }
         
     }
     
-    private func addLikeToObject<T>(_ object: T) async {
+    private func addLikeToObject<T>(_ object: T) async throws {
         
-        do {
-            if let colloquy = object as? Colloquy {
-                await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: colloquy.likes + 1)
-            } else if let activity = object as? Activity {
-                await activityUpdate.updateLikeCount(activityId: activity.id, countLikes: activity.likes + 1)
-            } else {
-                throw UserError.invalidType
-            }
-        } catch UserError.invalidType {
-            print("ERROR: \(UserError.invalidType.description)")
-        } catch {
-            print("ERROR: \(error.localizedDescription)")
+        if let colloquy = object as? Colloquy {
+            try await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: colloquy.likes + 1)
+        } else if let activity = object as? Activity {
+            try await activityUpdate.updateLikeCount(activityId: activity.id, countLikes: activity.likes + 1)
+        } else {
+            throw UserError.invalidType
         }
+        
     }
     
-    private func subtractLikeToObject<T>(_ object: T) async {
+    private func subtractLikeToObject<T>(_ object: T) async throws {
         
-        do {
-            if let colloquy = object as? Colloquy {
-                let countLike = colloquy.likes - 1 > 0 ? colloquy.likes - 1 : 0
-                await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: countLike)
-            } else if let activity = object as? Activity {
-                let countLike = activity.likes - 1 > 0 ? activity.likes - 1 : 0
-                await activityUpdate.updateLikeCount(activityId: activity.id, countLikes: countLike)
-            } else {
-                throw UserError.invalidType
-            }
-        } catch UserError.invalidType {
-            print("ERROR: \(UserError.invalidType.description)")
-        } catch {
-            print("ERROR SUBTRACT LIKE: \(error.localizedDescription)")
+        if let colloquy = object as? Colloquy {
+            let countLike = colloquy.likes - 1 > 0 ? colloquy.likes - 1 : 0
+            try await likeCount.updateLikeCount(colloquyId: colloquy.id, countLikes: countLike)
+        } else if let activity = object as? Activity {
+            let countLike = activity.likes - 1 > 0 ? activity.likes - 1 : 0
+            try await activityUpdate.updateLikeCount(activityId: activity.id, countLikes: countLike)
+        } else {
+            throw UserError.invalidType
         }
+        
     }
 }

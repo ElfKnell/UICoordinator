@@ -10,7 +10,7 @@ import FirebaseStorage
 
 class VideoService: VideoServiceProtocol {
     
-    func uploadVideoStorage(withData videoData: Data, locationId: String) async {
+    func uploadVideoStorage(withData videoData: Data, locationId: String) async throws {
         
         let filename = NSUUID().uuidString
         let ref = Storage.storage()
@@ -20,28 +20,22 @@ class VideoService: VideoServiceProtocol {
         let metadata = StorageMetadata()
         metadata.contentType = "video/quicktime"
         
-        do {
-            let _ = try await ref.putDataAsync(videoData, metadata: metadata)
-            let url = try await ref.downloadURL()
-            let video = Video(locationUid: locationId, timestamp: Timestamp(), videoURL: url.absoluteString)
-            await uploadVideo(video)
-        } catch {
-            print("ERROR WHILE UPLOADING VIDEO: \(error.localizedDescription)")
-        }
+        let _ = try await ref.putDataAsync(videoData, metadata: metadata)
+        let url = try await ref.downloadURL()
+        let video = Video(locationUid: locationId, timestamp: Timestamp(), videoURL: url.absoluteString)
+        try await uploadVideo(video)
+        
     }
     
-    private func uploadVideo(_ video: Video) async {
+    private func uploadVideo(_ video: Video) async throws {
         
-        do {
-            guard let videoData = try? Firestore.Encoder()
-                .encode(video) else { return }
-            
-            try await Firestore.firestore()
-                .collection("video")
-                .addDocument(data: videoData)
-        } catch {
-            print("ERROR WHILE UPLOADING VIDEO: \(error.localizedDescription)")
-        }
+        guard let videoData = try? Firestore.Encoder()
+            .encode(video) else { return }
+        
+        try await Firestore.firestore()
+            .collection("video")
+            .addDocument(data: videoData)
+        
     }
     
     func fetchVideosByLocation(_ locationId: String) async throws -> [Video] {

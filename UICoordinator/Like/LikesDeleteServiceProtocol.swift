@@ -9,6 +9,6 @@ import Foundation
 
 protocol LikesDeleteServiceProtocol {
     
-    func likesDelete(objectId: String, collectionName: CollectionNameForLike) async
+    func likesDelete(objectId: String, collectionName: CollectionNameForLike) async throws
     
 }

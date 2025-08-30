@@ -51,9 +51,9 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
         }
     }
     
-    func deleteUser(userId: String?) async {
+    func deleteUser(userId: String?) async throws {
         
-        do {
+        //do {
             
             guard let userId else {
                 throw UserError.userNotFound
@@ -64,11 +64,11 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
                 .document(userId)
                 .updateData(["isDelete": true, "deleteDate": Timestamp()])
            
-        } catch UserError.userNotFound {
-            logger.log("ERROR DELETE USER: \(UserError.userNotFound.description)")
-        } catch {
-            logger.log("ERROR DELETE USER: \(error.localizedDescription)")
-        }
+//        } catch UserError.userNotFound {
+//            logger.log("ERROR DELETE USER: \(UserError.userNotFound.description)")
+//        } catch {
+//            logger.log("ERROR DELETE USER: \(error.localizedDescription)")
+//        }
     }
     
     private func updateUserWithUniqueUsername(user: User, username: String, dataUser: [String: Any]) async throws {

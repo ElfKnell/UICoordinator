@@ -69,6 +69,11 @@ struct UpdateLocationView: View {
                 viewModel.initInfo(location: location)
                 
             }
+            .alert("Locations error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.messageError ?? "not discription")
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     HStack {
@@ -85,7 +90,7 @@ struct UpdateLocationView: View {
                             Button {
                                 
                                 Task {
-                                    try await viewModel.deleteLocation(locationId: location?.id, activityId: activityId)
+                                    await viewModel.deleteLocation(locationId: location?.id, activityId: activityId)
                                     
                                     handleUpdate()
                                     dismiss()
@@ -104,7 +109,7 @@ struct UpdateLocationView: View {
                     Button {
                         Task {
                             
-                            try await viewModel.saveLocation(
+                            await viewModel.saveLocation(
                                 location,
                                 activityId: activityId,
                                 user: container.currentUserService.currentUser)

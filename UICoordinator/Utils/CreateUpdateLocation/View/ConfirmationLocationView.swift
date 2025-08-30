@@ -45,7 +45,13 @@ struct ConfirmationLocationView: View {
             }
             .navigationTitle("Create Bookmark")
             .navigationBarTitleDisplayMode(.inline)
+            .alert("Locations error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.messageError ?? "not discription")
+            }
             .toolbar {
+                
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         annotation = nil
@@ -59,7 +65,7 @@ struct ConfirmationLocationView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         Task {
-                            try await viewModel.uploadLocationWithCoordinate(
+                            await viewModel.uploadLocationWithCoordinate(
                                 activityId: activityId,
                                 annotation: annotation,
                                 userUid: container.currentUserService.currentUser?.id)

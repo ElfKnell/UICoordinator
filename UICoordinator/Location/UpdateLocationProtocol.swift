@@ -9,7 +9,10 @@ import Foundation
 
 protocol UpdateLocationProtocol {
     
-    func updateNameAndDescriptionLocation(name: String, description: String, locationId: String) async
+    func updateNameAndDescriptionLocation(name: String,
+                                          description: String,
+                                          locationId: String) async throws
     
-    func updateAddressLocation(address: String, locationId: String) async
+    func updateAddressLocation(address: String, locationId: String) async throws
+    
 }

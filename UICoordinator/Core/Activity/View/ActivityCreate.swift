@@ -35,6 +35,11 @@ struct ActivityCreate: View {
         .task {
             viewModel.activity = await viewModel.createActivity(name: nameActivyty, currentUserId: container.currentUserService.currentUser?.id)
         }
+        .alert("Fetching error", isPresented: $viewModel.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "not discription")
+        }
     }
 }
 

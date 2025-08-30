@@ -9,8 +9,8 @@ import Foundation
 
 protocol LikeServiceProtocol {
     
-    func uploadLike(_ like: Like, collectionName: CollectionNameForLike) async
+    func uploadLike(_ like: Like, collectionName: CollectionNameForLike) async throws
     
-    func deleteLike(likeId: String, collectionName: CollectionNameForLike) async
+    func deleteLike(likeId: String, collectionName: CollectionNameForLike) async throws
     
 }

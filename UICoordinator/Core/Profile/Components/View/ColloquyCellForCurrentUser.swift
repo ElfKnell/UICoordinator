@@ -122,6 +122,11 @@ struct ColloquyCellForCurrentUser: View {
         } message: {
             Text("Once this colloquy is deleted, it cannot be restored. Are you sure you want to continue?")
         }
+        .alert("Delete error", isPresented: $colloquyService.isError) {
+            Button("Ok", role: .cancel) {}
+        } message: {
+            Text(colloquyService.messageError ?? "not discription")
+        }
         .sheet(item: $sheetStatus) { status in
             switch status {
             case .reply:

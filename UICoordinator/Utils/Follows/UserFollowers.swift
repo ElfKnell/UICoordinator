@@ -8,6 +8,7 @@
 import Observation
 import Foundation
 import SwiftData
+import FirebaseCrashlytics
 
 @Observable
 @MainActor
@@ -33,36 +34,58 @@ class UserFollowers: UserFollowersProtocol {
     
     func loadFollowersCurrentUser(userId: String?) async {
         
-        guard let currentUserId = userId else { return }
-        let followers = await fetchingService.fetchFollow(uid: currentUserId, byField: .followerField)
-        
-        if followers.isEmpty {
-            
-            self.followersCurrentUsers = []
-            self.followingIdsForCurrentUser = []
-            await clearLocalUsers()
-            
-        } else {
-            
-            self.followersCurrentUsers = followers
-            self.followingIdsForCurrentUser = followers.map({ $0.following })
-            
-            await checkedFollowing
-                .addLocalUsersByFollowingToStore(follows: self.followingIdsForCurrentUser)
-            await checkedFollowing
-                .removeUnfollowedLocalUsers(follows: self.followingIdsForCurrentUser)
-            
+        guard let currentUserId = userId else {
+            Crashlytics.crashlytics().log("User ID is nil in loadFollowersCurrentUser")
+            return
         }
-        await loadFollowingCurrentUser(userId: currentUserId)
+        
+        do {
+            
+            let followers = try await fetchingService.fetchFollow(uid: currentUserId, byField: .followerField)
+            
+            if followers.isEmpty {
+                
+                self.followersCurrentUsers = []
+                self.followingIdsForCurrentUser = []
+                await clearLocalUsers()
+                
+            } else {
+                
+                self.followersCurrentUsers = followers
+                self.followingIdsForCurrentUser = followers.map({ $0.following })
+                
+                try await checkedFollowing
+                    .addLocalUsersByFollowingToStore(follows: self.followingIdsForCurrentUser)
+                try await checkedFollowing
+                    .removeUnfollowedLocalUsers(follows: self.followingIdsForCurrentUser)
+                
+            }
+            try await loadFollowingCurrentUser(userId: currentUserId)
+            
+        } catch {
+            
+            Crashlytics.crashlytics().record(error: error)
+            Crashlytics.crashlytics().setCustomValue(currentUserId, forKey: "userId")
+            Crashlytics.crashlytics().log("Failed to load followers for user \(currentUserId)")
+        }
     }
     
     func clearLocalUsers() async {
-        await checkedFollowing.clearAllLocalUsers()
+        
+        do {
+            
+            try await checkedFollowing.clearAllLocalUsers()
+            
+        } catch {
+            Crashlytics.crashlytics().record(error: error)
+            Crashlytics.crashlytics().setCustomValue("clearLocalUsers", forKey: "clear")
+            Crashlytics.crashlytics().log("Failed clear Local Users")
+        }
     }
     
-    private func loadFollowingCurrentUser(userId: String) async {
+    private func loadFollowingCurrentUser(userId: String) async throws {
         
-        let following = await fetchingService.fetchFollow(uid: userId, byField: .followingField)
+        let following = try await fetchingService.fetchFollow(uid: userId, byField: .followingField)
         self.followersIdsForCurrentUser = following.map({ $0.follower })
     }
     
@@ -74,11 +97,20 @@ class UserFollowers: UserFollowersProtocol {
     func updateFollowCounts(for userId: String) {
         
         Task {
-            async let followersCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followerField)
-            async let followingCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followingField)
-
-            await self.countFollowers = followersCount
-            await self.countFollowing = followingCount
+            
+            do {
+                
+                async let followersCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followerField)
+                async let followingCount = await fetchingService.fetchFollowCount(uid: userId, byField: .followingField)
+                
+                try await self.countFollowers = followersCount
+                try await self.countFollowing = followingCount
+                
+            } catch {
+                Crashlytics.crashlytics().record(error: error)
+                Crashlytics.crashlytics().log("Failed to update follow counts for userId: \(userId)")
+            }
         }
+        
     }
 }

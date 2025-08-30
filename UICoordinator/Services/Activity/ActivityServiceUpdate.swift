@@ -49,49 +49,37 @@ class ActivityServiceUpdate: ActivityUpdateProtocol {
         
     }
     
-    func updateLikeCount(activityId: String, countLikes: Int) async {
+    func updateLikeCount(activityId: String, countLikes: Int) async throws {
         
-        do {
-            try await Firestore.firestore()
-                .collection(collectionName)
-                .document(activityId)
-                .updateData(["likes": countLikes])
-
-        } catch {
-            print(error.localizedDescription)
-        }
+        try await Firestore.firestore()
+            .collection(collectionName)
+            .document(activityId)
+            .updateData(["likes": countLikes])
+        
     }
     
-    func incrementRepliesCount(activityId: String) async {
+    func incrementRepliesCount(activityId: String) async throws {
         
-        do {
-            try await Firestore.firestore()
-                .collection(collectionName)
-                .document(activityId)
-                .updateData(["repliesCount": FieldValue.increment(Int64(1)) ])
-
-        } catch {
-            print(error.localizedDescription)
-        }
+        try await Firestore.firestore()
+            .collection(collectionName)
+            .document(activityId)
+            .updateData(["repliesCount": FieldValue.increment(Int64(1)) ])
+        
     }
     
     
-    func sreadActivity(_ activity: Activity, userId: String) async {
+    func sreadActivity(_ activity: Activity, userId: String) async throws {
         
-        do {
-            var userIdSpread: [String] = []
-            if let spreads = activity.spread {
-                userIdSpread = spreads
-            }
-            userIdSpread.append(userId)
-            
-            try await Firestore.firestore()
-                .collection(collectionName)
-                .document(activity.id)
-                .updateData(["spread": userIdSpread])
-        } catch {
-            print("ERROR update spread activity: \(error.localizedDescription)")
+        var userIdSpread: [String] = []
+        if let spreads = activity.spread {
+            userIdSpread = spreads
         }
+        userIdSpread.append(userId)
+        
+        try await Firestore.firestore()
+            .collection(collectionName)
+            .document(activity.id)
+            .updateData(["spread": userIdSpread])
 
     }
     
