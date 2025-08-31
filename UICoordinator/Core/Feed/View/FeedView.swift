@@ -30,7 +30,6 @@ struct FeedView: View {
                         ForEach(viewModel.colloquies) { colloquy in
                             ColloquyCellFactory.make(colloquy: colloquy)
                                 .onAppear {
-                                    // Load more data when the last post appears
                                     if colloquy == viewModel.colloquies.last {
                                         Task {
                                             await viewModel.fetchColloquies(currentUser: container.currentUserService.currentUser)
@@ -51,9 +50,14 @@ struct FeedView: View {
                         await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                     }
                 }
-                .onChange(of: showColloquyCreate) {
-                    Task {
-                        await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
+                .onChange(of: viewModel.isSaved) {
+                    
+                    if viewModel.isSaved {
+                        
+                        Task {
+                            await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
+                        }
+                        
                     }
                 }
                 .refreshable {
@@ -77,7 +81,7 @@ struct FeedView: View {
                     }
                 }
                 .sheet(isPresented: $showColloquyCreate) {
-                    CreateColloquyView()
+                    CreateColloquyView(isSaved: $viewModel.isSaved)
                         .presentationDetents([.height(340), .medium])
                 }
             }

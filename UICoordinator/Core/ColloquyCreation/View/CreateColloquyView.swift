@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CreateColloquyView: View {
     
+    @Binding var isSaved: Bool
+    
     var location: Location?
     var activityId: String?
     
@@ -23,7 +25,10 @@ struct CreateColloquyView: View {
         return container.currentUserService.currentUser
     }
     
-    init(location: Location? = nil, activityId: String? = nil, viewModelBilder: () -> CreateColloquyViewModel = {
+    init(isSaved: Binding<Bool>,
+         location: Location? = nil,
+         activityId: String? = nil,
+         viewModelBilder: () -> CreateColloquyViewModel = {
         CreateColloquyViewModel(
             likeCount: ColloquyInteractionCounterService(),
             colloquyService: ColloquyService(
@@ -42,6 +47,7 @@ struct CreateColloquyView: View {
         let vm = viewModelBilder()
         self.location = location
         self.activityId = activityId
+        self._isSaved = isSaved
         _viewModel = StateObject(wrappedValue: vm)
         
     }
@@ -107,6 +113,8 @@ struct CreateColloquyView: View {
                             
                             await viewModel.uploadColloquy(userId: container.authService.userSession?.uid, caption: caption, locatioId: location?.id, activityId: activityId)
                             
+                            isSaved = true
+                            
                             if viewModel.errorUpload != nil {
                                 self.isUploadingError = true
                             }
@@ -131,5 +139,7 @@ struct CreateColloquyView: View {
 }
 
 #Preview {
-    CreateColloquyView(location: nil, activityId: nil)
+    CreateColloquyView(isSaved: .constant(false),
+                       location: nil,
+                       activityId: nil)
 }

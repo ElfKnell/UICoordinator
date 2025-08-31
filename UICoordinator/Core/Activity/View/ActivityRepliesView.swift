@@ -13,7 +13,7 @@ struct ActivityRepliesView: View {
     let user: User?
     
     @State private var showColloquyCreate = false
-    @State var isChange = false
+    @State var isSaved = false
     
     @StateObject var viewModel: RepliesViewModel
     @Environment(\.dismiss) var dismiss
@@ -41,10 +41,8 @@ struct ActivityRepliesView: View {
                     LazyVStack {
                         ForEach(viewModel.replies) { reply in
                             ColloquyCellFactory.make(colloquy: reply)
-                                .onAppear {
-                                    Task {
-                                        await viewModel.fetchReplies(activity.id, currentUser: user)
-                                    }
+                                .task {
+                                    await viewModel.fetchReplies(activity.id, currentUser: user)
                                 }
                         }
                     }
@@ -58,6 +56,18 @@ struct ActivityRepliesView: View {
                 Task {
                     await viewModel.fetchRepliesRefresh(activity.id, currentUser: user)
                 }
+            }
+            .onChange(of: isSaved) {
+                
+                if isSaved {
+                    Task {
+                        await viewModel.fetchRepliesRefresh(
+                            activity.id,
+                            currentUser: user
+                        )
+                    }
+                }
+                
             }
             .navigationTitle("Replies")
             .navigationBarTitleDisplayMode(.inline)
@@ -83,10 +93,10 @@ struct ActivityRepliesView: View {
             }
             .foregroundStyle(.primary)
             .font(.subheadline)
-            .sheet(isPresented: $showColloquyCreate, content: {
-                CreateColloquyView(activityId: activity.id)
+            .sheet(isPresented: $showColloquyCreate) {
+                CreateColloquyView(isSaved: $isSaved, activityId: activity.id)
                     .presentationDetents([.height(340), .medium])
-            })
+            }
         }
     }
 }

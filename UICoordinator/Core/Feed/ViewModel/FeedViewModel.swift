@@ -14,6 +14,7 @@ class FeedViewModel: ObservableObject {
     
     @Published var colloquies = [Colloquy]()
     @Published var isLoading = false
+    @Published var isSaved = false
     @Published var isError = false
     @Published var messageError: String?
     

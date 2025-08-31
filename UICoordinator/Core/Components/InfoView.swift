@@ -143,6 +143,7 @@ struct InfoView: View {
             .navigationBarBackButtonHidden()
             .sheet(isPresented: $showCreatColloqy) {
                 CreateColloquyView(
+                    isSaved: .constant(false),
                     location: activity as? Location,
                     activityId: ((activity as? Activity) != nil) ?
                     activity.id : nil)

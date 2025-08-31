@@ -73,7 +73,7 @@ class ActivityMapEditViewModel: ObservableObject {
         self.activity = activity
         
         let center = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
-        let defaultRegion = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0))
+        let defaultRegion = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 180.0, longitudeDelta: 180.0))
         let initialRegion = activity.region ?? defaultRegion
         let shouldAutoSaving: Bool = !(activity.region != nil)
         
