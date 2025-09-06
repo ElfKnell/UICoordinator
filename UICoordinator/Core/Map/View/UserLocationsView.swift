@@ -82,7 +82,7 @@ struct UserLocationsView: View {
                 },
                 mapSeliction: $viewModel.mapSelection,
                 isUpdate: $viewModel.sheetConfig)
-                .presentationDetents([.medium])
+                .presentationDetents([.medium, .height(550)])
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 .presentationCornerRadius(12)
         }

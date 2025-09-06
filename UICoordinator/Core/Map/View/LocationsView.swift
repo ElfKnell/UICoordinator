@@ -199,7 +199,8 @@ struct LocationsView: View {
                         },
                         annotation: $viewModel.customAnnotation
                     )
-                        .presentationDetents([.height(340), .medium])
+                        .presentationDetents([.medium])
+                        .presentationCornerRadius(12)
 
                 case .locationsDetail:
                     
@@ -221,7 +222,7 @@ struct LocationsView: View {
                         mapSeliction: $viewModel.mapSelection,
                         isUpdate: $viewModel.sheetConfig
                     )
-                        .presentationDetents([.medium])
+                        .presentationDetents([.medium, .height(550)])
                         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                         .presentationCornerRadius(12)
                
@@ -234,7 +235,8 @@ struct LocationsView: View {
                         },
                         location: $viewModel.mapSelection
                     )
-                        .presentationDetents([.height(350), .medium])
+                        .presentationDetents([.medium])
+                        .presentationCornerRadius(12)
                         
                 case .routeDetails:
                     Text("Route details view is under construction")

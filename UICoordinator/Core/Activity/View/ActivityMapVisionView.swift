@@ -122,14 +122,14 @@ struct ActivityMapVisionView: View {
                     getDirectionsAction: viewModel.startSelectingDestination,
                     mapSeliction: $viewModel.selectedPlace,
                     isUpdate: .constant(nil))
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .height(550)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
             case .routeDetails:
                 RouteVisionDetailView(
                     route: $viewModel.selectedRoute)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .height(550)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)

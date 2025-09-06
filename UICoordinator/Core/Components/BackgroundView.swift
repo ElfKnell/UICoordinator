@@ -9,8 +9,6 @@ import SwiftUI
 
 struct BackgroundView: View {
     
-    var backgroundHeight: BackgroundSize?
-    
     var body: some View {
         RoundedRectangle(cornerRadius: 30, style: .continuous)
             .foregroundStyle(
@@ -20,7 +18,7 @@ struct BackgroundView: View {
                     endPoint: .bottomTrailing)
             )
             .rotationEffect(.degrees(137))
-            .frame(height: backgroundHeight?.value ?? .none)
+            .scaleEffect(1.3)
             .opacity(0.7)
             .ignoresSafeArea()
     }

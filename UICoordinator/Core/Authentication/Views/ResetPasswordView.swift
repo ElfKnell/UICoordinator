@@ -16,7 +16,7 @@ struct ResetPasswordView: View {
     var body: some View {
         ZStack {
             
-            BackgroundView(backgroundHeight: .large)
+            BackgroundView()
             
             VStack {
                 

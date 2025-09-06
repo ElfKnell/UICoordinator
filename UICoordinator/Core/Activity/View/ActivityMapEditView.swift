@@ -83,7 +83,7 @@ struct ActivityMapEditView: View {
                         }
                     },
                     annotation: $viewModel.customAnnotation)
-                    .presentationDetents([.height(340), .medium])
+                    .presentationDetents([.medium])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
@@ -94,7 +94,7 @@ struct ActivityMapEditView: View {
                     getDirectionsAction: viewModel.startSelectingDestination,
                     mapSeliction: $viewModel.selectedLocation,
                     isUpdate: $viewModel.sheetConfig)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .height(550)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
@@ -109,7 +109,7 @@ struct ActivityMapEditView: View {
                         }
                     },
                     location: $viewModel.selectedLocation)
-                    .presentationDetents([.height(340), .medium])
+                    .presentationDetents([.medium, .height(550)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
@@ -119,7 +119,7 @@ struct ActivityMapEditView: View {
                     handleUpdate: viewModel.updateRoute,
                     handleDetete: viewModel.deleteRoute,
                     route: $viewModel.selectedRoute)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .height(550)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
