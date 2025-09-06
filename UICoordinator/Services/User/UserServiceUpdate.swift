@@ -6,6 +6,7 @@
 //
 
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 class UserServiceUpdate: UserServiceUpdateProtocol {
@@ -47,28 +48,21 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
                 try await userDoc.updateData(updatedData)
             }
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             throw error
         }
     }
     
     func deleteUser(userId: String?) async throws {
         
-        //do {
-            
-            guard let userId else {
-                throw UserError.userNotFound
-            }
-            
-            try await firestore
-                .collection("users")
-                .document(userId)
-                .updateData(["isDelete": true, "deleteDate": Timestamp()])
-           
-//        } catch UserError.userNotFound {
-//            logger.log("ERROR DELETE USER: \(UserError.userNotFound.description)")
-//        } catch {
-//            logger.log("ERROR DELETE USER: \(error.localizedDescription)")
-//        }
+        guard let userId else {
+            throw UserError.userNotFound
+        }
+        
+        try await firestore
+            .collection("users")
+            .document(userId)
+            .updateData(["isDelete": true, "deleteDate": Timestamp()])
     }
     
     private func updateUserWithUniqueUsername(user: User, username: String, dataUser: [String: Any]) async throws {
@@ -105,6 +99,7 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
                 return nil
             } catch let error as NSError {
                 errorPointer?.pointee = error
+                Crashlytics.crashlytics().record(error: error)
                 return nil
             } catch {
                 let nsError = NSError(
@@ -112,6 +107,7 @@ class UserServiceUpdate: UserServiceUpdateProtocol {
                     code: 1,
                     userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
                 errorPointer?.pointee = nsError
+                Crashlytics.crashlytics().record(error: nsError)
                 return nil
             }
         }

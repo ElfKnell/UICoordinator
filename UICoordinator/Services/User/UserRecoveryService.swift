@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 class UserRecoveryService: UserRecoveryServiceProtocol {
@@ -30,8 +31,10 @@ class UserRecoveryService: UserRecoveryServiceProtocol {
                 .updateData(["isDelete": false])
            
         } catch UserError.userNotFound {
+            Crashlytics.crashlytics().record(error: UserError.userNotFound)
             throw UserError.userNotFound
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             throw error
         }
     }

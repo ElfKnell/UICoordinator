@@ -6,6 +6,7 @@
 //
 
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 class UserService: UserServiceProtocol {
@@ -25,7 +26,9 @@ class UserService: UserServiceProtocol {
             
         } catch {
             
+            Crashlytics.crashlytics().record(error: UserError.userNotFound)
             throw UserError.userNotFound
+            
         }
         
     }

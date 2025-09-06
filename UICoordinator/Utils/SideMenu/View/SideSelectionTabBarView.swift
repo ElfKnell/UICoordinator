@@ -39,7 +39,7 @@ struct SideSelectionTabBarView: View {
                     Settings()
                         .tag(2)
                     
-                    Text("Help")
+                    HelpView()
                         .tag(3)
                     
                     AboutView()

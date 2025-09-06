@@ -28,6 +28,7 @@ final class CoordinatorViewModel: ObservableObject {
     
     @MainActor
     private func checkLocationAvailability() {
+        
         if !locationManager.isTrackingAvailable {
             isLocationServicesEnabled = false
             errorMessage = "You have not enabled the location system. As a result, the app may experience limited functionality or reduced accuracy."
@@ -35,5 +36,6 @@ final class CoordinatorViewModel: ObservableObject {
             isLocationServicesEnabled = true
             errorMessage = nil
         }
+        
     }
 }

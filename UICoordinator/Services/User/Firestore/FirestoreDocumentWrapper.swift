@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 
@@ -26,7 +27,7 @@ final class FirestoreDocumentWrapper: FirestoreDocumentProtocol {
         do {
             try await ref.delete()
         } catch {
-            print("Error deleting document: \(error.localizedDescription)")
+            Crashlytics.crashlytics().record(error: error)
             throw error
         }
     }

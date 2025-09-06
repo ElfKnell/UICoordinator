@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseStorage
 import UIKit
 
@@ -42,8 +43,10 @@ class PhotoUploadToFirebase: PhotoUploadToFirebaseProtocol {
             try await uploadePhoto(photo)
             
         } catch let storageError as StorageErrorCode {
+            Crashlytics.crashlytics().record(error: storageError)
             throw PhotoServiceError.storageUploadFailed(storageError)
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             throw PhotoServiceError.storageUploadFailed(error)
         }
     }
@@ -59,8 +62,10 @@ class PhotoUploadToFirebase: PhotoUploadToFirebaseProtocol {
                 .addDocument(data: photoData)
             
         } catch let encodingError as EncodingError {
+            Crashlytics.crashlytics().record(error: encodingError)
             throw PhotoServiceError.firestoreEncodingFailed(encodingError)
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             throw PhotoServiceError.firestoreUploadFailed(error)
         }
     }

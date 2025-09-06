@@ -35,7 +35,7 @@ extension OrientationPhotoSelectedView {
                 Button {
                     viewModel.namePhoto = ""
                 } label: {
-                     LabelButtonView(imageName: "eraser.line.dashed.fill", label: "Clean")
+                     LabelButtonView(imageName: "eraser.line.dashed.fill", label: "Reset")
                 }
                 .padding(.horizontal)
                 

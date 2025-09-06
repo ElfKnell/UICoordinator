@@ -68,14 +68,20 @@ struct LocationsView: View {
                 }
                 .onTapGesture(count: 1) { position in
                     
-                    if viewModel.tappedOnAnnotation {
-                        viewModel.tappedOnAnnotation = false
-                        return
-                    }
-                    
-                    if let coordinate = proxy.convert(position, from: .local) {
-                        if viewModel.mapSelection == nil {
-                            viewModel.handleTap(on: coordinate)
+                    DispatchQueue.main.asyncAfter(
+                        deadline: .now() + 0.7)
+                    {
+                        withAnimation {
+                            if viewModel.tappedOnAnnotation {
+                                viewModel.tappedOnAnnotation = false
+                                return
+                            }
+                            
+                            if let coordinate = proxy.convert(position, from: .local) {
+                                if viewModel.mapSelection == nil {
+                                    viewModel.handleTap(on: coordinate)
+                                }
+                            }
                         }
                     }
                 }

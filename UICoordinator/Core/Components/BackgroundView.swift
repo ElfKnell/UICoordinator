@@ -13,9 +13,15 @@ struct BackgroundView: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 30, style: .continuous)
-            .foregroundStyle(.linearGradient(colors: [.blue, .red], startPoint: .topLeading, endPoint: .bottomTrailing))
+            .foregroundStyle(
+                .linearGradient(
+                    colors: [.blue, .red],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing)
+            )
             .rotationEffect(.degrees(137))
             .frame(height: backgroundHeight?.value ?? .none)
+            .opacity(0.7)
             .ignoresSafeArea()
     }
 }

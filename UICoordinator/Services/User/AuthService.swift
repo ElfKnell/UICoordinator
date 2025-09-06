@@ -7,6 +7,7 @@
 
 import Observation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 @Observable
@@ -40,6 +41,7 @@ class AuthService: AuthServiceProtocol {
            
         } catch {
             self.errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
     }
     
@@ -51,6 +53,7 @@ class AuthService: AuthServiceProtocol {
             try authStaticProvider.signOut()
         } catch {
             self.errorMessage = error.localizedDescription
+            Crashlytics.crashlytics().record(error: error)
         }
         userSession = nil
     }
@@ -66,6 +69,7 @@ class AuthService: AuthServiceProtocol {
             } catch {
                 self.userSession = nil
                 self.errorMessage = error.localizedDescription
+                Crashlytics.crashlytics().record(error: error)
             }
         }
     }

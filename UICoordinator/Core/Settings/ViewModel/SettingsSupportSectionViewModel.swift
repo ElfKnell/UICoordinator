@@ -6,13 +6,11 @@
 //
 
 import Foundation
-import Observation
 import StoreKit
 import UIKit
 import MessageUI
 
-@Observable
-class SettingsSupportSectionViewModel: NSObject, MFMailComposeViewControllerDelegate {
+class SettingsSupportSectionViewModel: NSObject, ObservableObject, MFMailComposeViewControllerDelegate {
     
     private let appID = "6748606035"
     

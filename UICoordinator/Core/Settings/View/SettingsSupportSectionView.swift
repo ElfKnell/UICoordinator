@@ -11,7 +11,7 @@ import MessageUI
 struct SettingsSupportSectionView: View {
     
     @State private var showMailErrorAlert = false
-    @State private var viewModel = SettingsSupportSectionViewModel()
+    @StateObject private var viewModel = SettingsSupportSectionViewModel()
     
     var body: some View {
         

@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 class FirestoreCreateUserService: FirestoreCreateUserProtocol {
@@ -57,6 +58,7 @@ class FirestoreCreateUserService: FirestoreCreateUserProtocol {
                     return nil
                 }
                 pointer.pointee = error
+                Crashlytics.crashlytics().record(error: error)
                 return nil
             } catch {
                 guard let pointer = errorPointer else {
@@ -64,6 +66,7 @@ class FirestoreCreateUserService: FirestoreCreateUserProtocol {
                     return nil
                 }
                 pointer.pointee = error as NSError
+                Crashlytics.crashlytics().record(error: error)
                 return nil
             }
         }

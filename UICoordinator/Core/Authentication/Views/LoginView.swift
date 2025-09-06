@@ -52,7 +52,8 @@ struct LoginView: View {
                         ResetPasswordView()
                     } label: {
                         Text("Forgot password?")
-                            .foregroundColor(.green)
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
                             .font(.system(size: 20, design: .serif))
                             .offset(x:90)
                     }
@@ -93,7 +94,7 @@ struct LoginView: View {
                                 .underline()
                                 .font(.system(size: 23, design: .serif))
                                 .foregroundStyle(.black)
-                                .shadow(radius: 5, x: 0, y: 2)
+                                .shadow(radius: 3, x: 0, y: 2)
                         }
                     }
                     .padding(.top)

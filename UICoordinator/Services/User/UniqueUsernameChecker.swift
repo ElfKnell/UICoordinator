@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 class UniqueUsernameChecker: UniqueUsernameCheckerProtocol {
@@ -23,9 +24,12 @@ class UniqueUsernameChecker: UniqueUsernameCheckerProtocol {
                 .getDocument()
             
             return !documentSnapshot.exists
+            
         } catch {
-            print(error.localizedDescription)
+            
+            Crashlytics.crashlytics().record(error: error)
             throw UserError.unknownError(error)
+            
         }
     }
 }

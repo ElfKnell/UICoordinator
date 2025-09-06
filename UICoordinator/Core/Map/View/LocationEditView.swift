@@ -62,7 +62,7 @@ struct LocationEditView: View {
                 } label: {
                     
                     HStack {
-                        Text("Creat new colloquy")
+                        Text("Create new colloquy")
                             .fontWeight(.semibold)
                         
                         Spacer()

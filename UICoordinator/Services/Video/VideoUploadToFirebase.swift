@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseStorage
 
 class VideoUploadToFirebase: VideoUploadToFirebaseProtocol {
@@ -35,8 +36,10 @@ class VideoUploadToFirebase: VideoUploadToFirebaseProtocol {
             let video = Video(locationUid: locationId, timestamp: Timestamp(), videoURL: url.absoluteString)
             try await uploadVideo(video)
         } catch let storageError as StorageErrorCode {
+            Crashlytics.crashlytics().record(error: storageError)
             throw VideoServiceError.storageUploadFailed(storageError)
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             throw VideoServiceError.unknownError(error)
         }
     }
@@ -53,8 +56,10 @@ class VideoUploadToFirebase: VideoUploadToFirebaseProtocol {
                 .collection("video")
                 .addDocument(data: videoData)
         } catch let encodingError as EncodingError {
+            Crashlytics.crashlytics().record(error: encodingError)
             throw VideoServiceError.firestoreEncodingFailed(encodingError)
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             throw VideoServiceError.firestoreUploadFailed(error)
         }
     }

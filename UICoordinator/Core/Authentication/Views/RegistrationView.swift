@@ -12,6 +12,8 @@ struct RegistrationView: View {
     @Binding var isNewUser: Bool
     @StateObject var registrationModel: RegistrationViewModel
     
+    @FocusState private var isPasswordFocused: Bool
+    
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.dismiss) var dismiss
     
@@ -52,10 +54,11 @@ struct RegistrationView: View {
                                 .textInputAutocapitalization(.never)
                             
                             InputView(text: $registrationModel.password, title: "Password", placeholder: "password", isSecureField: true)
+                                .focused($isPasswordFocused)
                             
                         }
                         
-                        if !registrationModel.password.isEmpty {
+                        if isPasswordFocused  {
                             
                             VStack(alignment: .leading) {
                                 
@@ -159,7 +162,7 @@ struct RegistrationView: View {
                                 .underline()
                                 .font(.system(size: 23, design: .serif))
                                 .foregroundStyle(.black)
-                                .shadow(radius: 5, x: 0, y: 2)
+                                .shadow(radius: 3, x: 0, y: 2)
                         }
                     }
                     .padding(.bottom)

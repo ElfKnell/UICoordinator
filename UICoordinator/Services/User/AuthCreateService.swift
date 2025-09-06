@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseCrashlytics
 import FirebaseAuth
 
 class AuthCreateService: AuthCreateServiceProtocol {
@@ -48,10 +49,13 @@ class AuthCreateService: AuthCreateServiceProtocol {
             }
             
             if authError.domain == AuthErrorDomain {
+                Crashlytics.crashlytics().record(error: authError)
                 throw UserError.authCreationFailed(authError)
             } else if authError.domain == "FirestoreErrorDomain" {
+                Crashlytics.crashlytics().record(error: authError)
                 throw UserError.unknownError(authError)
             } else {
+                Crashlytics.crashlytics().record(error: authError)
                 throw UserError.unknownError(authError)
             }
             
@@ -60,8 +64,9 @@ class AuthCreateService: AuthCreateServiceProtocol {
             if let user = authDataResult?.firebaseUser {
                 try? await user.delete()
             }
-            
+            Crashlytics.crashlytics().record(error: error)
             throw UserError.unknownError(error)
+            
         }
     }
 }
