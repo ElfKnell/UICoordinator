@@ -16,11 +16,11 @@ struct CoordinateInfoView: View {
         
         VStack {
             
-            Text("Coordinats")
+            Text("Coordinates")
                 .font(.title3)
             
             HStack {
-                Text("Lanitude:")
+                Text("Latitude:")
                 
                 Spacer()
                 

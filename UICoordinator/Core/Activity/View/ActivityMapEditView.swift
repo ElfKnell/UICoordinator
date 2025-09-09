@@ -83,7 +83,7 @@ struct ActivityMapEditView: View {
                         }
                     },
                     annotation: $viewModel.customAnnotation)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(350), .medium])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
@@ -109,7 +109,7 @@ struct ActivityMapEditView: View {
                         }
                     },
                     location: $viewModel.selectedLocation)
-                    .presentationDetents([.medium, .height(550)])
+                    .presentationDetents([.medium, .height(350)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
