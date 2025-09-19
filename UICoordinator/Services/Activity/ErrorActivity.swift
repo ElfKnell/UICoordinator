@@ -18,6 +18,7 @@ enum ErrorActivity: Error, LocalizedError {
     case failedUpdateRoute
     case idNotFound
     case nameNil
+    case activitiesNotFound
     
     var errorDescription: String? {
         switch self {
@@ -39,6 +40,8 @@ enum ErrorActivity: Error, LocalizedError {
             return "Current id not found"
         case .nameNil:
             return "The name field cannot be empty"
+        case .activitiesNotFound:
+            return "Activities not found"
         }
     }
 }

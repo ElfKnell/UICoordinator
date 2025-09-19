@@ -18,11 +18,17 @@ class CreateReplyViewModel: ObservableObject {
     
     private let colloquyService: ColloquyServiceProtocol
     private let increment: ColloquyInteractionCounterServiceProtocol
+    private let contentModerator: ContentModeratorProtocol
     
-    init(text: String = "", colloquyService: ColloquyServiceProtocol, increment: ColloquyInteractionCounterServiceProtocol) {
+    init(text: String = "",
+         colloquyService: ColloquyServiceProtocol,
+         increment: ColloquyInteractionCounterServiceProtocol,
+         contentModerator: ContentModeratorProtocol) {
+        
         self.text = text
         self.colloquyService = colloquyService
         self.increment = increment
+        self.contentModerator = contentModerator
     }
     
     @MainActor
@@ -37,6 +43,14 @@ class CreateReplyViewModel: ObservableObject {
             if self.text.isEmpty { return }
             
             let caption = self.text
+            
+            let analyze = try await contentModerator
+                .analyzeTextWithAlamofire(input: caption, model: .analyzeText)
+            
+            if analyze.label.contains("Negative") {
+                throw ModerationError.invalidPost
+            }
+            
             let reply = Colloquy(ownerUid: userId, caption: caption, timestamp: Timestamp(), likes: 0, locationId: nil, ownerColloquy: colloquyId, isDelete: false)
             
             self.text = ""

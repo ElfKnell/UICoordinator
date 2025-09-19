@@ -8,6 +8,7 @@
 import Foundation
 
 enum FollowError: Error {
+    
     case encodingFailed
     case invalidInput
         
@@ -16,7 +17,8 @@ enum FollowError: Error {
         case .encodingFailed:
             return "Failed to encode Follow object"
         case .invalidInput:
-                return "Invalid input, value is empty"
+            return "Invalid input, value is empty"
         }
     }
+    
 }

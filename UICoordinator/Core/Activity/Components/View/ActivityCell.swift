@@ -83,6 +83,21 @@ struct ActivityCell: View {
                                     .font(.caption)
                                     .foregroundStyle(Color(.systemGray3))
                                 
+                                if activity.user != container
+                                    .currentUserService
+                                    .currentUser
+                                {
+                                    
+                                    Menu {
+                                        
+                                        ReportButtonView(object: activity)
+                                        
+                                    } label: {
+                                        Image(systemName: "ellipsis")
+                                            .foregroundStyle(.gray)
+                                    }
+                                    
+                                }
                             }
                             
                             HStack {
@@ -109,6 +124,7 @@ struct ActivityCell: View {
                         Spacer()
                         
                         if activity.user != container.currentUserService.currentUser {
+                            
                             if viewModel.isStread {
                                 Image(systemName: "arrowshape.bounce.forward.fill")
                                     .foregroundStyle(.green)

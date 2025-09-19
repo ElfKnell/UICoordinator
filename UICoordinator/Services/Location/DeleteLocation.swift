@@ -6,6 +6,7 @@
 //
 
 import Firebase
+import FirebaseCrashlytics
 import FirebaseFirestoreSwift
 
 class DeleteLocation: DeleteLocationProtocol {
@@ -28,4 +29,5 @@ class DeleteLocation: DeleteLocationProtocol {
             try await deleteLocation(at: id)
         }
     }
+    
 }

@@ -9,6 +9,7 @@ import Foundation
 
 struct UserContentListViewModelFactory {
     
+    @MainActor
     static func make(user: User) -> UserContentListViewModel {
         UserContentListViewModel(
             user: user,

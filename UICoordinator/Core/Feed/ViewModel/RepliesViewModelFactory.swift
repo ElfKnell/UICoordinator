@@ -9,7 +9,10 @@ import Foundation
 
 struct RepliesViewModelFactory {
     
-    static func makeRepliesViewModel(_ cid: String, currentUser: User?, isOrdering: Bool) -> RepliesViewModel {
+    static func makeRepliesViewModel(_ cid: String,
+                                     currentUser: User?,
+                                     isOrdering: Bool) -> RepliesViewModel {
+        
         RepliesViewModel(cid, currentUser: currentUser,
                          isOrdering: isOrdering,
                          fetchRepliesFirebase: FetchRepliesFirebase(

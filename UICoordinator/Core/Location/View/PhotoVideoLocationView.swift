@@ -13,18 +13,15 @@ struct PhotoVideoLocationView: View {
     @EnvironmentObject var conteiner: DIContainer
     
     @StateObject var viewModelPhoto: PhotoViewModel
-    @StateObject var viewModelVideo: VideoViewModel
+    //@StateObject var viewModelVideo: VideoViewModel
     
     @MainActor
     init(location: MapSelectionProtocol,
          viewModelPhotoBilder: @MainActor @escaping () -> PhotoViewModel = {
         PhotoViewModelFactory.make()
-    }, viewModelVideoBilder: @MainActor @escaping () -> VideoViewModel = {
-        VideoViewModelFactory.make()
     }) {
         self.location = location
         _viewModelPhoto = StateObject(wrappedValue: viewModelPhotoBilder())
-        _viewModelVideo = StateObject(wrappedValue: viewModelVideoBilder())
     }
     
     var body: some View {
@@ -58,18 +55,18 @@ struct PhotoVideoLocationView: View {
                 }
             }
             
-            VStack {
-                NavigationLink {
-                    VideoView(
-                        locationId: location.id,
-                        isAccessible: CheckingForCurrentUser.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))
-                        .environmentObject(viewModelVideo)
-                } label: {
-                    Text("Choose Video")
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .padding()
-            }
+//            VStack {
+//                NavigationLink {
+//                    VideoView(
+//                        locationId: location.id,
+//                        isAccessible: CheckingForCurrentUser.isOwnerCurrentUser(location.ownerUid, currentUser: conteiner.currentUserService.currentUser))
+//                        .environmentObject(viewModelVideo)
+//                } label: {
+//                    Text("Choose Video")
+//                }
+//                .navigationBarTitleDisplayMode(.inline)
+//                .padding()
+//            }
         }
     }
 }

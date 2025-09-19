@@ -7,13 +7,13 @@
 
 import Foundation
 
-@MainActor
-final class VideoViewModelFactory {
-    
-    static func make() -> VideoViewModel {
-        VideoViewModel(
-            videoService: VideoService(),
-            videoUploadService: VideoUploadToFirebase()
-        )
-    }
-}
+//@MainActor
+//final class VideoViewModelFactory {
+//    
+//    static func make() -> VideoViewModel {
+//        VideoViewModel(
+//            videoService: VideoService(),
+//            videoUploadService: VideoUploadToFirebase()
+//        )
+//    }
+//}

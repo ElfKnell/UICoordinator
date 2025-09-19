@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UserContentListView: View {
+    
     @StateObject var viewModel: UserContentListViewModel
     @EnvironmentObject var container: DIContainer
     @State private var isLandscape: Bool = UIDevice.current.orientation.isLandscape
@@ -75,7 +76,9 @@ struct UserContentListView: View {
                             
                         } else {
                             
-                            ColloquyCellFactory.make(colloquy: colloquy)
+                            ColloquyCellFactory.make(
+                                colloquy: colloquy
+                            )
                                 .padding(.horizontal, isLandscape ? 41 : 1)
                                 .task {
                                     

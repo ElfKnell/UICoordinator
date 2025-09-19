@@ -36,12 +36,9 @@ struct CreateColloquyView: View {
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService()),
-                deleteLikes: LikesDeleteService(
-                    likeServise: LikeService(
-                        serviceCreate: FirestoreLikeCreateServise(),
-                        serviceDetete: FirestoreGeneralDeleteService(
-                            db: FirestoreAdapter())))),
-            activityUpdate: ActivityServiceUpdate())
+                deleteLikes: LikesDeleteService()),
+            activityUpdate: ActivityServiceUpdate(),
+            contentModerator: ContentModerator())
     }) {
         
         let vm = viewModelBilder()
@@ -58,36 +55,43 @@ struct CreateColloquyView: View {
             
             VStack {
                 
-                HStack(alignment: .top) {
+                if !viewModel.isLoading {
                     
-                    CircularProfileImageView(user: user, size: .small)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .top) {
                         
-                        Text(user?.username ?? "no name")
-                            .fontWeight(.semibold)
+                        CircularProfileImageView(user: user, size: .small)
                         
-                        TextField("Start a colloquy", text: $caption, axis: .vertical)
+                        VStack(alignment: .leading, spacing: 4) {
+                            
+                            Text(user?.username ?? "no name")
+                                .fontWeight(.semibold)
+                            
+                            TextField("Start a colloquy", text: $caption, axis: .vertical)
+                            
+                        }
+                        .font(.footnote)
                         
+                        Spacer()
+                        
+                        if !caption.isEmpty {
+                            Button {
+                                caption = ""
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .resizable()
+                                    .frame(width: 12, height: 12)
+                                    .foregroundStyle(.gray)
+                            }
+                        }
                     }
-                    .font(.footnote)
                     
                     Spacer()
                     
-                    if !caption.isEmpty {
-                        Button {
-                            caption = ""
-                        } label: {
-                            Image(systemName: "xmark")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                                .foregroundStyle(.gray)
-                        }
-                    }
+                } else {
+                    
+                    LoadingView(width: 200, height: 200)
+                    
                 }
-                
-                Spacer()
-                
             }
             .padding()
             .navigationTitle("\(location?.name ?? self.activityId != nil ? "Reply" : "") Colloquy")
@@ -115,10 +119,10 @@ struct CreateColloquyView: View {
                             
                             isSaved = true
                             
-                            if viewModel.errorUpload != nil {
-                                self.isUploadingError = true
+                            if !viewModel.isError {
+                                dismiss()
                             }
-                            dismiss()
+                            
                         }
                     }
                     .opacity(caption.isEmpty ? 0.3 : 1.0)
@@ -128,11 +132,6 @@ struct CreateColloquyView: View {
             }
             .foregroundStyle(.primary)
             .font(.subheadline)
-            .alert("Update Error", isPresented: $isUploadingError) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorUpload ?? "")
-            }
 
         }
     }

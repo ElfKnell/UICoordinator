@@ -20,6 +20,7 @@ class CurrentUserService: CurrentUserServiceProtocol {
         self.firestoreService = firestoreService
     }
     
+    @MainActor
     func fetchCurrentUser(userId: String?) async throws {
         
         guard let userId else {
@@ -33,6 +34,7 @@ class CurrentUserService: CurrentUserServiceProtocol {
         self.currentUser = user
     }
     
+    @MainActor
     func updateCurrentUser() async throws {
         
         guard let uid = self.currentUser?.id else {

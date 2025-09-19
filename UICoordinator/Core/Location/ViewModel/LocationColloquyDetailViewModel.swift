@@ -14,12 +14,12 @@ class LocationColloquyDetailViewModel: ObservableObject {
     @Published var switcher = PhotoSwitch.noPhoto
     @Published var videos = [Video]()
     
-    let videoService: VideoServiceProtocol
+    //let videoService: VideoServiceProtocol
     let photoService: PhotoServiceProtocol
     
-    init(videoService: VideoServiceProtocol, photoService: PhotoServiceProtocol) {
+    init(photoService: PhotoServiceProtocol) {
         
-        self.videoService = videoService
+        //self.videoService = videoService
         self.photoService = photoService
     }
     
@@ -39,13 +39,13 @@ class LocationColloquyDetailViewModel: ObservableObject {
         }
     }
     
-    @MainActor
-    func fetchVideos(_ locationId: String) async {
-        do {
-            self.videos = try await videoService
-                .fetchVideosByLocation(locationId)
-        } catch {
-            print("ERROR FETCHING VIDEO: \(error.localizedDescription)")
-        }
-    }
+//    @MainActor
+//    func fetchVideos(_ locationId: String) async {
+//        do {
+//            self.videos = try await videoService
+//                .fetchVideosByLocation(locationId)
+//        } catch {
+//            print("ERROR FETCHING VIDEO: \(error.localizedDescription)")
+//        }
+//    }
 }

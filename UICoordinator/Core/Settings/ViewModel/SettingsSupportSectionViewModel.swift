@@ -7,17 +7,23 @@
 
 import Foundation
 import StoreKit
-import UIKit
-import MessageUI
 
-class SettingsSupportSectionViewModel: NSObject, ObservableObject, MFMailComposeViewControllerDelegate {
+class SettingsSupportSectionViewModel: ObservableObject {
+    
+    @Published var showMailErrorAlert = false
     
     private let appID = "6748606035"
     
     private let supportEmail = "kyrych.app@gmail.com"
     
+    private let emailSender: EmailSenderProtocol
+    
     var shareAppURL: URL? {
         URL(string: "https://apps.apple.com/app/id\(appID)")
+    }
+    
+    init(emailSender: EmailSenderProtocol) {
+        self.emailSender = emailSender
     }
     
     @MainActor
@@ -36,26 +42,10 @@ class SettingsSupportSectionViewModel: NSObject, ObservableObject, MFMailCompose
     
     func sendFeedbackEmail() {
         
-        let mailVC = MFMailComposeViewController()
-        mailVC.mailComposeDelegate = self
-        mailVC.setToRecipients([supportEmail])
-        mailVC.setSubject("Feedback for Trailcraft App")
+        let subject = "Feedback for Trailcraft App"
+        let body = "Hello, I’d like to share feedback..."
         
-        if let windowScene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive }) {
-            
-            if let rootViewController = windowScene.windows.first?.rootViewController {
-                rootViewController.present(mailVC, animated: true)
-            }
-            
-        }
-    }
-    
-    func mailComposeController(_ controller: MFMailComposeViewController,
-                               didFinishWith result: MFMailComposeResult,
-                               error: Error?) {
-        controller.dismiss(animated: true)
+        emailSender.sendFeedbackEmail(subject: subject, body: body)
     }
     
 }

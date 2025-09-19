@@ -39,8 +39,11 @@ struct ActivityRepliesView: View {
                         .frame(width: 10)
                     
                     LazyVStack {
+                        
                         ForEach(viewModel.replies) { reply in
-                            ColloquyCellFactory.make(colloquy: reply)
+                            ColloquyCellFactory.make(
+                                colloquy: reply
+                            )
                                 .task {
                                     await viewModel.fetchReplies(activity.id, currentUser: user)
                                 }

@@ -15,5 +15,6 @@ class LoginViewModel{
     var password = ""
     var isLoginError = false
     var isCreatedUser = false
+    var isLoading = false
     
 }

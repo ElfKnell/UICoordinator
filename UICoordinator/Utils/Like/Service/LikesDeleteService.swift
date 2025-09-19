@@ -11,27 +11,40 @@ import FirebaseCrashlytics
 
 class LikesDeleteService: LikesDeleteServiceProtocol {
     
-    let likeServise: LikeServiceProtocol
-    
-    init(likeServise: LikeServiceProtocol) {
-        self.likeServise = likeServise
-    }
-    
     func likesDelete(objectId: String, collectionName: CollectionNameForLike) async throws {
         
-        let snapshot = try await Firestore
-            .firestore()
+        let db = Firestore.firestore()
+        
+        let snapshot = try await db
             .collection(collectionName.value)
             .whereField("colloquyId", isEqualTo: objectId)
             .getDocuments()
         
-        let likes = snapshot.documents.compactMap({ try? $0.data(as: Like.self)})
-        
-        if likes.isEmpty { return }
-        
-        for like in likes {
-            try await likeServise.deleteLike(likeId: like.id, collectionName: collectionName)
+        guard !snapshot.documents.isEmpty else {
+            return
         }
         
+        let chunkedDocs = snapshot.documents.chunked(into: 500)
+        
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for chunk in chunkedDocs {
+                
+                group.addTask {
+                    
+                    let batch = db.batch()
+                    
+                    for doc in chunk {
+                        batch.deleteDocument(doc.reference)
+                    }
+                    
+                    do {
+                        try await batch.commit()
+                    } catch {
+                        Crashlytics.crashlytics().record(error: error)
+                    }
+                }
+            }
+            try await group.waitForAll()
+        }
     }
 }

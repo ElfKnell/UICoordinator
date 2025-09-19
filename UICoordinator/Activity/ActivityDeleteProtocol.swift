@@ -11,4 +11,6 @@ protocol ActivityDeleteProtocol {
     
     func deleteActivity(activity: Activity) async throws
     
+    func deleteAllActivitiesByUser(userId: String) async throws
+    
 }

@@ -39,12 +39,13 @@ struct ReplyComposerView: View {
                     .frame(width: 10)
                 
                 LazyVStack {
+                    
                     ForEach(viewModel.replies) { reply in
-                        ColloquyCellFactory.make(colloquy: reply)
-                            .onAppear {
-                                Task {
-                                    await viewModel.fetchReplies(colloquy.id, currentUser: user)
-                                }
+                        ColloquyCellFactory.make(
+                            colloquy: reply
+                        )
+                            .task {
+                                await viewModel.fetchReplies(colloquy.id, currentUser: user)
                             }
                     }
                 }

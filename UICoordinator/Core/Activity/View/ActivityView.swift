@@ -29,6 +29,12 @@ struct ActivityView: View {
             .navigationDestination(for: String.self, destination: { name in
                 ActivityCreate(nameActivyty: name)
             })
+            .task {
+                await container.authService.checkUserSession()
+                await container.blockService
+                    .fetchBlockers(container
+                        .currentUserService.currentUser)
+            }
             .toolbar {
                 
                 Button {

@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseCrashlytics
 
+@MainActor
 class UserContentListViewModel: ObservableObject {
     
     @Published var colloquies = [Colloquy]()
@@ -15,6 +16,7 @@ class UserContentListViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var isError = false
     @Published var messageError: String?
+    @Published var blockers: Set<String> = []
     
     private let fetchColloquies: FetchColloquiesProtocol
     private let fetchReplies: FetchRepliesProtocol
@@ -35,7 +37,6 @@ class UserContentListViewModel: ObservableObject {
         
     }
     
-    @MainActor
     func startLoadColloquies() async {
         
         self.isLoading = true
@@ -47,7 +48,6 @@ class UserContentListViewModel: ObservableObject {
         self.isLoading = false
     }
     
-    @MainActor
     func startReplies(currentUser: User?) async {
         
         self.isLoading = true
@@ -59,7 +59,6 @@ class UserContentListViewModel: ObservableObject {
         self.isLoading = false
     }
     
-    @MainActor
     func fetchColloquiesNext() async {
         
         self.isLoading = true
@@ -71,7 +70,6 @@ class UserContentListViewModel: ObservableObject {
     }
     
 
-    @MainActor
     func fetchNextReplies(currentUser: User?) async {
         
         self.isLoading = true
@@ -82,7 +80,6 @@ class UserContentListViewModel: ObservableObject {
         
     }
     
-    @MainActor
     private func fetchReplies(currentUser: User?) async {
         
         self.isError = false
@@ -102,7 +99,6 @@ class UserContentListViewModel: ObservableObject {
     
     }
     
-    @MainActor
     private func fetchColloquies() async {
         
         self.isError = false
@@ -120,4 +116,5 @@ class UserContentListViewModel: ObservableObject {
         }
         
     }
+    
 }

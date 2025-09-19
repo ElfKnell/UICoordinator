@@ -16,4 +16,6 @@ protocol PhotoServiceProtocol {
     
     func deletePhoto(photo: Photo)  async throws
     
+    func deletePhotoByLocation(_ locationId: String) async throws
+    
 }

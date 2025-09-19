@@ -18,6 +18,7 @@ class RegistrationViewModel: ObservableObject {
     @Published var isCreateUserError = false
     @Published var isLicenseAccepted = false
     @Published var isPasswordCorect = false
+    @Published var isLoading = false
     @Published var eula = "https://elfknell.github.io/Licenses/eula.html"
     @Published var privacyPolicy = "https://elfknell.github.io/Licenses/privacy_policy.html"
     
@@ -32,6 +33,7 @@ class RegistrationViewModel: ObservableObject {
         
         errorCreated = nil
         isCreateUserError = false
+        isLoading = true
         
         do {
             
@@ -40,16 +42,20 @@ class RegistrationViewModel: ObservableObject {
             }
             try await userCreate.createUser(withEmail: self.email, password: self.password, fullname: self.name, username: self.username)
             
+            isLoading = false
             return true
         } catch let userError as UserError {
             errorCreated = userError.description
             isCreateUserError = true
+            isLoading = false
             return false
         } catch {
             errorCreated = error.localizedDescription
             isCreateUserError = true
+            isLoading = false
             return false
         }
+
     }
     
 }

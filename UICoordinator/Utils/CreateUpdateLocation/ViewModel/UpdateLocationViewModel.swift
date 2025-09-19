@@ -13,7 +13,7 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     
     private let deleteLocation: DeleteLocationProtocol
     private let photoService: PhotoServiceProtocol
-    private let videoService: VideoServiceProtocol
+    //private let videoService: VideoServiceProtocol
     
     @Published var name = ""
     @Published var description = ""
@@ -23,12 +23,11 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
     @Published var isError = false
     
     init(deleteLocation: DeleteLocationProtocol,
-         photoService: PhotoServiceProtocol,
-         videoService: VideoServiceProtocol) {
+         photoService: PhotoServiceProtocol) {
         
         self.deleteLocation = deleteLocation
         self.photoService = photoService
-        self.videoService = videoService
+        //self.videoService = videoService
     }
     
     func initInfo(location: Location?) {
@@ -51,15 +50,15 @@ class UpdateLocationViewModel: LocationService, ObservableObject {
             
             if activityId == nil {
                 let fotos = try await photoService.fetchPhotosByLocation(locationId)
-                let videos = try await videoService.fetchVideosByLocation(locationId)
+                //let videos = try await videoService.fetchVideosByLocation(locationId)
                 
                 for foto in fotos {
                     try await photoService.deletePhoto(photo: foto)
                 }
                 
-                for video in videos {
-                    try await videoService.deleteVideo(video: video)
-                }
+//                for video in videos {
+//                    try await videoService.deleteVideo(video: video)
+//                }
             }
 
             try await deleteLocation.deleteLocation(at: locationId)

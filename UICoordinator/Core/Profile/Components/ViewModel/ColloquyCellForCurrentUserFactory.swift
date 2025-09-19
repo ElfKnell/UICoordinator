@@ -17,11 +17,7 @@ struct ColloquyCellForCurrentUserFactory {
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService()),
-                deleteLikes: LikesDeleteService(
-                    likeServise: LikeService(
-                        serviceCreate: FirestoreLikeCreateServise(),
-                        serviceDetete: FirestoreGeneralDeleteService(
-                            db: FirestoreAdapter()))))
+                deleteLikes: LikesDeleteService())
         )
         
         let viewModel = LikesViewModel(

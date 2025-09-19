@@ -37,10 +37,14 @@ class PhotoViewModel : ObservableObject {
     
     let photoService: PhotoServiceProtocol
     let photoUploadService: PhotoUploadToFirebaseProtocol
+    let contentModerator: ContentModeratorProtocol
     
-    init(photoService: PhotoServiceProtocol, photoUploadService: PhotoUploadToFirebaseProtocol) {
+    init(photoService: PhotoServiceProtocol,
+         photoUploadService: PhotoUploadToFirebaseProtocol,
+         contentModerator: ContentModeratorProtocol) {
         self.photoService = photoService
         self.photoUploadService = photoUploadService
+        self.contentModerator = contentModerator
     }
     
     func uploadPhoto(locationId: String) async {
@@ -49,13 +53,22 @@ class PhotoViewModel : ObservableObject {
         self.activeError = nil
         
         do {
+            
             guard let image = selectedImage else {
                 throw PhotoServiceError.invalidImage
             }
+            
             let name = self.namePhoto
             if name == "" {
                 throw PhotoServiceError.missingPhotoName
             }
+            
+            let results = try await contentModerator.check(image: image)
+                    
+            if let nsfw = results.first(where: { $0.label == "NSFW" }), nsfw.score > 0.7 {
+                throw ModerationError.invalidImage
+            }
+            
             try await photoUploadService
                 .uploadePhotoStorage(image, locationId: locationId, namePhoto: name)
             

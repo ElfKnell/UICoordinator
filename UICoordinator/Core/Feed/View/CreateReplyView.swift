@@ -26,12 +26,9 @@ struct CreateReplyView: View {
                 repliesFetchingService: FetchRepliesFirebase(
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService()),
-                deleteLikes: LikesDeleteService(
-                    likeServise: LikeService(
-                        serviceCreate: FirestoreLikeCreateServise(),
-                        serviceDetete: FirestoreGeneralDeleteService(
-                            db: FirestoreAdapter())))),
-            increment: ColloquyInteractionCounterService())
+                deleteLikes: LikesDeleteService()),
+            increment: ColloquyInteractionCounterService(),
+            contentModerator: ContentModerator())
     }) {
         
         let vm = viewModelBilder()

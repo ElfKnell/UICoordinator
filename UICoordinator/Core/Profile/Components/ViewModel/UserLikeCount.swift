@@ -13,9 +13,6 @@ class UserLikeCount: ObservableObject {
     @Published var countLikes = 0
     @Published var usersLike = [User]()
     
-    @Published var errorMessage: String?
-    @Published var isError = false
-    
     private let userService: UserServiceProtocol
     private let fetchingLikes: FetchLikesServiceProtocol
     
@@ -28,9 +25,6 @@ class UserLikeCount: ObservableObject {
     @MainActor
     func fetchLikes(userId: String) async {
         
-        self.isError = false
-        self.errorMessage = nil
-        
         do {
             
             usersLike = []
@@ -40,7 +34,6 @@ class UserLikeCount: ObservableObject {
                           byField: .userIdField,
                           userId: userId)
             
-            self.errorMessage = nil
             self.countLikes = likes.count
             let usersIdLikes =  Set(likes.map { $0.ownerUid })
         
@@ -51,8 +44,8 @@ class UserLikeCount: ObservableObject {
             }
         } catch {
             
-            self.errorMessage = error.localizedDescription
-            self.isError = true
+            Crashlytics.crashlytics()
+                .setCustomValue(userId, forKey: "current_user_id")
             Crashlytics.crashlytics().record(error: error)
             
         }

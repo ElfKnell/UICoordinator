@@ -27,6 +27,7 @@ class RepliesViewModel: ObservableObject {
         self.isOrdering = isOrdering
         self.fetchRepliesFirebase = fetchRepliesFirebase
         self.localUserServise = localUserServise
+
         Task {
             await fetchRepliesRefresh(cid, currentUser: currentUser)
         }

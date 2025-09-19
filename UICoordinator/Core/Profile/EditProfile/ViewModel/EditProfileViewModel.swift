@@ -11,6 +11,12 @@ import FirebaseCrashlytics
 
 class EditProfileViewModel: ObservableObject {
     
+    @Published var nickname = ""
+    @Published var bio = ""
+    @Published var link = ""
+    @Published var newPassword = ""
+    @Published var isPrivateProfile = false
+    @Published var isLoading = false
     @Published var selectedItem: PhotosPickerItem? {
         didSet { Task { await loadPhoto() } }
     }
@@ -22,11 +28,15 @@ class EditProfileViewModel: ObservableObject {
     @Published var privacyPolicy = "https://elfknell.github.io/Licenses/privacy_policy.html"
     
     private var uiImage: UIImage?
-    private let userServiseUpdate: UserServiceUpdateProtocol
     
-    init(userServiseUpdate: UserServiceUpdateProtocol) {
+    private let userServiseUpdate: UserServiceUpdateProtocol
+    private let deleteUser: DeleteCurrentUserProtocol
+    
+    init(userServiseUpdate: UserServiceUpdateProtocol,
+         deleteUser: DeleteCurrentUserProtocol) {
         
         self.userServiseUpdate = userServiseUpdate
+        self.deleteUser = deleteUser
     }
     
     @MainActor
@@ -39,6 +49,7 @@ class EditProfileViewModel: ObservableObject {
         var userData: [String: Any]  = [:]
         errorMessage = nil
         isError = false
+        isLoading = true
         
         let trimmedBio = bio.trimmingCharacters(in: .whitespaces)
         let trimmedLink = link.trimmingCharacters(in: .whitespaces)
@@ -73,21 +84,24 @@ class EditProfileViewModel: ObservableObject {
             isError = true
             Crashlytics.crashlytics().record(error: error)
         }
-        
+        isLoading = false
     }
     
-    func deleteCurrentUser(userId: String?) async {
+    @MainActor
+    func deleteCurrentUser(user: User?, userSession: FirebaseUserProtocol?) async {
         
         errorMessage = nil
         isError = false
+        isLoading = true
         
         do {
-            try await userServiseUpdate.deleteUser(userId: userId)
+            try await deleteUser.deleteUser(currentUser: user, userSession: userSession)
         } catch {
             errorMessage = error.localizedDescription
             isError = true
             Crashlytics.crashlytics().record(error: error)
         }
+        isLoading = false
     }
     
     @MainActor

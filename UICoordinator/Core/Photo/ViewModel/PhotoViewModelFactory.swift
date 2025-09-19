@@ -13,7 +13,8 @@ final class PhotoViewModelFactory {
     static func make() -> PhotoViewModel {
         PhotoViewModel(
             photoService: PhotoService(),
-            photoUploadService: PhotoUploadToFirebase()
+            photoUploadService: PhotoUploadToFirebase(),
+            contentModerator: ContentModerator()
         )
     }
 }

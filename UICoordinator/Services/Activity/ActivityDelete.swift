@@ -10,50 +10,45 @@ import Foundation
 
 class ActivityDelete: ActivityDeleteProtocol {
     
-    let servaceDelete: FirestoreGeneralDeleteProtocol
+    let serviceDelete: FirestoreGeneralDeleteProtocol
     let locationDelete: DeleteLocationProtocol
     let likesDelete: LikesDeleteServiceProtocol
     let spreadDelete: DeleteSpreadServiceProtocol
     let photoService: PhotoServiceProtocol
-    let videoService: VideoServiceProtocol
+    //let videoService: VideoServiceProtocol
     let routesServise: RouteDeleteServiceProtocol
     let colloquyService: ColloquyServiceProtocol
     
-    init(servaceDelete: FirestoreGeneralDeleteProtocol,
+    init(serviceDelete: FirestoreGeneralDeleteProtocol,
          locationDelete: DeleteLocationProtocol,
          likesDelete: LikesDeleteServiceProtocol,
          spreadDelete: DeleteSpreadServiceProtocol,
          photoService: PhotoServiceProtocol,
-         videoService: VideoServiceProtocol,
+         //videoService: VideoServiceProtocol,
          routesServise: RouteDeleteServiceProtocol,
          colloquyService: ColloquyServiceProtocol) {
         
-        self.servaceDelete = servaceDelete
+        self.serviceDelete = serviceDelete
         self.locationDelete = locationDelete
         self.likesDelete = likesDelete
         self.spreadDelete = spreadDelete
         self.photoService = photoService
-        self.videoService = videoService
+        //self.videoService = videoService
         self.routesServise = routesServise
         self.colloquyService = colloquyService
     }
     
     func deleteActivity(activity: Activity) async throws {
         
-        let photos = try await photoService.fetchPhotosByLocation(activity.id)
-        let videos = try await videoService.fetchVideosByLocation(activity.id)
+        //let videos = try await videoService.fetchVideosByLocation(activity.id)
         
-        if !photos.isEmpty {
-            for photo in photos {
-                try await photoService.deletePhoto(photo: photo)
-            }
-        }
+        try await photoService.deletePhotoByLocation(activity.id)
         
-        if !videos.isEmpty {
-            for video in videos {
-                try await videoService.deleteVideo(video: video)
-            }
-        }
+//        if !videos.isEmpty {
+//            for video in videos {
+//                try await videoService.deleteVideo(video: video)
+//            }
+//        }
         
         try await routesServise.deleteByActivity(activityId: activity.id)
         
@@ -65,9 +60,42 @@ class ActivityDelete: ActivityDeleteProtocol {
         
         try await spreadDelete.removeSpreads(activity.id, withType: .activity)
         
-        try await self.servaceDelete.deleteDocument(from: "Activity", documentId: activity.id)
+        try await self.serviceDelete.deleteDocument(from: "Activity", documentId: activity.id)
         
     }
     
+    func deleteAllActivitiesByUser(userId: String) async throws {
+        
+        let db = Firestore.firestore()
+        
+        let snapshot = try await db
+            .collection("Activity")
+            .whereField("ownerUid", isEqualTo: userId)
+            .getDocuments()
+        
+        guard !snapshot.documents.isEmpty else {
+            throw ErrorActivity.activitiesNotFound
+        }
+        
+        let activities = snapshot.documents
+            .compactMap({ try? $0.data(as: Activity.self)})
+        
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            
+            for activity in activities {
+                
+                group.addTask {
+                    do {
+                        try await self.deleteActivity(activity: activity)
+                    } catch {
+                        Crashlytics.crashlytics().record(error: error)
+                    }
+                }
+                
+            }
+            try await group.waitForAll()
+        }
+        
+    }
     
 }

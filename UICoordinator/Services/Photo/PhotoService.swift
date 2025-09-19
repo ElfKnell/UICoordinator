@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseStorage
+import FirebaseCrashlytics
 
 class PhotoService: PhotoServiceProtocol {
     
@@ -39,5 +40,25 @@ class PhotoService: PhotoServiceProtocol {
             .collection("photos")
             .document(photo.id)
             .delete()
+    }
+    
+    func deletePhotoByLocation(_ locationId: String) async throws {
+        
+        let photos = try await fetchPhotosByLocation(locationId)
+        
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for photo in photos {
+                group.addTask {
+                    do {
+                        try await self.deletePhoto(photo: photo)
+                    } catch {
+                        Crashlytics.crashlytics().record(error: error)
+                    }
+                }
+            }
+            
+            try await group.waitForAll()
+        }
+        
     }
 }

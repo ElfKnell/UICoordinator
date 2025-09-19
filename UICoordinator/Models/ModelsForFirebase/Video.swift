@@ -15,6 +15,7 @@ struct Video: Identifiable, Codable {
     var title: String?
     let timestamp: Timestamp
     let videoURL: String
+    var isFlagged: Bool? = false
     
     var id: String {
         return videoId ?? NSUUID().uuidString

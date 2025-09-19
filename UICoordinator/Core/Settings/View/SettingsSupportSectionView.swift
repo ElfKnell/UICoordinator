@@ -10,8 +10,15 @@ import MessageUI
 
 struct SettingsSupportSectionView: View {
     
-    @State private var showMailErrorAlert = false
-    @StateObject private var viewModel = SettingsSupportSectionViewModel()
+    @StateObject private var viewModel : SettingsSupportSectionViewModel
+    
+    init(viewModelBilder: @escaping () -> SettingsSupportSectionViewModel = {
+        SettingsSupportSectionViewModel(
+            emailSender: EmailSender()
+        )
+    }) {
+        self._viewModel = StateObject(wrappedValue: viewModelBilder())
+    }
     
     var body: some View {
         
@@ -39,7 +46,7 @@ struct SettingsSupportSectionView: View {
                 if MFMailComposeViewController.canSendMail() {
                     viewModel.sendFeedbackEmail()
                 } else {
-                    showMailErrorAlert = true
+                    viewModel.showMailErrorAlert = true
                 }
                 
             } label: {
@@ -48,7 +55,7 @@ struct SettingsSupportSectionView: View {
             }
             
         }
-        .alert("Email not configured", isPresented: $showMailErrorAlert) {
+        .alert("Email not configured", isPresented: $viewModel.showMailErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Please set up a Mail account in order to send feedback.")

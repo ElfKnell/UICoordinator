@@ -14,6 +14,13 @@ struct LoginView: View {
     @EnvironmentObject var container: DIContainer
     @Environment(\.horizontalSizeClass) var sizeClass
     
+    @FocusState private var focusedField: Field?
+
+    enum Field {
+        case email
+        case password
+    }
+    
     var body: some View {
         
         NavigationStack {
@@ -21,93 +28,119 @@ struct LoginView: View {
             ZStack {
                 
                 BackgroundView()
+                    .onTapGesture {
+                        focusedField = nil
+                    }
                 
-                VStack {
+                if !loginModel.isLoading {
                     
-                    Spacer()
-                    if sizeClass != .compact {
+                    VStack {
+                        
                         Spacer()
-                    }
-                    
-                    LogoView()
-                    
-                    if loginModel.isCreatedUser {
-                        
-                        HStack {
-                            Text("Please sign in")
-                                .foregroundColor(.green)
-                                .font(.title2)
+                        if sizeClass != .compact {
+                            Spacer()
                         }
-                        .padding()
                         
-                    }
-                    
-                    InputView(text: $loginModel.email, title: "Email", placeholder: "name@example.com")
-                        .textInputAutocapitalization(.never)
-                    
-                    InputView(text: $loginModel.password, title: "Password", placeholder: "password", isSecureField: true)
-                        .padding(.bottom)
-                    
-                    NavigationLink {
-                        ResetPasswordView()
-                    } label: {
-                        Text("Forgot password?")
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                            .font(.system(size: 20, design: .serif))
-                            .offset(x:90)
-                    }
-                    .padding(.bottom)
-                    
-                    Button {
-                        Task {
+                        LogoView()
+                        
+                        if loginModel.isCreatedUser {
                             
-                            await container.authService.login(withEmail: loginModel.email, password: loginModel.password)
-                            
-                            loginModel.isCreatedUser = false
-                            
-                            if container.authService.errorMessage != nil {
-                                loginModel.isLoginError = true
+                            HStack {
+                                Text("Please sign in")
+                                    .foregroundColor(.green)
+                                    .font(.title2)
                             }
+                            .padding()
+                            
                         }
-                    } label: {
                         
-                        ButtonLabelView(title: "Login", widthButton: 170)
+                        InputView(text: $loginModel.email, title: "Email", placeholder: "name@example.com")
+                            .textInputAutocapitalization(.never)
+                            .focused($focusedField, equals: .email)
+                        
+                        InputView(text: $loginModel.password, title: "Password", placeholder: "password", isSecureField: true)
                             .padding(.bottom)
-                
-                    }
-                    .disabled(!formIsValid)
-                    .opacity(formIsValid ? 1.0 : 0.5)
-                    
-                    
-                    HStack {
-                        
-                        Text("Don't have an account?")
-                            .font(.system(size: 20, design: .serif))
+                            .focused($focusedField, equals: .password)
                         
                         NavigationLink {
-                            RegistrationView(isNewUser: $loginModel.isCreatedUser)
-                                .navigationBarBackButtonHidden(true)
+                            ResetPasswordView()
                         } label: {
-                            Text("Sign up")
-                                .bold()
-                                .underline()
-                                .font(.system(size: 23, design: .serif))
-                                .foregroundStyle(.black)
-                                .shadow(radius: 3, x: 0, y: 2)
+                            Text("Forgot password?")
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                .font(.system(size: 20, design: .serif))
+                                .offset(x:90)
                         }
+                        .padding(.bottom)
+                        
+                        Button {
+                            
+                            Task {
+                                loginModel.isLoading = true
+                                
+                                await container.authService.login(withEmail: loginModel.email, password: loginModel.password)
+                                
+                                loginModel.isCreatedUser = false
+                                
+                                if container.authService.errorMessage != nil {
+                                    loginModel.isLoginError = true
+                                }
+                                
+                                loginModel.isLoading = false
+                            }
+                            
+                        } label: {
+                            
+                            ButtonLabelView(title: "Login", widthButton: 170)
+                                .padding(.bottom)
+                            
+                        }
+                        .disabled(!formIsValid)
+                        .opacity(formIsValid ? 1.0 : 0.5)
+                        
+                        
+                        HStack {
+                            
+                            Text("Don't have an account?")
+                                .font(.system(size: 20, design: .serif))
+                            
+                            NavigationLink {
+                                RegistrationView(isNewUser: $loginModel.isCreatedUser)
+                                    .navigationBarBackButtonHidden(true)
+                            } label: {
+                                Text("Sign up")
+                                    .bold()
+                                    .underline()
+                                    .font(.system(size: 23, design: .serif))
+                                    .foregroundStyle(.black)
+                                    .shadow(radius: 3, x: 0, y: 2)
+                            }
+                        }
+                        .padding(.top)
+                        
+                        Spacer()
+                        
                     }
-                    .padding(.top)
+                    .alert("Login problems", isPresented: $loginModel.isLoginError) {
+                        Button("Email Support") {
+                            if let emailURL = URL(
+                                string: "mailto:kyrych.app@gmail.com"
+                            ) {
+                                UIApplication.shared.open(emailURL)
+                            }
+                        }
+                        Button("OK", role: .cancel) {}
+                    } message: {
+                        Text(container.authService.errorMessage ?? "no error description")
+                    }
+                    .onAppear {
+                        focusedField = .email
+                    }
                     
-                    Spacer()
-                  
+                } else {
+                    LoadingView(width: 300, height: 300)
                 }
-                .alert("Login problems", isPresented: $loginModel.isLoginError) {
-                    Button("OK", role: .cancel) {}
-                } message: {
-                    Text(container.authService.errorMessage ?? "no error")
-                }
-
+                
             }
         }
     }

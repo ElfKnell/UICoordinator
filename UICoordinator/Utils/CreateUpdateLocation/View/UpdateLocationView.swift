@@ -27,8 +27,7 @@ struct UpdateLocationView: View {
         viewModelBilder: @escaping () -> UpdateLocationViewModel = {
             UpdateLocationViewModel(
                 deleteLocation: DeleteLocation(),
-                photoService: PhotoService(),
-                videoService: VideoService())
+                photoService: PhotoService())
         }) {
         
         self.activityId = activityId

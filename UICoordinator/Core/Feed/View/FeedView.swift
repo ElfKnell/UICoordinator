@@ -23,12 +23,15 @@ struct FeedView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
             ZStack {
                 ScrollView(showsIndicators: false) {
                     LazyVStack {
                         ForEach(viewModel.colloquies) { colloquy in
-                            ColloquyCellFactory.make(colloquy: colloquy)
+                            ColloquyCellFactory.make(
+                                colloquy: colloquy
+                            )
                                 .onAppear {
                                     if colloquy == viewModel.colloquies.last {
                                         Task {
@@ -49,6 +52,10 @@ struct FeedView: View {
                     if viewModel.colloquies.isEmpty {
                         await viewModel.fetchColloquiesRefresh(currentUser: container.currentUserService.currentUser)
                     }
+                    await container.authService.checkUserSession()
+                    await container.blockService
+                        .fetchBlockers(container
+                            .currentUserService.currentUser)
                 }
                 .onChange(of: viewModel.isSaved) {
                     

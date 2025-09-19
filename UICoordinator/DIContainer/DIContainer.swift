@@ -17,6 +17,8 @@ final class DIContainer: ObservableObject {
     let userFollow: UserFollowersProtocol
     var networkMonitor: AppConnectivityManager
     
+    var blockService: FetchingBlocksServiceProtocol
+    
     init() {
         
         let firestoreService = FirestoreService()
@@ -37,6 +39,8 @@ final class DIContainer: ObservableObject {
                                         checkedFollowing: checkedFollowing)
         
         self.networkMonitor = AppConnectivityManager(networkMonitor: NetworkMonitor())
+        
+        self.blockService = FetchingBlocksService()
     }
+    
 }
-

@@ -27,6 +27,7 @@ class FeedViewModel: ObservableObject {
         
         self.localUserServise = localUserServise
         self.fetchColloquies = fetchColloquies
+
     }
     
     @MainActor
@@ -72,4 +73,5 @@ class FeedViewModel: ObservableObject {
             
         }
     }
+    
 }

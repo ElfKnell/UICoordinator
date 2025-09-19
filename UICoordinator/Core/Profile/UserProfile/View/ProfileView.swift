@@ -19,7 +19,13 @@ struct ProfileView: View {
     
     init(user: User, isChange: Binding<Bool>,
          viewModelBilder: @escaping () -> ProfileViewModel = {
-        ProfileViewModel(subscription: SubscribeOrUnsubscribe(followServise: FollowService()))
+        ProfileViewModel(
+            subscription: SubscribeOrUnsubscribe(
+                followServise: FollowService()),
+            followService: FollowsDeleteByUser(),
+            blockService: BlockService(
+                serviceCreate: FirestoreGeneralServiceCreate())
+        )
     }) {
         self.user = user
         self._isChange = isChange
@@ -38,76 +44,157 @@ struct ProfileView: View {
                     
                     HStack {
                         
-                        Spacer()
-                        
-                        if user.id != container.currentUserService.currentUser?.id {
+                        if container.blockService
+                            .blocksId.contains(user.id) {
                             
-                            Button {
-                                
-                                if container.userFollow.isFollowingCurrentUser(uid: user.id) {
-                                    viewModel.unfollow(user: user,
-                                                       followers: container.userFollow.followersCurrentUsers)
-                                } else {
-                                    viewModel.follow(user: user, currentUserId: container.currentUserService.currentUser?.id)
-                                }
-                                isChange.toggle()
-                                dismiss()
-
-                            } label: {
-                                
-                                Text(container.userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.white)
-                                    .frame(maxWidth: .infinity, minHeight: 32)
-                                    .background(.black)
-                                    .cornerRadius(11)
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        if let isPrivate = user.isPrivateProfile, isPrivate {
-                            
-                            Text("Private Profile")
+                            Text("Blocked")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(.white)
+                                .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, minHeight: 32)
-                                .background(.black)
-                                .cornerRadius(11)
+                                .background(Color.gray)
+                                .clipShape(RoundedRectangle(cornerRadius: 22.0))
                             
                         } else {
                             
-                            NavigationLink {
-                                UserLocationsView(userId: user.id)
-                            } label: {
-                                Text("Map")
+                            Spacer()
+                            
+                            if user.id != container.currentUserService.currentUser?.id {
+                                
+                                Button {
+                                    
+                                    if container.userFollow.isFollowingCurrentUser(uid: user.id) {
+                                        viewModel.unfollow(user: user,
+                                                           followers: container.userFollow.followersCurrentUsers)
+                                    } else {
+                                        viewModel.follow(
+                                            user: user,
+                                            blockers: container
+                                                .blockService.blocksId,
+                                            currentUserId: container
+                                                .currentUserService
+                                                .currentUser?.id)
+                                    }
+                                    isChange.toggle()
+                                    dismiss()
+                                    
+                                } label: {
+                                    
+                                    Text(container.userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.white)
+                                        .frame(maxWidth: .infinity, minHeight: 32)
+                                        .background(.black)
+                                        .cornerRadius(11)
+                                }
+                                .disabled(!container
+                                    .blockService
+                                    .blocksId
+                                    .contains(user.id))
+                            }
+                            
+                            Spacer()
+                            
+                            if let isPrivate = user.isPrivateProfile, isPrivate {
+                                
+                                Text("Private Profile")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.white)
                                     .frame(maxWidth: .infinity, minHeight: 32)
                                     .background(.black)
                                     .cornerRadius(11)
+                                
+                            } else {
+                                
+                                NavigationLink {
+                                    UserLocationsView(userId: user.id)
+                                } label: {
+                                    Text("Map")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.white)
+                                        .frame(maxWidth: .infinity, minHeight: 32)
+                                        .background(.black)
+                                        .cornerRadius(11)
+                                }
+                                
                             }
                             
+                            Spacer()
+                            
                         }
-                        
-                        Spacer()
                     }
                     .padding()
                     .frame(height: 39)
                     .modifier(CornerRadiusModifier())
                     .padding()
                     
-                    UserContentListView(user: user)
+                    if !container.blockService
+                        .blocksId.contains(user.id) {
+                        
+                        UserContentListView(user: user)
+                        
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
             .padding(.horizontal)
+            .toolbar {
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    
+                    Menu {
+                        
+                        Button {
+                            
+                            viewModel.checkAndHandleBlock(
+                                userId: user.id,
+                                blockers: container
+                                    .blockService.blockedsId,
+                                currentUser: container
+                                    .currentUserService
+                                    .currentUser
+                            )
+                            
+                        } label: {
+                            
+                            if container.blockService.blockedsId.contains(user.id) {
+                                Label("Unblock", systemImage: "person.fill.checkmark")
+                            } else {
+                                Label("Block", systemImage: "person.fill.xmark")
+                            }
+                            
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.blue, lineWidth: 2)
+                        )
+                        
+                        ReportButtonView(object: user)
+                        
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundStyle(.primary)
+                    }
+                    
+                }
+            }
             .onAppear {
                 
                 container.userFollow.updateFollowCounts(for: user.id)
+                
+            }
+            .onChange(of: viewModel.isBloked) {
+                
+                Task {
+                    await container.blockService
+                        .fetchBlockers(container
+                            .currentUserService.currentUser)
+                }
                 
             }
         }

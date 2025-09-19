@@ -10,6 +10,7 @@ import SwiftUI
 struct ColloquyCell: View {
     
     let colloquy: Colloquy
+
     @EnvironmentObject var container: DIContainer
     @StateObject var viewModelLike: LikesViewModel
     @State private var showReplieCreate = false
@@ -53,13 +54,27 @@ struct ColloquyCell: View {
                         
                         Spacer()
                         
-                        Text(colloquy.timestamp.timestampString())
-                            .font(.caption)
-                            .foregroundStyle(Color(.systemGray3))
+                        HStack {
+                            
+                            Text(colloquy.timestamp.timestampString())
+                                .font(.caption)
+                                .foregroundStyle(Color(.systemGray3))
+                            
+                            Menu {
+                                
+                                ReportButtonView(object: colloquy)
+                                
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .foregroundStyle(.gray)
+                            }
+                            
+                        }
                         
                     }
                     
                     HStack {
+                        
                         if let name = colloquy.location?.name {
                             NavigationLink {
                                 LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
@@ -72,6 +87,7 @@ struct ColloquyCell: View {
                         Text(colloquy.caption)
                             .font(.footnote)
                             .multilineTextAlignment(.leading)
+                        
                     }
                     
                     HStack(spacing: 16) {
@@ -130,5 +146,8 @@ struct ColloquyCell: View {
 
 #Preview {
 
-    ColloquyCellFactory.make(colloquy: DeveloperPreview.colloquy)
+    ColloquyCellFactory.make(
+        colloquy: DeveloperPreview.colloquy
+    )
+    
 }

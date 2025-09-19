@@ -50,4 +50,5 @@ class ColloquyService: ColloquyServiceProtocol {
         try await serviceDetete.deleteDocument(from: collectionName, documentId: colloquy.id)
         
     }
+    
 }

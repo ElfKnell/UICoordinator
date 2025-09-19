@@ -15,6 +15,7 @@ struct Photo: Identifiable, Codable {
     var name: String?
     let timestamp: Timestamp
     let photoURL: String
+    var isFlagged: Bool? = false
     
     var id: String {
         return photoId ?? NSUUID().uuidString

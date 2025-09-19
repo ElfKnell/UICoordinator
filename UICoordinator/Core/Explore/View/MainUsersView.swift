@@ -25,6 +25,11 @@ struct MainUsersView: View {
         ExploreView(users: viewModel.users)
             .task {
                 await viewModel.featchUsers(userId: container.authService.userSession?.uid)
+                
+                await container.authService.checkUserSession()
+                await container.blockService
+                    .fetchBlockers(container
+                        .currentUserService.currentUser)
             }
             .alert("Upload error", isPresented: $viewModel.isError) {
                 Button("Ok", role: .cancel) {}

@@ -12,8 +12,6 @@ class FollowsToUsers: ObservableObject {
     
     @Published var followingUsers = [User]()
     @Published var followerUsers = [User]()
-    @Published var isError = false
-    @Published var errorMessage: String? = nil
     
     private var localUserServise: LocalUserServiceProtocol
     private var fetchUsers: FetchingUsersServiceProtocol
@@ -25,10 +23,7 @@ class FollowsToUsers: ObservableObject {
     }
     
     @MainActor
-    func fetchFollowsToUsers(usersFollowing: [String], curretnUser: User?) async {
-        
-        isError = false
-        errorMessage = nil
+    func fetchFollowsToUsers(usersFollowing: [String], currentUser: User?) async {
         
         do {
             
@@ -37,13 +32,14 @@ class FollowsToUsers: ObservableObject {
             
             self.followingUsers = try await fetchUsers.fetchUsersByIds(at: usersFollowing)
             
-            var users = try await localUserServise.fetchUsersbyLocalUsers(currentUser: curretnUser)
-            users.removeAll(where: { $0.id == curretnUser?.id })
+            var users = try await localUserServise.fetchUsersbyLocalUsers(currentUser: currentUser)
+            users.removeAll(where: { $0.id == currentUser?.id })
             self.followerUsers = users
             
         } catch {
-            isError = true
-            errorMessage = error.localizedDescription
+            
+            Crashlytics.crashlytics()
+                .setCustomValue(currentUser?.id ?? "nil", forKey: "current_user_id")
             Crashlytics.crashlytics().record(error: error)
         }
 

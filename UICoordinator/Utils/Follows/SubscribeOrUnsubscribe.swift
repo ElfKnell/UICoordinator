@@ -11,10 +11,10 @@ import FirebaseCrashlytics
 
 class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtocol {
     
-    private let followServise: FollowServiceProtocol
+    private let followService: FollowServiceProtocol
     
     init(followServise: FollowServiceProtocol) {
-        self.followServise = followServise
+        self.followService = followServise
     }
     
     func subscribed(with user: User, currentUserId: String?) async {
@@ -28,7 +28,7 @@ class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtocol {
         
         do {
             
-            try await followServise.uploadeFollow(follow)
+            try await followService.uploadeFollow(follow)
             
         } catch {
             Crashlytics.crashlytics().record(error: error)
@@ -43,7 +43,7 @@ class SubscribeOrUnsubscribe: SubscribeOrUnsubscribeProtocol {
             
             for follower in followersCurrentUsers {
                 if follower.following == user.id {
-                    try await followServise.deleteFollow(followId: follower.id)
+                    try await followService.deleteFollow(followId: follower.id)
                     return
                 }
             }

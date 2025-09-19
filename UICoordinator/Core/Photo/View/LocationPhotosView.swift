@@ -15,7 +15,7 @@ struct LocationPhotosView: View {
     init(activity: MapSelectionProtocol,
          viewModelBilder: @escaping () -> LocationColloquyDetailViewModel = {
         LocationColloquyDetailViewModel(
-            videoService: VideoService(),
+            //videoService: VideoService(),
             photoService: PhotoService())
     }) {
         self.activity = activity
@@ -38,17 +38,17 @@ struct LocationPhotosView: View {
                     switch viewModel.switcher {
                     case .oldPhoto:
                         VStack {
-                            ImageView(photoURL: viewModel.photo?.photoURL)
                             
-                            Text(viewModel.namePhoto)
-                                .padding(.bottom)
+                            if let photo = viewModel.photo {
+                                PhotoView(photo: photo)
+                            }
+                            
                         }
                     case .newPhoto:
                         VStack {
-                            ImageView(photoURL: viewModel.photos[0].photoURL)
-                            
-                            Text(viewModel.photos[0].name ?? "")
-                                .padding(.bottom)
+                            if let firstPhoto = viewModel.photos.first {
+                                PhotoView(photo: firstPhoto)
+                            }
                         }
                     case .noPhoto:
                         Image(systemName: "photo.fill")

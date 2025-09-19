@@ -45,11 +45,16 @@ struct CurrentUserProfileView: View {
                     }
                 }
             }
-            .onAppear {
+            .task {
                 
                 if let user = container.currentUserService.currentUser {
                     container.userFollow.updateFollowCounts(for: user.id)
                 }
+                
+                await container.authService.checkUserSession()
+                await container.blockService
+                    .fetchBlockers(container
+                        .currentUserService.currentUser)
                 
             }
             .onChange(of: viewModel.isSaved) {
