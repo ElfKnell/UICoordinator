@@ -38,22 +38,21 @@ class CreateColloquyViewModel: ObservableObject {
         self.errorMessage = nil
         
         do {
-            
+
             guard let uid = userId else {
                 throw UserError.userNotFound
             }
             
-            if caption.isEmpty {
+            guard !caption.isEmpty else {
                 throw ColloquyError.captionIsEmpty
             }
             
-            let analyze = try await contentModerator
-                .analyzeTextWithAlamofire(input: caption, model: .analyzeText)
+            let analyze = try await contentModerator.moderateText(text: caption)
             
-            if analyze.label.contains("Negative") {
+            guard !analyze else {
                 throw ModerationError.invalidPost
             }
-            
+
             let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
             
             try await colloquyService.uploadeColloquy(colloquy)

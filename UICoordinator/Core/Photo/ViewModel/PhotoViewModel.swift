@@ -63,9 +63,8 @@ class PhotoViewModel : ObservableObject {
                 throw PhotoServiceError.missingPhotoName
             }
             
-            let results = try await contentModerator.check(image: image)
-                    
-            if let nsfw = results.first(where: { $0.label == "NSFW" }), nsfw.score > 0.7 {
+            let result = try await contentModerator.checkImage(image: image)
+            guard !result else {
                 throw ModerationError.invalidImage
             }
             

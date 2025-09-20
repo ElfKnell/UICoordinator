@@ -44,10 +44,9 @@ class CreateReplyViewModel: ObservableObject {
             
             let caption = self.text
             
-            let analyze = try await contentModerator
-                .analyzeTextWithAlamofire(input: caption, model: .analyzeText)
+            let analyze = try await contentModerator.moderateText(text: caption)
             
-            if analyze.label.contains("Negative") {
+            guard !analyze else {
                 throw ModerationError.invalidPost
             }
             
