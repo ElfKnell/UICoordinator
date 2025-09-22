@@ -75,6 +75,7 @@ struct ProfileView: View {
                                                 .currentUserService
                                                 .currentUser?.id)
                                     }
+                                    
                                     isChange.toggle()
                                     dismiss()
                                     
@@ -88,10 +89,7 @@ struct ProfileView: View {
                                         .background(.black)
                                         .cornerRadius(11)
                                 }
-                                .disabled(!container
-                                    .blockService
-                                    .blocksId
-                                    .contains(user.id))
+                                
                             }
                             
                             Spacer()

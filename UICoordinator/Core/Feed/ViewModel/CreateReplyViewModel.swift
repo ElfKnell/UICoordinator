@@ -12,6 +12,7 @@ import FirebaseCrashlytics
 class CreateReplyViewModel: ObservableObject {
     
     @Published var isError = false
+    @Published var isLoading = false
     @Published var messageError: String?
     
     var text: String
@@ -35,6 +36,7 @@ class CreateReplyViewModel: ObservableObject {
     func saveColloquy(_ colloquyId: String, userId: String?) async {
         
         isError = false
+        isLoading = true
         messageError = nil
         
         do {
@@ -62,5 +64,7 @@ class CreateReplyViewModel: ObservableObject {
             messageError = error.localizedDescription
             Crashlytics.crashlytics().record(error: error)
         }
+        
+        isLoading = false
     }
 }

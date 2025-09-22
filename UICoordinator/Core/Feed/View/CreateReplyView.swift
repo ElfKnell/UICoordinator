@@ -39,61 +39,67 @@ struct CreateReplyView: View {
     }
     
     var body: some View {
-        HStack {
-            
-            CircularProfileImageView(user: user, size: .small)
-            
-            TextField("Write your reply.", text: $viewModel.text,  axis: .vertical)
-                .lineLimit(0...10)
-                .padding(.horizontal)
-                .textFieldStyle(.roundedBorder)
-                .modifier(CornerRadiusModifier())
-                .focused($isSearch)
-                .padding()
-                .overlay(alignment: .leading) {
-                    
-                    if isSearch {
+        
+        if !viewModel.isLoading {
+            HStack {
+                
+                CircularProfileImageView(user: user, size: .small)
+                
+                TextField("Write your reply.", text: $viewModel.text,  axis: .vertical)
+                    .lineLimit(0...10)
+                    .padding(.horizontal)
+                    .textFieldStyle(.roundedBorder)
+                    .modifier(CornerRadiusModifier())
+                    .focused($isSearch)
+                    .padding()
+                    .overlay(alignment: .leading) {
                         
-                        Button {
-                            viewModel.text = ""
-                            isSearch = false
+                        if isSearch {
                             
-                        } label: {
-                            
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.red)
-                                .font(.title2)
-                            
-                        }
-                    }
-                }
-                .overlay(alignment: .trailing) {
-                    
-                    if isSearch {
-                        
-                        Button {
-                            
-                            Task {
-                                await viewModel.saveColloquy(colloquyId, userId: user?.id)
+                            Button {
+                                viewModel.text = ""
+                                isSearch = false
+                                
+                            } label: {
+                                
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.red)
+                                    .font(.title2)
+                                
                             }
-                            isCreate.toggle()
-                            isSearch = false
-                            
-                        } label: {
-                            
-                            Image(systemName: "checkmark.message.fill")
-                                .foregroundStyle(.green)
-                                .font(.title)
-                            
                         }
                     }
-                }
-        }
-        .padding(.horizontal)
-        .alert("Create error", isPresented: $viewModel.isError) {
-            Button("Ok", role: .cancel) {}
-        } message: {
-            Text(viewModel.messageError ?? "not discription")
+                    .overlay(alignment: .trailing) {
+                        
+                        if isSearch {
+                            
+                            Button {
+                                
+                                Task {
+                                    await viewModel.saveColloquy(colloquyId, userId: user?.id)
+                                    isCreate.toggle()
+                                }
+                                
+                                isSearch = false
+                                
+                            } label: {
+                                
+                                Image(systemName: "checkmark.message.fill")
+                                    .foregroundStyle(.green)
+                                    .font(.title)
+                                
+                            }
+                        }
+                    }
+            }
+            .padding(.horizontal)
+            .alert("Create error", isPresented: $viewModel.isError) {
+                Button("Ok", role: .cancel) {}
+            } message: {
+                Text(viewModel.messageError ?? "not discription")
+            }
+        } else {
+            LoadingView(width: 100, height: 100)
         }
     }
 }
