@@ -22,7 +22,7 @@ struct SharePostsHelpView: View {
             Each post may include:
             • A marker with a specific location  
             • A title and description
-            • Photos and videos 
+            • Photos 
             
             Shared posts can be **opened in map, updated, and reused** by other users.  
             This helps build a community-based library of useful locations and recommendations.

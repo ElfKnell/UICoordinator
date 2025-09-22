@@ -11,7 +11,7 @@ import Observation
 @Observable
 class AboutViewModel {
     
-    var info_1 = "Effortlessly place customizable beacons on maps to mark your favorite spots or important locations. Tag them with notes, vivid photos, or even captivating videos for rich context."
+    var info_1 = "Effortlessly place customizable beacons on maps to mark your favorite spots or important locations. Tag them with notes and vivid photos for rich context."
     
     var info_2 = "Share locations instantly in a built-in chat, where users can engage by commenting and liking your posts. It’s perfect for group trips, event planning, or simply connecting over great places."
     
