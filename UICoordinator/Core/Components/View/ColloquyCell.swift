@@ -60,13 +60,17 @@ struct ColloquyCell: View {
                                 .font(.caption)
                                 .foregroundStyle(Color(.systemGray3))
                             
-                            Menu {
+                            if colloquy.user?.id != container.currentUserService.currentUser?.id {
                                 
-                                ReportButtonView(object: colloquy)
+                                Menu {
+                                    
+                                    ReportButtonView(object: colloquy)
+                                    
+                                } label: {
+                                    Image(systemName: "ellipsis")
+                                        .foregroundStyle(.gray)
+                                }
                                 
-                            } label: {
-                                Image(systemName: "ellipsis")
-                                    .foregroundStyle(.gray)
                             }
                             
                         }
