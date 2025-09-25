@@ -45,7 +45,7 @@ class FeedViewModel: ObservableObject {
         
         self.isLoading = true
         
-        fetchColloquies.reload()
+        await fetchColloquies.reload()
         self.colloquies.removeAll()
         await fetchColloquiesFirebase(currentUser: currentUser)
         

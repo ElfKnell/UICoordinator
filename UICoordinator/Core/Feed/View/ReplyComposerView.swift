@@ -33,10 +33,12 @@ struct ReplyComposerView: View {
             ReplyCreateView(colloquy: colloquy, isNeedButton: isEditButton, isEdit: $isVisible)
             
             Divider()
+                .overlay(Color.accentColor)
             
             HStack {
                 Divider()
-                    .frame(width: 10)
+                    .frame(width: 1)
+                    .overlay(Color.accentColor)
                 
                 LazyVStack {
                     
@@ -66,7 +68,10 @@ struct ReplyComposerView: View {
         .safeAreaInset(edge: .bottom) {
             
             if isVisible {
-                CreateReplyView(isCreate: $isCreate, colloquyId: colloquy.id, user: user)
+                CreateReplyView(isCreate: $isCreate,
+                                colloquyId: colloquy.id,
+                                activityId: nil,
+                                user: user)
             }
         }
         

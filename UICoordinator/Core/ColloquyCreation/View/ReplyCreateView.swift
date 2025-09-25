@@ -26,14 +26,14 @@ struct ReplyCreateView: View {
                     HStack {
                         
                         Text(colloquy.user?.username ?? "")
-                            .font(.footnote)
+                            .font(.body)
                             .fontWeight(.semibold)
                         
                         Spacer()
                         
                         Text(colloquy.timestamp.timestampString())
-                            .font(.caption)
-                            .foregroundStyle(Color(.systemGray3))
+                            .font(.callout)
+                            .foregroundStyle(Color.accentColor)
                         
                     }
                     
@@ -49,7 +49,7 @@ struct ReplyCreateView: View {
                         }
                         
                         Text(colloquy.caption)
-                            .font(.footnote)
+                            .font(.callout)
                             .multilineTextAlignment(.leading)
                     }
                 }

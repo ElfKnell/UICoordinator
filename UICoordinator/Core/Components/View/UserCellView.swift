@@ -24,7 +24,7 @@ struct UserCellView: View {
                 Text(user.fullname)
                 
             }
-            .font(.footnote)
+            .font(.body)
             
             Spacer()
             
@@ -33,7 +33,7 @@ struct UserCellView: View {
                 if container.blockService.blocksId.contains(user.id) {
                     
                     Text("Blocked")
-                        .font(.subheadline)
+                        .font(.headline)
                         .fontWeight(.semibold)
                         .frame(width: 100, height: 32)
                         .overlay {
@@ -44,7 +44,7 @@ struct UserCellView: View {
                 } else {
                     
                     Text(container.userFollow.isFollowingCurrentUser(uid: user.id) ? "Unfollow" : "Follow")
-                        .font(.subheadline)
+                        .font(.headline)
                         .fontWeight(.semibold)
                         .frame(width: 100, height: 32)
                         .overlay {

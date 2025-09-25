@@ -49,14 +49,22 @@ struct RegistrationView: View {
                                 
                                 InputView(text: $registrationModel.email, title: "Email", placeholder: "name@example.com")
                                     .textInputAutocapitalization(.never)
+                                    .accessibilityLabel("Email input field")
+                                    .accessibilityHint("Enter your email address")
                                 
                                 InputView(text: $registrationModel.name, title: "Full name", placeholder: "Name")
+                                    .accessibilityLabel("Full name input field")
+                                    .accessibilityHint("Enter your full name")
                                 
                                 InputView(text: $registrationModel.username, title: "Username", placeholder: "Username")
                                     .textInputAutocapitalization(.never)
+                                    .accessibilityLabel("Username input field")
+                                    .accessibilityHint("Enter your username")
                                 
                                 InputView(text: $registrationModel.password, title: "Password", placeholder: "password", isSecureField: true)
                                     .focused($isPasswordFocused)
+                                    .accessibilityLabel("Password input field")
+                                    .accessibilityHint("Enter your password")
                                 
                             }
                             
@@ -89,6 +97,8 @@ struct RegistrationView: View {
                         ZStack(alignment: .trailing) {
                             
                             InputView(text: $registrationModel.cPassword, title: "Confirm password", placeholder: "confirm password", isSecureField: true)
+                                .accessibilityLabel("Confirm password input field")
+                                .accessibilityHint("Re-enter your password to confirm")
                             
                             if !registrationModel.password.isEmpty && !registrationModel.cPassword.isEmpty {
                                 
@@ -127,6 +137,8 @@ struct RegistrationView: View {
                         }
                         .frame(width: 300)
                         .padding()
+                        .accessibilityLabel("Accept privacy policy and EULA")
+                        .accessibilityHint("Toggle to accept terms and conditions")
                         
                         Button {
                             
@@ -147,6 +159,8 @@ struct RegistrationView: View {
                         .padding()
                         .disabled(!formIsValid)
                         .opacity(formIsValid ? 1.0 : 0.5)
+                        .accessibilityLabel("Sign up button")
+                        .accessibilityHint("Tap to create a new account")
                         
                         if sizeClass != .compact {
                             Spacer()
@@ -166,6 +180,9 @@ struct RegistrationView: View {
                                     .foregroundStyle(.black)
                                     .shadow(radius: 3, x: 0, y: 2)
                             }
+                            .accessibilityLabel("Sign in button")
+                            .accessibilityHint("Tap to go to login screen")
+                            
                         }
                         .padding(.bottom)
                         
@@ -179,7 +196,7 @@ struct RegistrationView: View {
                     }
                     
                 } else {
-                    LoadingView(width: 300, height: 300)
+                    LoadingView(size: 300)
                 }
             }
         }

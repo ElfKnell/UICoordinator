@@ -63,7 +63,7 @@ class LocationViewModel: ObservableObject {
             
             if let userId = userId, self.locations.isEmpty {
                 
-                fetchLocations.reload()
+                await fetchLocations.reload()
                 self.locations = try await fetchLocations
                     .getLocations(userId: userId, pageSize: pageSize)
                 
@@ -89,7 +89,7 @@ class LocationViewModel: ObservableObject {
         do {
             
             guard let userId else { return }
-            fetchLocations.reload()
+            await fetchLocations.reload()
             self.locations = try await fetchLocations
                 .getLocations(userId: userId, pageSize: pageSize)
             
@@ -270,7 +270,7 @@ class LocationViewModel: ObservableObject {
     
     private func loadColor() {
         if let loadedColor = Color.loadFromAppStorage("routerColor") {
-            routerColor = Color(red: loadedColor.red, green: loadedColor.green, blue: loadedColor.blue, opacity: loadedColor.alpha)
+            routerColor = loadedColor
         }
     }
 }

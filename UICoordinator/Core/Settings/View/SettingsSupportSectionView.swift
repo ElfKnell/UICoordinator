@@ -32,6 +32,8 @@ struct SettingsSupportSectionView: View {
                           systemImage: "square.and.arrow.up")
                     
                 }
+                .accessibilityLabel("Recommend Trailcraft")
+                .accessibilityHint("Opens the share sheet to recommend Trailcraft to others")
                 
             }
             
@@ -40,6 +42,8 @@ struct SettingsSupportSectionView: View {
             } label: {
                 Label("Rate Trailcraft", systemImage: "star.fill")
             }
+            .accessibilityLabel("Rate Trailcraft")
+            .accessibilityHint("Opens the App Store to rate Trailcraft")
             
             Button {
                 
@@ -53,6 +57,8 @@ struct SettingsSupportSectionView: View {
                 Label("Send Feedback via Email",
                       systemImage: "envelope.fill")
             }
+            .accessibilityLabel("Send Feedback via Email")
+            .accessibilityHint("Opens Mail to send feedback to the developer")
             
         }
         .alert("Email not configured", isPresented: $viewModel.showMailErrorAlert) {

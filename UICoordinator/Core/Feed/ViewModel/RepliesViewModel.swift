@@ -48,7 +48,7 @@ class RepliesViewModel: ObservableObject {
         
         self.isLoading = true
         
-        fetchRepliesFirebase.reload()
+        await fetchRepliesFirebase.reload()
         self.replies.removeAll()
         await fetchRepliesData(cid: cid, currentUser: currentUser)
         

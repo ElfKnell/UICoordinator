@@ -73,7 +73,7 @@ struct MarkerView: View {
                 .rotationEffect(.degrees(rotation))
                 
                 Text(name)
-                    .font(.caption)
+                    .font(.headline)
                     .padding(.horizontal, 8)
                     .foregroundStyle(colorText)
                     .background(.ultraThinMaterial)
@@ -86,11 +86,11 @@ struct MarkerView: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.5), value: scale)
         .onAppear {
             if let loadedColorMarker = Color.loadFromAppStorage("selectedColorMarker") {
-                colorImage = Color(red: loadedColorMarker.red, green: loadedColorMarker.green, blue: loadedColorMarker.blue, opacity: loadedColorMarker.alpha)
+                colorImage = loadedColorMarker
             }
             
             if let loadedColorText = Color.loadFromAppStorage("selectedColorText") {
-                colorText = Color(red: loadedColorText.red, green: loadedColorText.green, blue: loadedColorText.blue, opacity: loadedColorText.alpha)
+                colorText = loadedColorText
             }
             
             if isSelected {

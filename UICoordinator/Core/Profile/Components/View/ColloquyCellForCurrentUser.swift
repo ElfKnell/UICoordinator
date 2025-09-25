@@ -30,14 +30,14 @@ struct ColloquyCellForCurrentUser: View {
                     HStack {
                         
                         Text(user.username)
-                            .font(.footnote)
+                            .font(.body)
                             .fontWeight(.semibold)
                         
                         Spacer()
                         
                         Text(colloquy.timestamp.timestampString())
-                            .font(.caption)
-                            .foregroundStyle(Color(.systemGray3))
+                            .font(.callout)
+                            .foregroundStyle(Color.accentColor)
                         
                         Button {
                             colloquyService.isRemove = true
@@ -55,12 +55,13 @@ struct ColloquyCellForCurrentUser: View {
                                 sheetStatus = .location
                             } label: {
                                 Text(name)
+                                    .font(.body)
                                     .foregroundStyle(.blue)
                             }
                         }
                         
                         Text(colloquy.caption)
-                            .font(.footnote)
+                            .font(.callout)
                             .multilineTextAlignment(.leading)
                     }
                     
@@ -91,12 +92,13 @@ struct ColloquyCellForCurrentUser: View {
                         
                         Spacer()
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color.accentColor)
                     .padding(.vertical, 8)
                 }
             }
             
             Divider()
+                .overlay(Color.accentColor)
             
         }
         .padding([.horizontal, .top])

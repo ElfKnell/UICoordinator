@@ -20,20 +20,23 @@ class CreateReplyViewModel: ObservableObject {
     private let colloquyService: ColloquyServiceProtocol
     private let increment: ColloquyInteractionCounterServiceProtocol
     private let contentModerator: ContentModeratorProtocol
+    private let activityUpdate: ActivityUpdateProtocol
     
     init(text: String = "",
          colloquyService: ColloquyServiceProtocol,
          increment: ColloquyInteractionCounterServiceProtocol,
-         contentModerator: ContentModeratorProtocol) {
+         contentModerator: ContentModeratorProtocol,
+         activityUpdate: ActivityUpdateProtocol) {
         
         self.text = text
         self.colloquyService = colloquyService
         self.increment = increment
         self.contentModerator = contentModerator
+        self.activityUpdate = activityUpdate
     }
     
     @MainActor
-    func saveColloquy(_ colloquyId: String, userId: String?) async {
+    func saveColloquy(colloquyId: String?, activityId: String?, userId: String?) async {
         
         isError = false
         isLoading = true
@@ -41,7 +44,9 @@ class CreateReplyViewModel: ObservableObject {
         
         do {
             
-            guard let userId else { return }
+            guard let userId else {
+                throw UserError.userIdNil
+            }
             if self.text.isEmpty { return }
             
             let caption = self.text
@@ -52,12 +57,15 @@ class CreateReplyViewModel: ObservableObject {
                 throw ModerationError.invalidPost
             }
             
-            let reply = Colloquy(ownerUid: userId, caption: caption, timestamp: Timestamp(), likes: 0, locationId: nil, ownerColloquy: colloquyId, isDelete: false)
+            if let cid = colloquyId {
+                try await createReplyForColloquy(cid, userId: userId, caption: caption)
+            } else if let aid = activityId {
+                try await createReplyForActivity(aid, userId: userId, caption: caption)
+            } else {
+                return
+            }
             
             self.text = ""
-            
-            try await colloquyService.uploadeColloquy(reply)
-            try await increment.incrementRepliesCount(colloquyId: colloquyId)
             
         } catch {
             isError = true
@@ -67,4 +75,40 @@ class CreateReplyViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    private func createReplyForColloquy(_ colloquyId: String,
+                                        userId: String,
+                                        caption: String) async throws {
+        
+        let reply = Colloquy(ownerUid: userId,
+                             caption: caption,
+                             timestamp: Timestamp(),
+                             likes: 0,
+                             locationId: nil,
+                             ownerColloquy: colloquyId,
+                             isDelete: false)
+        
+        try await colloquyService.uploadeColloquy(reply)
+        try await increment.incrementRepliesCount(colloquyId: colloquyId)
+        
+    }
+    
+    private func createReplyForActivity(_ activityId: String,
+                                        userId: String,
+                                        caption: String) async throws {
+        
+        let colloquy = Colloquy(ownerUid: userId,
+                                caption: caption,
+                                timestamp: Timestamp(),
+                                likes: 0,
+                                locationId: nil,
+                                ownerColloquy: activityId,
+                                isDelete: false)
+        
+        try await colloquyService.uploadeColloquy(colloquy)
+        
+        try await activityUpdate.incrementRepliesCount(activityId: activityId)
+        
+    }
+    
 }

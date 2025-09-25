@@ -148,6 +148,7 @@ struct ActivityMapEditView: View {
                 }
                 .padding()
                 .padding(.top)
+                .accessibilityLabel("Settings")
                 
                 Spacer()
                 
@@ -204,6 +205,7 @@ struct ActivityMapEditView: View {
                                     .shadow(radius: 5)
                                 
                             }
+                            .accessibilityLabel("Save region")
                             
                             if viewModel.shouldRestoreSavedRegion {
                                 
@@ -222,6 +224,7 @@ struct ActivityMapEditView: View {
                                         .shadow(radius: 5)
                                     
                                 }
+                                .accessibilityLabel("My location")
                             }
                         }
                         .padding(.horizontal)
@@ -243,6 +246,7 @@ struct ActivityMapEditView: View {
                                     .clipShape(Circle())
                                     .shadow(radius: 5)
                             }
+                            .accessibilityLabel("Activity Details")
                             
                             Button {
                                 

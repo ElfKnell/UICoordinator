@@ -83,7 +83,7 @@ struct UpdateLocationView: View {
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                         }
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color.primary)
                         
                         if location?.locationId != nil {
                             Button {

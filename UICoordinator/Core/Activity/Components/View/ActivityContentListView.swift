@@ -46,12 +46,12 @@ struct ActivityContentListView: View {
                 ForEach(ActivityOwner.allCases) { filter in
                     VStack {
                         Text(filter.title)
-                            .font(.subheadline)
+                            .font(.headline)
                             .fontWeight(selectedFilter == filter ? .semibold : .regular)
                         
                         if selectedFilter == filter {
                             Rectangle()
-                                .foregroundStyle(.black)
+                                .foregroundStyle(Color.primary)
                                 .frame(width: filterBarWidth, height: 1)
                                 .matchedGeometryEffect(id: "item", in: animation)
                         } else {
@@ -120,7 +120,9 @@ struct ActivityContentListView: View {
                     }
                     .task {
                         Task {
-                            await activityMy.refresh(currentUser: currentUser)
+                            if activityMy.activities.isEmpty {
+                                await activityMy.refresh(currentUser: currentUser)
+                            }
                         }
                     }
                     .onChange(of: isUpdate) {
@@ -157,7 +159,7 @@ struct ActivityContentListView: View {
                 
             } else {
                 
-                LoadingView(width: 150, height: 150)
+                LoadingView(size: 150)
                 
             }
         }

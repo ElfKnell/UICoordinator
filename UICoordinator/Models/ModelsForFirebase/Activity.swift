@@ -33,7 +33,7 @@ struct Activity: Identifiable, Codable, Hashable, MapSelectionProtocol, LikeObje
     var locationsId: [String]
     
     var id: String {
-        return activityId ?? NSUUID().uuidString
+        return activityId ?? ""
     }
     
     var region: MKCoordinateRegion? {

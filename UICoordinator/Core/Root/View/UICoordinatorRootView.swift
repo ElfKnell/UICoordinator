@@ -31,7 +31,7 @@ struct UICoordinatorRootView: View {
         Group {
             switch appState {
             case .loading:
-                LoadingView(width: 300, height: 300)
+                LoadingView(size: 300)
             case .loggedIn(let user):
                 CoordinatorTabView()
                     .task {

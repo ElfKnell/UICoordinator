@@ -45,7 +45,7 @@ struct ExploreView: View {
                         }
                     }
                 } else {
-                    LoadingView(width: 300, height: 300)
+                    LoadingView(size: 300)
                 }
             }
             .onChange(of: isChange) {

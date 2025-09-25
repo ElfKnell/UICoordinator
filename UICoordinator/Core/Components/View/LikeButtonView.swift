@@ -24,6 +24,7 @@ struct LikeButtonView<T: LikeObject>: View {
             } label: {
                 if viewModel.likeId == nil {
                     Image(systemName: "heart")
+                        .foregroundStyle(Color.primary)
                 } else {
                     Image(systemName: "heart.fill")
                         .foregroundStyle(.red)
@@ -32,6 +33,7 @@ struct LikeButtonView<T: LikeObject>: View {
             
             if colloquyOrActivity.likes > 0 {
                 Text("\(colloquyOrActivity.likes)")
+                    .foregroundStyle(Color.accentColor)
             }
         }
     }

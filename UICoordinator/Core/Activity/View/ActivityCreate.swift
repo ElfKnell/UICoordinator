@@ -29,7 +29,7 @@ struct ActivityCreate: View {
             if viewModel.activity != nil {
                 ActivityMapEditView(activity: viewModel.activity!)
             } else {
-                LoadingView(width: 150, height: 150)
+                LoadingView(size: 150)
             }
         }
         .task {

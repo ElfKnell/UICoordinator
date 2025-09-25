@@ -31,6 +31,14 @@ enum RouteTransportType: String, Codable, CaseIterable, Identifiable {
         case .any: return .any
         }
     }
+    
+    var iconName: String {
+        switch self {
+        case .automobile: return "car.fill"
+        case .walking: return "figure.walk"
+        case .any: return "location"
+        }
+    }
 }
 
 extension RouteTransportType {

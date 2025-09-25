@@ -13,5 +13,5 @@ protocol FetchingActivitiesProtocol {
     
     func fetchActivitiesByUser(user: User, pageSize: Int) async throws -> [Activity]
     
-    func clean()
+    func clean() async
 }

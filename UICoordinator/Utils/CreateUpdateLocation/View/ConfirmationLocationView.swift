@@ -57,8 +57,8 @@ struct ConfirmationLocationView: View {
                         annotation = nil
                         dismiss()
                     }
-                    .font(.subheadline)
-                    .foregroundStyle(.black)
+                    .font(.headline)
+                    .foregroundStyle(Color.primary)
             
                 }
                 
@@ -75,8 +75,8 @@ struct ConfirmationLocationView: View {
                             dismiss()
                         }
                     }
-                    .font(.subheadline)
-                    .foregroundStyle(.black)
+                    .font(.headline)
+                    .foregroundStyle(Color.green)
                     .fontWeight(.semibold)
                     .opacity(viewModel.name.isEmpty ? 0.3 : 1.0)
                     .disabled(viewModel.name.isEmpty)

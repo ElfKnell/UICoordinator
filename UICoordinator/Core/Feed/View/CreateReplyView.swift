@@ -10,13 +10,15 @@ import SwiftUI
 struct CreateReplyView: View {
     
     @Binding var isCreate: Bool
-    let colloquyId: String
+    let colloquyId: String?
+    let activityId: String?
     let user: User?
     @StateObject var viewModel: CreateReplyViewModel
     @FocusState private var isSearch: Bool
     
     init(isCreate: Binding<Bool>,
-         colloquyId: String,
+         colloquyId: String?,
+         activityId: String?,
          user: User?,
          viewModelBilder: () -> CreateReplyViewModel = {
         CreateReplyViewModel(
@@ -28,13 +30,15 @@ struct CreateReplyView: View {
                     userService: UserService()),
                 deleteLikes: LikesDeleteService()),
             increment: ColloquyInteractionCounterService(),
-            contentModerator: ContentModerator())
+            contentModerator: ContentModerator(),
+            activityUpdate: ActivityServiceUpdate())
     }) {
         
         let vm = viewModelBilder()
         self._isCreate = isCreate
         self._viewModel = StateObject(wrappedValue: vm)
         self.colloquyId = colloquyId
+        self.activityId = activityId
         self.user = user
     }
     
@@ -76,7 +80,11 @@ struct CreateReplyView: View {
                             Button {
                                 
                                 Task {
-                                    await viewModel.saveColloquy(colloquyId, userId: user?.id)
+                                    await viewModel.saveColloquy(
+                                        colloquyId: colloquyId,
+                                        activityId: activityId,
+                                        userId: user?.id
+                                    )
                                     isCreate.toggle()
                                 }
                                 
@@ -98,12 +106,18 @@ struct CreateReplyView: View {
             } message: {
                 Text(viewModel.messageError ?? "not discription")
             }
+            .onAppear {
+                isSearch = true
+            }
         } else {
-            LoadingView(width: 100, height: 100)
+            LoadingView(size: 100)
         }
     }
 }
 
 #Preview {
-    CreateReplyView(isCreate: .constant(false), colloquyId: "", user: nil)
+    CreateReplyView(isCreate: .constant(false),
+                    colloquyId: nil,
+                    activityId: nil,
+                    user: nil)
 }

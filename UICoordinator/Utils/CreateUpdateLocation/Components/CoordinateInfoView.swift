@@ -18,6 +18,7 @@ struct CoordinateInfoView: View {
             
             Text("Coordinates")
                 .font(.title3)
+                .foregroundStyle(.black)
             
             HStack {
                 Text("Latitude:")
@@ -27,7 +28,8 @@ struct CoordinateInfoView: View {
                 Text("Longitude:")
                 
             }
-            .font(.subheadline)
+            .font(.body)
+            .foregroundStyle(.black)
             .padding(.horizontal)
             
             HStack {
@@ -38,7 +40,8 @@ struct CoordinateInfoView: View {
                 Text("\(coordinate?.longitude ?? 0.0)")
                 
             }
-            .font(.subheadline)
+            .font(.body)
+            .foregroundStyle(.black)
             .padding(.horizontal)
         }
     }

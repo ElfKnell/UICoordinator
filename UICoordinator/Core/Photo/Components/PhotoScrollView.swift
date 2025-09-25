@@ -31,7 +31,7 @@ struct PhotoScrollView: View {
                             .shadow(radius: 5)
                         
                         Text(photo.name ?? "")
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Color.primary)
                     }
                     .padding(3)
                     .onTapGesture {

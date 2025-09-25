@@ -31,12 +31,12 @@ struct UserContentListView: View {
                 ForEach(ProfileColloquyFilter.allCases) { filter in
                     VStack {
                         Text(filter.title)
-                            .font(.subheadline)
+                            .font(.headline)
                             .fontWeight(selectedFilter == filter ? .semibold : .regular)
                         
                         if selectedFilter == filter {
                             Rectangle()
-                                .foregroundStyle(.black)
+                                .foregroundStyle(Color.primary)
                                 .frame(width: filterBarWidth, height: 1)
                                 .matchedGeometryEffect(id: "item", in: animation)
                         } else {
@@ -113,7 +113,9 @@ struct UserContentListView: View {
                         await viewModel.startLoadColloquies()
                     }
                 }
+                
             } else {
+                
                 LazyVStack {
                     if !viewModel.replies.isEmpty || viewModel.isLoading {
                         ForEach(viewModel.replies) { colloquy in
@@ -125,6 +127,7 @@ struct UserContentListView: View {
                                         
                                         await viewModel.fetchNextReplies(currentUser: container.currentUserService.currentUser)
                                     }
+                                    
                                 }
                         }
                         
@@ -139,6 +142,7 @@ struct UserContentListView: View {
                             .font(.title)
                             .padding()
                     }
+                    
                 }
                 .padding(.horizontal)
                 .task {

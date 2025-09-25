@@ -42,7 +42,7 @@ struct FeedView: View {
                         }
                         
                         if viewModel.isLoading {
-                            ProgressView()
+                            LoadingView(size: 200)
                                 .padding()
                         }
                     }

@@ -27,14 +27,14 @@ struct ActivityCell: View {
                         .padding(.top, 8)
                     
                     VStack {
+                        
                         Text(user.fullname)
-                            .font(.footnote)
                             .fontWeight(.bold)
                         
                         Text(user.username)
-                            .font(.footnote)
                             .fontWeight(.semibold)
                     }
+                    .font(.body)
                     
                     Spacer()
                     
@@ -74,14 +74,14 @@ struct ActivityCell: View {
                             HStack {
                                 
                                 Text(activity.user?.username ?? "")
-                                    .font(.footnote)
+                                    .font(.callout)
                                     .fontWeight(.semibold)
                                 
                                 Spacer()
                                 
                                 Text(activity.time.timestampString())
-                                    .font(.caption)
-                                    .foregroundStyle(Color(.systemGray3))
+                                    .font(.callout)
+                                    .foregroundStyle(Color.accentColor)
                                 
                                 if activity.user != container
                                     .currentUserService
@@ -94,7 +94,7 @@ struct ActivityCell: View {
                                         
                                     } label: {
                                         Image(systemName: "ellipsis")
-                                            .foregroundStyle(.gray)
+                                            .foregroundStyle(Color.accentColor)
                                     }
                                     
                                 }
@@ -103,14 +103,14 @@ struct ActivityCell: View {
                             HStack {
                                 
                                 Text(activity.name)
-                                    .font(.footnote)
+                                    .font(.body)
                                     .fontWeight(.bold)
                                 
                                 Spacer()
                                 
                                 Text("^[\(activity.locationsId.count) location](inflect: true)")
-                                    .font(.footnote)
-                                
+                                    .font(.body)
+                                    .accessibilityLabel("\(activity.locationsId.count) locations")
                             }
                         }
                     }
@@ -118,7 +118,7 @@ struct ActivityCell: View {
                     HStack(spacing: 8) {
                         
                         Text(activity.typeActivity.description)
-                            .font(.footnote)
+                            .font(.body)
                             .fontWeight(.semibold)
                         
                         Spacer()
@@ -148,6 +148,7 @@ struct ActivityCell: View {
                         } label: {
                             Image(systemName: "bubble.right")
                         }
+                        .accessibilityLabel("Show replies")
                         
                         if let count = activity.repliesCount {
                             Text("\(count)")
@@ -161,6 +162,7 @@ struct ActivityCell: View {
                                 Image(systemName: "trash.fill")
                                     .foregroundStyle(.red)
                             }
+                            .accessibilityLabel("Delete activity")
                         }
                     }
                 }
@@ -188,6 +190,7 @@ struct ActivityCell: View {
 
             
             Divider()
+                .overlay(Color.accentColor)
             
         }
         .padding([.horizontal, .top])

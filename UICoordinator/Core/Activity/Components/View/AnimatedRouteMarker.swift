@@ -53,15 +53,3 @@ struct AnimatedRouteMarker: View {
         transportTypeRout: .automobile
     )
 }
-
-extension RouteTransportType {
-    
-    var iconName: String {
-        switch self {
-        case .automobile: return "car.fill"
-        case .walking: return "figure.walk"
-        case .any: return "location"
-        }
-    }
-    
-}

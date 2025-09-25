@@ -52,6 +52,7 @@ struct EditActivity: View {
                                 Text(option.description).tag(option)
                             }
                         }
+                        .accessibilityLabel("Activity type")
                         
                     }
                     
@@ -63,6 +64,7 @@ struct EditActivity: View {
                                 Text(option.description).tag(option as UserMapStyle?)
                             }
                         }
+                        .accessibilityLabel("Map Style")
                         
                     }
                     
@@ -74,6 +76,7 @@ struct EditActivity: View {
                                 Text(option.displayName).tag(option as RouteTransportType?)
                             }
                         }
+                        .accessibilityLabel("Transport Type")
                         
                     }
                     
@@ -82,6 +85,7 @@ struct EditActivity: View {
                         Text("Privaty Status")
                     }
                     .tint(.green)
+                    .accessibilityLabel("Status")
                     
                 }
                 
@@ -100,6 +104,7 @@ struct EditActivity: View {
                                 .foregroundStyle(.red)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
+                        .accessibilityLabel("Cancel")
                         
                         Button {
                             
@@ -121,6 +126,7 @@ struct EditActivity: View {
                         }
                         .disabled(activity.name.isEmpty)
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Save")
                     }
                     .listRowBackground(Color.clear)
                     .padding(.vertical, 10)

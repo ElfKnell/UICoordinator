@@ -21,8 +21,8 @@ struct LocationEditView: View {
             
             Section(
                 header: Text(location.name)
-                    .font(.headline)
-                    .foregroundStyle(.black)
+                    .font(.title2)
+                    .foregroundStyle(Color.accentColor)
             ) {
                 
                 VStack(alignment: .leading, spacing: 12) {
@@ -32,11 +32,11 @@ struct LocationEditView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             
                             Text("Address:")
-                                .font(.subheadline)
+                                .font(.body)
                                 .foregroundStyle(.secondary)
                             
                             Text(address)
-                                .font(.body)
+                                .font(.headline)
                             
                         }
                     }
@@ -44,11 +44,11 @@ struct LocationEditView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         
                         Text("Description:")
-                            .font(.subheadline)
+                            .font(.body)
                             .foregroundStyle(.secondary)
                         
                         Text(location.description)
-                            .font(.footnote)
+                            .font(.headline)
                             .foregroundStyle(.primary)
                         
                     }

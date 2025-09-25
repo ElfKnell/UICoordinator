@@ -11,6 +11,6 @@ protocol FetchLocationsProtocol {
     
     func getLocations(userId: String, pageSize: Int) async throws -> [Location]
     
-    func reload()
+    func reload() async
     
 }

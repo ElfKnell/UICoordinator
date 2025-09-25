@@ -139,7 +139,7 @@ struct EditProfileView: View {
                     .foregroundStyle(.black)
                     
                 } else {
-                    LoadingView(width: 300, height: 300)
+                    LoadingView(size: 300)
                 }
                 
             }
@@ -185,7 +185,7 @@ struct EditProfileView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .font(.subheadline)
+                    .font(.headline)
                     .foregroundStyle(.primary)
                 }
                 
@@ -209,7 +209,7 @@ struct EditProfileView: View {
                                 }
                             }
                         }
-                        .font(.subheadline)
+                        .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
                         

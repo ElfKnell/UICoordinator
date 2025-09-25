@@ -41,8 +41,9 @@ class UserContentListViewModel: ObservableObject {
         
         self.isLoading = true
         
-        fetchColloquies.reload()
+        await fetchColloquies.reload()
         self.colloquies.removeAll()
+        self.replies.removeAll()
         await fetchColloquies()
         
         self.isLoading = false
@@ -52,7 +53,8 @@ class UserContentListViewModel: ObservableObject {
         
         self.isLoading = true
         
-        fetchReplies.reload()
+        await fetchReplies.reload()
+        self.colloquies.removeAll()
         self.replies.removeAll()
         await fetchReplies(currentUser: currentUser)
         

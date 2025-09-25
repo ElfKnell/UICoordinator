@@ -8,7 +8,7 @@
 import Firebase
 import FirebaseFirestoreSwift
 
-class FetchLocationsFromFirebase: FetchLocationsProtocol {
+actor FetchLocationsFromFirebase: FetchLocationsProtocol {
     
     var isDataLoaded = false
     private var lastDocument: DocumentSnapshot?
@@ -42,7 +42,7 @@ class FetchLocationsFromFirebase: FetchLocationsProtocol {
         
     }
     
-    func reload() {
+    func reload() async {
         
         self.lastDocument = nil
         self.isDataLoaded = false

@@ -55,6 +55,14 @@ struct ActivityRepliesView: View {
                 
             }
             .padding(.horizontal)
+            .safeAreaInset(edge: .bottom) {
+                
+                CreateReplyView(isCreate: $isSaved,
+                                colloquyId: nil,
+                                activityId: activity.id,
+                                user: user)
+                
+            }
             .refreshable {
                 Task {
                     await viewModel.fetchRepliesRefresh(activity.id, currentUser: user)
@@ -85,21 +93,9 @@ struct ActivityRepliesView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showColloquyCreate.toggle()
-                    } label: {
-                        Image(systemName: "pencil.line")
-                            .fontWeight(.bold)
-                    }
-                }
             }
             .foregroundStyle(.primary)
             .font(.subheadline)
-            .sheet(isPresented: $showColloquyCreate) {
-                CreateColloquyView(isSaved: $isSaved, activityId: activity.id)
-                    .presentationDetents([.height(340), .medium])
-            }
         }
     }
 }

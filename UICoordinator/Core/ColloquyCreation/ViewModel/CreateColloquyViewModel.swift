@@ -16,22 +16,19 @@ class CreateColloquyViewModel: ObservableObject {
     
     private let likeCount: ColloquyInteractionCounterServiceProtocol
     private let colloquyService: ColloquyServiceProtocol
-    private let activityUpdate: ActivityUpdateProtocol
     private let contentModerator: ContentModeratorProtocol
     
     init(likeCount: ColloquyInteractionCounterServiceProtocol,
          colloquyService: ColloquyServiceProtocol,
-         activityUpdate: ActivityUpdateProtocol,
          contentModerator: ContentModeratorProtocol) {
         
         self.likeCount = likeCount
         self.colloquyService = colloquyService
-        self.activityUpdate = activityUpdate
         self.contentModerator = contentModerator
     }
     
     @MainActor
-    func uploadColloquy(userId: String?, caption: String, locatioId: String?, activityId: String?) async {
+    func uploadColloquy(userId: String?, caption: String, locatioId: String?) async {
         
         self.isLoading = true
         self.isError = false
@@ -53,13 +50,9 @@ class CreateColloquyViewModel: ObservableObject {
                 throw ModerationError.invalidPost
             }
 
-            let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: activityId ?? "", isDelete: false)
+            let colloquy = Colloquy(ownerUid: uid, caption: caption, timestamp: Timestamp(), likes: 0, locationId: locatioId, ownerColloquy: "", isDelete: false)
             
             try await colloquyService.uploadeColloquy(colloquy)
-            
-            if let activityId = activityId {
-                try await activityUpdate.incrementRepliesCount(activityId: activityId)
-            }
             
         } catch {
             self.isError = true

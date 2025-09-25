@@ -16,15 +16,15 @@ struct BottomHeaderView: View {
         VStack {
             
             Text(counts)
-                .font(.subheadline)
+                .font(.body)
                 .fontWeight(.bold)
             
             HStack {
                 Image(systemName: imageName)
                 
                 Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.accentColor)
             }
         }
         .padding(.horizontal)

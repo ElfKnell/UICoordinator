@@ -32,7 +32,7 @@ class FetchAllActivityViewModel: ObservableObject {
     func refresh(currentUser: User?) async {
         
         activities.removeAll()
-        fetchingActivities.clean()
+        await fetchingActivities.clean()
         activitySpread.clean()
         await fetchFollowersActivity(currentUser: currentUser)
 

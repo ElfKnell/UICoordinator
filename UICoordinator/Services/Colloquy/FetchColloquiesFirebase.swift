@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class FetchColloquiesFirebase: FetchColloquiesProtocol {
+actor FetchColloquiesFirebase: FetchColloquiesProtocol {
     
     private var lastDocument: DocumentSnapshot?
     private var isDataLoaded = false
@@ -113,7 +113,7 @@ class FetchColloquiesFirebase: FetchColloquiesProtocol {
         
     }
     
-    func reload() {
+    func reload() async {
         
         self.lastDocument = nil
         self.isDataLoaded = false

@@ -32,6 +32,8 @@ struct ResetPasswordView: View {
                         .textInputAutocapitalization(.never)
                         .focused($emailFieldFocused)
                         .padding()
+                        .accessibilityLabel("Email input field")
+                        .accessibilityHint("Enter your email address to reset password")
                     
                     HStack {
                         
@@ -41,6 +43,8 @@ struct ResetPasswordView: View {
                         } label: {
                             ButtonLabelView(title: "Back", widthButton: 170)
                         }
+                        .accessibilityLabel("Back button")
+                        .accessibilityHint("Go back to the previous screen")
                         
                         Button {
                             Task {
@@ -51,6 +55,8 @@ struct ResetPasswordView: View {
                         }
                         .disabled(!formIsValid)
                         .opacity(formIsValid ? 1.0 : 0.5)
+                        .accessibilityLabel("Send button")
+                        .accessibilityHint("Send password reset email")
                     }
                     
                 case .isSuccess:
@@ -67,11 +73,15 @@ struct ResetPasswordView: View {
                     } label: {
                         ButtonLabelView(title: "Back", widthButton: 170)
                     }
+                    .accessibilityLabel("Back button")
+                    .accessibilityHint("Go back to the previous screen")
                     
                 case .isIssue:
                     Text(viewModel.message)
                         .font(.title2)
                         .padding(.horizontal)
+                        .accessibilityLabel("Error message")
+                        .accessibilityHint(viewModel.message)
                     
                     HStack {
                         
@@ -81,6 +91,8 @@ struct ResetPasswordView: View {
                             ButtonLabelView(title: "Try again", widthButton: 150)
                         }
                         .padding(.horizontal)
+                        .accessibilityLabel("Try again button")
+                        .accessibilityHint("Retry sending password reset email")
                         
                         Button {
                             viewModel.processReset = .isStart
@@ -89,6 +101,9 @@ struct ResetPasswordView: View {
                             ButtonLabelView(title: "Back", widthButton: 150)
                         }
                         .padding(.horizontal)
+                        .accessibilityLabel("Back button")
+                        .accessibilityHint("Go back to the previous screen")
+                        
                     }
                 }
                 
@@ -104,8 +119,6 @@ struct ResetPasswordView: View {
 }
 
 #Preview {
-    
-    //let viewModel = ResetPasswordViewModel(authReset: AuthResetPasswordService())
     
     ResetPasswordView()
 }

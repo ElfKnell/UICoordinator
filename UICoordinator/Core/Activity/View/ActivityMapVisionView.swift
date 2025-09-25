@@ -155,6 +155,7 @@ struct ActivityMapVisionView: View {
                             .shadow(radius: 5)
                     }
                     .padding(7)
+                    .accessibilityLabel("Activity Information")
                     
                     Button {
                         
@@ -170,6 +171,7 @@ struct ActivityMapVisionView: View {
                             .shadow(radius: 5)
                     }
                     .padding(7)
+                    .accessibilityLabel("Clear my elements from the map")
                 }
                 
                 Spacer()

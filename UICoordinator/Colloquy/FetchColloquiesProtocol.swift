@@ -13,5 +13,5 @@ protocol FetchColloquiesProtocol {
     
     func getUserColloquies(user: User, pageSize: Int) async throws -> [Colloquy]
     
-    func reload()
+    func reload() async
 }

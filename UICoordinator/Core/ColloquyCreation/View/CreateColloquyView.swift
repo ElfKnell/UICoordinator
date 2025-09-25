@@ -20,6 +20,7 @@ struct CreateColloquyView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var isUploadingError = false
+    @FocusState private var isSearch: Bool
     
     private var user: User? {
         return container.currentUserService.currentUser
@@ -37,7 +38,6 @@ struct CreateColloquyView: View {
                     fetchLocation: FetchLocationFromFirebase(),
                     userService: UserService()),
                 deleteLikes: LikesDeleteService()),
-            activityUpdate: ActivityServiceUpdate(),
             contentModerator: ContentModerator())
     }) {
         
@@ -66,22 +66,32 @@ struct CreateColloquyView: View {
                             Text(user?.username ?? "no name")
                                 .fontWeight(.semibold)
                             
-                            TextField("Start a colloquy", text: $caption, axis: .vertical)
+                            TextField("Start a colloquy",
+                                      text: $caption,
+                                      axis: .vertical)
+                            .focused($isSearch)
+                            .accessibilityLabel("Colloquy input field")
+                            .accessibilityHint("Enter the text of your colloquy")
                             
                         }
-                        .font(.footnote)
+                        .font(.headline)
                         
                         Spacer()
                         
                         if !caption.isEmpty {
+                            
                             Button {
                                 caption = ""
+                                isSearch = false
                             } label: {
                                 Image(systemName: "xmark")
                                     .resizable()
                                     .frame(width: 12, height: 12)
                                     .foregroundStyle(.gray)
                             }
+                            .accessibilityLabel("Clear text")
+                            .accessibilityHint("Clears the text you have typed")
+                            
                         }
                     }
                     
@@ -89,13 +99,16 @@ struct CreateColloquyView: View {
                     
                 } else {
                     
-                    LoadingView(width: 200, height: 200)
+                    LoadingView(size: 200)
                     
                 }
             }
             .padding()
             .navigationTitle("\(location?.name ?? self.activityId != nil ? "Reply" : "") Colloquy")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                isSearch = true
+            }
             .alert("Create error", isPresented: $viewModel.isError) {
                 Button("Ok", role: .cancel) {}
             } message: {
@@ -107,6 +120,8 @@ struct CreateColloquyView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityLabel("Cancel button")
+                    .accessibilityHint("Dismisses the colloquy creation screen")
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -115,7 +130,7 @@ struct CreateColloquyView: View {
                         
                         Task {
                             
-                            await viewModel.uploadColloquy(userId: container.authService.userSession?.uid, caption: caption, locatioId: location?.id, activityId: activityId)
+                            await viewModel.uploadColloquy(userId: container.authService.userSession?.uid, caption: caption, locatioId: location?.id)
                             
                             isSaved = true
                             
@@ -128,10 +143,12 @@ struct CreateColloquyView: View {
                     .opacity(caption.isEmpty ? 0.3 : 1.0)
                     .disabled(caption.isEmpty)
                     .fontWeight(.semibold)
+                    .accessibilityLabel("Post button")
+                    .accessibilityHint(caption.isEmpty ? "Disabled, enter text to enable" : "Posts the colloquy")
                 }
             }
             .foregroundStyle(.primary)
-            .font(.subheadline)
+            .font(.headline)
 
         }
     }

@@ -43,9 +43,13 @@ struct ActivityView: View {
                     Image(systemName: "pencil.tip.crop.circle.badge.plus")
                         .font(.title2)
                 }
+                .accessibilityLabel("Create new activity")
+                .accessibilityHint("Opens a prompt to create a new activity")
                 .alert("Create a new activity", isPresented: $isCreate) {
                     
                     TextField("Name activity", text: $name)
+                        .accessibilityLabel("Activity Name")
+                        .accessibilityHint("Enter the name for the new activity")
                     
                     Button("OK") {
                         if !name.isEmpty {

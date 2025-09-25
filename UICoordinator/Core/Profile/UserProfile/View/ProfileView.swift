@@ -86,8 +86,10 @@ struct ProfileView: View {
                                         .fontWeight(.semibold)
                                         .foregroundStyle(.white)
                                         .frame(maxWidth: .infinity, minHeight: 32)
+                                        .border(.primary)
                                         .background(.black)
-                                        .cornerRadius(11)
+                                        .clipShape(RoundedRectangle(cornerRadius: 11))
+
                                 }
                                 
                             }
@@ -101,8 +103,9 @@ struct ProfileView: View {
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.white)
                                     .frame(maxWidth: .infinity, minHeight: 32)
+                                    .border(.primary)
                                     .background(.black)
-                                    .cornerRadius(11)
+                                    .clipShape(RoundedRectangle(cornerRadius: 11))
                                 
                             } else {
                                 
@@ -114,8 +117,10 @@ struct ProfileView: View {
                                         .fontWeight(.semibold)
                                         .foregroundStyle(.white)
                                         .frame(maxWidth: .infinity, minHeight: 32)
+                                        .border(.primary)
                                         .background(.black)
-                                        .cornerRadius(11)
+                                        .clipShape(RoundedRectangle(cornerRadius: 11))
+                                        
                                 }
                                 
                             }

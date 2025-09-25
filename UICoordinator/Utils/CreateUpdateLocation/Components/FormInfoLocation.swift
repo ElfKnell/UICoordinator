@@ -16,19 +16,39 @@ struct FormInfoLocation: View {
     var body: some View {
         VStack {
             
-            TextField("Place name", text: $name)
-                .font(.callout)
+            TextField(
+                "",
+                text: $name,
+                prompt: Text("Place name")
+                    .foregroundStyle(.gray)
+            )
+                .font(.body)
                 .padding(9)
+                .foregroundStyle(Color.black)
                 .modifier(CornerRadiusModifier())
             
-            TextField("Address...", text: $address, axis: .vertical)
-                .font(.footnote)
+            TextField(
+                "",
+                text: $address,
+                prompt: Text("Address...")
+                    .foregroundStyle(.gray),
+                axis: .vertical
+            )
+                .font(.callout)
                 .padding(8)
+                .foregroundStyle(Color.black)
                 .modifier(CornerRadiusModifier())
             
-            TextField("Description...", text: $description, axis: .vertical)
-                .font(.footnote)
+            TextField(
+                "",
+                text: $description,
+                prompt: Text("Description...")
+                    .foregroundStyle(.gray),
+                axis: .vertical
+            )
+                .font(.callout)
                 .padding(8)
+                .foregroundStyle(Color.black)
                 .modifier(CornerRadiusModifier())
             
         }

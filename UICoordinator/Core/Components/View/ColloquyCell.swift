@@ -48,7 +48,7 @@ struct ColloquyCell: View {
                             
                         } label: {
                             Text(colloquy.user?.username ?? "")
-                                .font(.footnote)
+                                .font(.body)
                                 .fontWeight(.semibold)
                         }
                         
@@ -57,8 +57,8 @@ struct ColloquyCell: View {
                         HStack {
                             
                             Text(colloquy.timestamp.timestampString())
-                                .font(.caption)
-                                .foregroundStyle(Color(.systemGray3))
+                                .font(.callout)
+                                .foregroundStyle(Color.primary)
                             
                             if colloquy.user?.id != container.currentUserService.currentUser?.id {
                                 
@@ -68,7 +68,7 @@ struct ColloquyCell: View {
                                     
                                 } label: {
                                     Image(systemName: "ellipsis")
-                                        .foregroundStyle(.gray)
+                                        .foregroundStyle(Color.primary)
                                 }
                                 
                             }
@@ -84,12 +84,13 @@ struct ColloquyCell: View {
                                 LocationColloquyView(location: colloquy.location ?? DeveloperPreview.location)
                             } label: {
                                 Text(name)
+                                    .font(.body)
                                     .foregroundStyle(.blue)
                             }
                         }
                         
                         Text(colloquy.caption)
-                            .font(.footnote)
+                            .font(.callout)
                             .multilineTextAlignment(.leading)
                         
                     }
@@ -121,12 +122,13 @@ struct ColloquyCell: View {
                         
                         Spacer()
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color.accentColor)
                     .padding(.vertical, 8)
                 }
             }
             
             Divider()
+                .overlay(Color.accentColor)
             
         }
         .padding([.horizontal, .top])

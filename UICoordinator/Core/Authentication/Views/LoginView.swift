@@ -57,10 +57,12 @@ struct LoginView: View {
                         InputView(text: $loginModel.email, title: "Email", placeholder: "name@example.com")
                             .textInputAutocapitalization(.never)
                             .focused($focusedField, equals: .email)
+                            .accessibilityLabel("Email input field")
                         
                         InputView(text: $loginModel.password, title: "Password", placeholder: "password", isSecureField: true)
                             .padding(.bottom)
                             .focused($focusedField, equals: .password)
+                            .accessibilityLabel("Password input field")
                         
                         NavigationLink {
                             ResetPasswordView()
@@ -72,6 +74,7 @@ struct LoginView: View {
                                 .offset(x:90)
                         }
                         .padding(.bottom)
+                        .accessibilityLabel("Forgot password button")
                         
                         Button {
                             
@@ -97,6 +100,8 @@ struct LoginView: View {
                         }
                         .disabled(!formIsValid)
                         .opacity(formIsValid ? 1.0 : 0.5)
+                        .accessibilityLabel("Login button")
+                        .accessibilityHint("Tap to sign in with your credentials")
                         
                         
                         HStack {
@@ -115,6 +120,8 @@ struct LoginView: View {
                                     .foregroundStyle(.black)
                                     .shadow(radius: 3, x: 0, y: 2)
                             }
+                            .accessibilityLabel("Sign up button")
+                            .accessibilityHint("Tap to create a new account")
                         }
                         .padding(.top)
                         
@@ -138,7 +145,7 @@ struct LoginView: View {
                     }
                     
                 } else {
-                    LoadingView(width: 300, height: 300)
+                    LoadingView(size: 300)
                 }
                 
             }

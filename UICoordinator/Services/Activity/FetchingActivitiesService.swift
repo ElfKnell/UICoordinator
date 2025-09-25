@@ -8,7 +8,7 @@
 import Firebase
 import Foundation
 
-class FetchingActivitiesService: FetchingActivitiesProtocol {
+actor FetchingActivitiesService: FetchingActivitiesProtocol {
     
     private var lastDocument: DocumentSnapshot?
     private var isDataLoaded = false
@@ -42,7 +42,13 @@ class FetchingActivitiesService: FetchingActivitiesProtocol {
         
         self.lastDocument = snapshot.documents.last
         
-        var activitys = snapshot.documents.compactMap({ try? $0.data(as: Activity.self)})
+        var activitys = snapshot.documents.compactMap { doc -> Activity? in
+            var activity = try? doc.data(as: Activity.self)
+            if activity?.activityId == nil {
+                activity?.activityId = doc.documentID
+            }
+            return activity
+        }
         
         for i in 0 ..< activitys.count
         {
@@ -79,7 +85,13 @@ class FetchingActivitiesService: FetchingActivitiesProtocol {
         
         self.lastDocumentByUser = snapshot.documents.last
         
-        var activities = snapshot.documents.compactMap({ try? $0.data(as: Activity.self)})
+        var activities = snapshot.documents.compactMap { doc -> Activity? in
+            var activity = try? doc.data(as: Activity.self)
+            if activity?.activityId == nil {
+                activity?.activityId = doc.documentID
+            }
+            return activity
+        }
         
         for i in 0 ..< activities.count
         {
@@ -90,7 +102,7 @@ class FetchingActivitiesService: FetchingActivitiesProtocol {
         
     }
     
-    func clean() {
+    func clean() async {
         self.lastDocument = nil
         self.isDataLoaded = false
         self.lastDocumentByUser = nil

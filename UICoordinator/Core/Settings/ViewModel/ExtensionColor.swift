@@ -23,25 +23,25 @@ extension Color {
     
     // Save RGBA components to AppStorage
     func saveToAppStorage(_ keyColor: String) {
-        let (red, green, blue, alpha) = self.toRGB()
-        let rgbaString = "\(red),\(green),\(blue),\(alpha)"
+        let rgba = self.toRGB()
+        let string = "\(rgba.red),\(rgba.green),\(rgba.blue),\(rgba.alpha)"
         
         // Save the RGBA string to AppStorage
-        UserDefaults.standard.set(rgbaString, forKey: keyColor)
+        UserDefaults.standard.set(string, forKey: keyColor)
     }
     
-    static func loadFromAppStorage(_ nameColor: String) -> (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
-            guard let rgbaString = UserDefaults.standard.string(forKey: nameColor) else {
+    static func loadFromAppStorage(_ nameColor: String) -> Color? {
+        
+        guard let rgbaString = UserDefaults.standard.string(forKey: nameColor) else {
                 return nil
         }
             
         // Split the RGBA string and convert to CGFloat values
         let components = rgbaString.split(separator: ",").compactMap { CGFloat(Double($0) ?? 0.0) }
-        if components.count == 4 {
-            return (components[0], components[1], components[2], components[3])
-        }
         
-        return nil
+        guard components.count == 4 else { return nil }
+        return Color(red: components[0], green: components[1], blue: components[2], opacity: components[3])
+        
     }
     
 }

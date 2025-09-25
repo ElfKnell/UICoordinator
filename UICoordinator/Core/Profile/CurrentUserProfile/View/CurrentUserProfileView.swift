@@ -18,7 +18,7 @@ struct CurrentUserProfileView: View {
             
             ScrollView(showsIndicators: false) {
                 if viewModel.isLoaded {
-                    LoadingView(width: 300, height: 300)
+                    LoadingView(size: 300)
                 } else {
                     if let currentUser = container.currentUserService.currentUser {
                         VStack(spacing: 20) {

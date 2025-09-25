@@ -108,7 +108,7 @@ struct RouteDetailView: View {
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                         }
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color.primary)
                         .padding(.horizontal)
                         
                         Button {

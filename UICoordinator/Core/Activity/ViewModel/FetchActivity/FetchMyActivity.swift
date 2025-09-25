@@ -26,7 +26,7 @@ class FetchMyActivity: ObservableObject {
     @MainActor
     func refresh(currentUser: User?) async {
         activities.removeAll()
-        fetchingActivities.clean()
+        await fetchingActivities.clean()
         await fetchMyActivity(currentUser: currentUser)
     }
     
