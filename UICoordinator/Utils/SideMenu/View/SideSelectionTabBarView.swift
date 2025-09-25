@@ -16,37 +16,34 @@ struct SideSelectionTabBarView: View {
     var selectedTabIndex: Int
     
     var body: some View {
+        
         NavigationStack {
+            
             ZStack {
-                TabView(selection: $selectedTab)  {
-                    
-                    LocationsView()
-                        .onAppear {
-                            if sizeClass == .compact {
+                
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        LocationsView()
+                            .onAppear {
                                 mainSelectedTab = 0
                             }
-                        }
-                        .tag(0)
-                    
-                    CurrentUserProfileView()
-                        .onAppear {
-                            if sizeClass == .compact {
+                    case 1:
+                        CurrentUserProfileView()
+                            .onAppear {
                                 mainSelectedTab = 4
                             }
-                        }
-                        .tag(1)
-                    
-                    Settings()
-                        .tag(2)
-                    
-                    HelpView()
-                        .tag(3)
-                    
-                    AboutView()
-                        .tag(4)
+                    case 2:
+                        Settings()
+                    case 3:
+                        HelpView()
+                    case 4:
+                        AboutView()
+                    default:
+                        LocationsView()
+                    }
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                .gesture(DragGesture())
+                .navigationBarTitleDisplayMode(.inline)
                 
                 SideMenuView(isShowind: $showSideMenu, selectedTab: $selectedTab)
                     
