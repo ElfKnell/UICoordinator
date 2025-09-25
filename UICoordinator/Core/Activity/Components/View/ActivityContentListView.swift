@@ -120,9 +120,7 @@ struct ActivityContentListView: View {
                     }
                     .task {
                         Task {
-                            if activityMy.activities.isEmpty {
-                                await activityMy.refresh(currentUser: currentUser)
-                            }
+                            await activityMy.refresh(currentUser: currentUser)
                         }
                     }
                     .onChange(of: isUpdate) {

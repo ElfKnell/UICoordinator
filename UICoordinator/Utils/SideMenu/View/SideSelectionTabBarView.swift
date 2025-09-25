@@ -46,8 +46,10 @@ struct SideSelectionTabBarView: View {
                         .tag(4)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .gesture(DragGesture())
                 
                 SideMenuView(isShowind: $showSideMenu, selectedTab: $selectedTab)
+                    
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

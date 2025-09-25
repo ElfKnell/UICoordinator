@@ -26,8 +26,8 @@ struct ActivityCreate: View {
     
     var body: some View {
         Group {
-            if viewModel.activity != nil {
-                ActivityMapEditView(activity: viewModel.activity!)
+            if let activity = viewModel.activity {
+                ActivityMapEditView(activity: activity)
             } else {
                 LoadingView(size: 150)
             }
