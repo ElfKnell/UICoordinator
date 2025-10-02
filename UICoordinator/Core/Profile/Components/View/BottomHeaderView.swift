@@ -13,19 +13,22 @@ struct BottomHeaderView: View {
     let imageName: String
     
     var body: some View {
+        
         VStack {
             
-            Text(counts)
-                .font(.body)
-                .fontWeight(.bold)
-            
             HStack {
+                
+                Text(counts)
+                    .font(.body)
+                    .fontWeight(.bold)
+                
                 Image(systemName: imageName)
                 
-                Text(title)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.accentColor)
             }
+            
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(Color.accentColor)
         }
         .padding(.horizontal)
     }

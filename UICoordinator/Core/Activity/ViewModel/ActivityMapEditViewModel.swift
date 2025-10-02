@@ -51,6 +51,7 @@ class ActivityMapEditViewModel: ObservableObject {
     @Published var shouldAutoSaveRegion: Bool = true
     @Published var shouldUserLocation: Bool = false
     @Published var shouldRestoreSavedRegion: Bool = false
+    @Published var isOpen: Bool = false
     
     @Published var isSelectingDestination: Bool = false
     @Published var showClearButton: Bool = false

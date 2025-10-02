@@ -68,10 +68,12 @@ struct ReplyComposerView: View {
         .safeAreaInset(edge: .bottom) {
             
             if isVisible {
+                
                 CreateReplyView(isCreate: $isCreate,
                                 colloquyId: colloquy.id,
                                 activityId: nil,
                                 user: user)
+
             }
         }
         

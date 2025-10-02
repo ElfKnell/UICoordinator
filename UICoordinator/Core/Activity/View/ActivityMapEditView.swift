@@ -52,10 +52,13 @@ struct ActivityMapEditView: View {
                 selectedRoute: $viewModel.selectedRoute,
                 routes: $viewModel.routes,
                 sheetConfig: $viewModel.sheetConfig)
-                .edgesIgnoringSafeArea(.all)
+            .ignoresSafeArea(.container, edges: .top)
             
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
         .onChange(of: viewModel.selectedLocation) { _, newValue in
+            viewModel.isOpen = false
             if let destination = newValue, viewModel.isSelectingDestination {
                 Task {
                     await viewModel.buildRoute(to: destination)
@@ -83,7 +86,7 @@ struct ActivityMapEditView: View {
                         }
                     },
                     annotation: $viewModel.customAnnotation)
-                    .presentationDetents([.height(350), .medium])
+                    .presentationDetents([.medium, .height(500)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
@@ -109,7 +112,7 @@ struct ActivityMapEditView: View {
                         }
                     },
                     location: $viewModel.selectedLocation)
-                    .presentationDetents([.medium, .height(350)])
+                    .presentationDetents([.medium, .height(500)])
                     .presentationBackgroundInteraction(
                         .enabled(upThrough: .medium))
                     .presentationCornerRadius(12)
@@ -130,25 +133,16 @@ struct ActivityMapEditView: View {
         } message: {
             Text(viewModel.errorMessage ?? "unknown error")
         }
+        .toolbar {
+            
+            ToolbarItem(placement: .topBarLeading) {
+                BackButtonView()
+            }
+            
+        }
         .overlay(alignment: .top) {
             
             HStack {
-                Button {
-                    
-                    viewModel.isSettings.toggle()
-                    
-                } label: {
-                    Image(systemName: "gear")
-                        .imageScale(.large)
-                        .foregroundStyle(.primary)
-                        .padding(10)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
-                }
-                .padding()
-                .padding(.top)
-                .accessibilityLabel("Settings")
                 
                 Spacer()
                 
@@ -181,7 +175,7 @@ struct ActivityMapEditView: View {
                 }
             }
         }
-        .safeAreaInset(edge: .bottom) {
+        .overlay(alignment: .bottom) {
             
             if !viewModel.isSettings {
                 
@@ -199,7 +193,7 @@ struct ActivityMapEditView: View {
                                 Image(systemName: "mappin.and.ellipse")
                                     .imageScale(.large)
                                     .foregroundStyle(.primary)
-                                    .padding(10)
+                                    .padding(9)
                                     .background(.ultraThinMaterial)
                                     .clipShape(Circle())
                                     .shadow(radius: 5)
@@ -215,10 +209,10 @@ struct ActivityMapEditView: View {
                                     
                                 } label: {
                                     
-                                    Image(systemName: "arrow.uturn.backward.circle")
+                                    Image(systemName: "arrow.uturn.backward")
                                         .imageScale(.large)
                                         .foregroundStyle(.primary)
-                                        .padding(10)
+                                        .padding(9)
                                         .background(.ultraThinMaterial)
                                         .clipShape(Circle())
                                         .shadow(radius: 5)
@@ -233,35 +227,80 @@ struct ActivityMapEditView: View {
                         
                         VStack {
                             
-                            NavigationLink {
+                            if viewModel.isOpen {
                                 
-                                InfoView(activity: viewModel.activity)
+                                Button {
+                                    
+                                    withAnimation(.spring()) {
+                                        viewModel.isOpen = false
+                                        viewModel.isSettings = true
+                                    }
+                                    
+                                } label: {
+                                    Image(systemName: "gear")
+                                        .imageScale(.large)
+                                        .foregroundStyle(.primary)
+                                        .padding(9)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 5)
+                                }
+                                .accessibilityLabel("Settings")
                                 
-                            } label: {
-                                Image(systemName: "camera")
-                                    .imageScale(.large)
-                                    .foregroundStyle(.primary)
-                                    .padding(10)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(Circle())
-                                    .shadow(radius: 5)
+                                NavigationLink {
+                                    
+                                    InfoView(activity: viewModel.activity)
+                                    
+                                } label: {
+                                    Image(systemName: "camera")
+                                        .imageScale(.large)
+                                        .foregroundStyle(.primary)
+                                        .padding(9)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 5)
+                                }
+                                .accessibilityLabel("Activity Details")
+                                .simultaneousGesture(TapGesture().onEnded({
+                                    viewModel.isOpen = false
+                                }))
+                                
+                                Button {
+                                    
+                                    withAnimation(.spring()) {
+                                        viewModel.isOpen = false
+                                        viewModel.shouldUserLocation = true
+                                    }
+                                    
+                                } label: {
+                                    Image(systemName: "location")
+                                        .imageScale(.large)
+                                        .foregroundStyle(.primary)
+                                        .padding(9)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 5)
+                                }
+                                .accessibilityLabel("My location")
+                                
                             }
-                            .accessibilityLabel("Activity Details")
                             
                             Button {
                                 
-                                viewModel.shouldUserLocation = true
+                                withAnimation(.spring()) {
+                                    viewModel.isOpen.toggle()
+                                }
                                 
                             } label: {
-                                Image(systemName: "location")
+                                Image(systemName: viewModel.isOpen ? "xmark.octagon" : "ellipsis.curlybraces")
                                     .imageScale(.large)
                                     .foregroundStyle(.primary)
-                                    .padding(10)
+                                    .padding(9)
                                     .background(.ultraThinMaterial)
                                     .clipShape(Circle())
                                     .shadow(radius: 5)
                             }
-                            
+                            .accessibilityLabel("Menu")
                         }
                         .padding(.horizontal)
                     }

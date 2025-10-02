@@ -73,6 +73,9 @@ struct ActivityMapVisionView: View {
                 }
             }
         }
+        .navigationTitle(activity.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
         .mapControls {
             MapCompass()
             MapPitchToggle()
@@ -135,6 +138,13 @@ struct ActivityMapVisionView: View {
                     .presentationCornerRadius(12)
             }
         })
+        .toolbar {
+            
+            ToolbarItem(placement: .topBarLeading) {
+                BackButtonView()
+            }
+            
+        }
         .overlay(alignment: .top) {
             
             HStack {

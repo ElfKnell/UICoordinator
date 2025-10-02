@@ -19,36 +19,36 @@ final class FetchLikesServiceTests: XCTestCase {
         sut = FetchLikesService(likeRepository: mockRepocitory)
     }
 
-    func testGetLikeByColloquyAndUser_Success() async {
+    func testGetLikeByColloquyAndUser_Success() async throws {
         
-        let result = await sut.getLikeByColloquyAndUser(collectionName: .likes, colloquyId: "testColloquy", userId: "user123")
+        let result = try await sut.getLikeByColloquyAndUser(collectionName: .likes, colloquyId: "testColloquy", userId: "user123")
         
         XCTAssertEqual(result, "mock_like_id")
     }
 
-    func testGetLikeByColloquyAndUser_Error() async {
+    func testGetLikeByColloquyAndUser_Error() async throws {
         
         mockRepocitory.shouldThrowGenericError = true
         _ = FetchLikesService(likeRepository: mockRepocitory)
         
-        let result = await sut.getLikeByColloquyAndUser(collectionName: .likes, colloquyId: "testColloquy", userId: "user123")
+        let result = try await sut.getLikeByColloquyAndUser(collectionName: .likes, colloquyId: "testColloquy", userId: "user123")
         
         XCTAssertNil(result)
     }
     
-    func testGetLikes_Success() async {
+    func testGetLikes_Success() async throws {
         
-        let result = await sut.getLikes(collectionName: .activityLikes, byField: .userIdField, userId: "user123")
+        let result = try await sut.getLikes(collectionName: .activityLikes, byField: .userIdField, userId: "user123")
         
         XCTAssertEqual(result.count, 1)
         XCTAssertEqual(result.first?.likeId, "like11")
     }
     
-    func testGetLikes_Error() async {
+    func testGetLikes_Error() async throws {
         mockRepocitory.shouldThrowGenericError = true
         _ = FetchLikesService(likeRepository: mockRepocitory)
         
-        let result = await sut.getLikes(collectionName: .likes, byField: .userIdField, userId: "user123")
+        let result = try await sut.getLikes(collectionName: .likes, byField: .userIdField, userId: "user123")
         
         XCTAssertTrue(result.isEmpty)
     }

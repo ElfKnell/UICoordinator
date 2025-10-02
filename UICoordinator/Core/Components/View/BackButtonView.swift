@@ -16,6 +16,9 @@ struct BackButtonView: View {
             dismiss()
         } label: {
             Image(systemName: "arrow.left.circle")
+                .background(Circle().fill(Color.white))
+                .shadow(radius: 3)
+                .foregroundColor(.black)
         }
     }
 }

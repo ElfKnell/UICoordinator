@@ -14,7 +14,7 @@ struct CreateReplyView: View {
     let activityId: String?
     let user: User?
     @StateObject var viewModel: CreateReplyViewModel
-    @FocusState private var isSearch: Bool
+    @FocusState private var isSelected: Bool
     
     init(isCreate: Binding<Bool>,
          colloquyId: String?,
@@ -40,11 +40,13 @@ struct CreateReplyView: View {
         self.colloquyId = colloquyId
         self.activityId = activityId
         self.user = user
+        self.isSelected = true
     }
     
     var body: some View {
         
         if !viewModel.isLoading {
+            
             HStack {
                 
                 CircularProfileImageView(user: user, size: .small)
@@ -54,15 +56,15 @@ struct CreateReplyView: View {
                     .padding(.horizontal)
                     .textFieldStyle(.roundedBorder)
                     .modifier(CornerRadiusModifier())
-                    .focused($isSearch)
+                    .focused($isSelected)
                     .padding()
                     .overlay(alignment: .leading) {
                         
-                        if isSearch {
+                        if isSelected {
                             
                             Button {
                                 viewModel.text = ""
-                                isSearch = false
+                                isSelected = false
                                 
                             } label: {
                                 
@@ -75,7 +77,7 @@ struct CreateReplyView: View {
                     }
                     .overlay(alignment: .trailing) {
                         
-                        if isSearch {
+                        if isSelected {
                             
                             Button {
                                 
@@ -88,7 +90,7 @@ struct CreateReplyView: View {
                                     isCreate.toggle()
                                 }
                                 
-                                isSearch = false
+                                isSelected = false
                                 
                             } label: {
                                 
@@ -107,7 +109,7 @@ struct CreateReplyView: View {
                 Text(viewModel.messageError ?? "not discription")
             }
             .onAppear {
-                isSearch = true
+                isSelected = true
             }
         } else {
             LoadingView(size: 100)

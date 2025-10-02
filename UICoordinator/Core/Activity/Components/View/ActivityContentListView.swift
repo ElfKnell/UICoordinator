@@ -128,11 +128,6 @@ struct ActivityContentListView: View {
                             await activityMy.refresh(currentUser: currentUser)
                         }
                     }
-                    .onChange(of: isCreate) {
-                        Task {
-                            await activityMy.refresh(currentUser: currentUser)
-                        }
-                    }
                     .alert("Fetching error", isPresented: $activityMy.isError) {
                         Button("Ok", role: .cancel) {}
                     } message: {
