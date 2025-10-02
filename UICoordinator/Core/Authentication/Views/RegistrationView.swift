@@ -41,11 +41,16 @@ struct RegistrationView: View {
                             if sizeClass != .compact {
                                 
                                 Spacer()
-                                Spacer()
                                 
                             }
                             
                             LogoView()
+                            
+                            if sizeClass != .compact {
+                                
+                                Spacer()
+                                
+                            }
                             
                             ZStack(alignment: .leading) {
                                 
@@ -122,7 +127,6 @@ struct RegistrationView: View {
                                     }
                                 }
                             }
-                            .padding()
                             
                             Toggle(isOn: $registrationModel.isLicenseAccepted) {
                                 
@@ -139,7 +143,7 @@ struct RegistrationView: View {
                                     }
                                 }
                             }
-                            .frame(width: 300)
+                            .frame(maxWidth: 300)
                             .padding()
                             .accessibilityLabel("Accept privacy policy and EULA")
                             .accessibilityHint("Toggle to accept terms and conditions")
@@ -172,7 +176,7 @@ struct RegistrationView: View {
                             
                             HStack {
                                 Text("Already have an account?")
-                                    .font(.system(size: 20, design: .serif))
+                                    .font(.title3)
                                 
                                 Button {
                                     dismiss()
@@ -180,7 +184,7 @@ struct RegistrationView: View {
                                     Text("Sign in")
                                         .bold()
                                         .underline()
-                                        .font(.system(size: 23, design: .serif))
+                                        .font(.title2)
                                         .foregroundStyle(.black)
                                         .shadow(radius: 3, x: 0, y: 2)
                                 }
@@ -205,7 +209,7 @@ struct RegistrationView: View {
                     .scrollIndicators(.hidden)
                     
                 } else {
-                    LoadingView(size: 300)
+                    LoadingView(size: 250)
                         .accessibilityLabel("Loading indicator")
                         .accessibilityHint("Please wait while we process your registration")
                 }

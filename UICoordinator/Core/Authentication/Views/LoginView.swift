@@ -43,6 +43,10 @@ struct LoginView: View {
                         
                         LogoView()
                         
+                        if sizeClass != .compact {
+                            Spacer()
+                        }
+                        
                         if loginModel.isCreatedUser {
                             
                             HStack {
@@ -64,17 +68,22 @@ struct LoginView: View {
                             .focused($focusedField, equals: .password)
                             .accessibilityLabel("Password input field")
                         
-                        NavigationLink {
-                            ResetPasswordView()
-                        } label: {
-                            Text("Forgot password?")
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                                .font(.system(size: 20, design: .serif))
-                                .offset(x:90)
+                        HStack {
+                            
+                            Spacer()
+                            
+                            NavigationLink {
+                                ResetPasswordView()
+                            } label: {
+                                Text("Forgot password?")
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                    .font(.title3)
+                                
+                            }
+                            .padding([.bottom, .horizontal])
+                            .accessibilityLabel("Forgot password button")
                         }
-                        .padding(.bottom)
-                        .accessibilityLabel("Forgot password button")
                         
                         Button {
                             
@@ -107,7 +116,7 @@ struct LoginView: View {
                         HStack {
                             
                             Text("Don't have an account?")
-                                .font(.system(size: 20, design: .serif))
+                                .font(.title3)
                             
                             NavigationLink {
                                 RegistrationView(isNewUser: $loginModel.isCreatedUser)
@@ -116,7 +125,7 @@ struct LoginView: View {
                                 Text("Sign up")
                                     .bold()
                                     .underline()
-                                    .font(.system(size: 23, design: .serif))
+                                    .font(.title2)
                                     .foregroundStyle(.black)
                                     .shadow(radius: 3, x: 0, y: 2)
                             }
@@ -126,6 +135,9 @@ struct LoginView: View {
                         .padding(.top)
                         
                         Spacer()
+                        if sizeClass != .compact {
+                            Spacer()
+                        }
                         
                     }
                     .alert("Login problems", isPresented: $loginModel.isLoginError) {
@@ -145,7 +157,7 @@ struct LoginView: View {
                     }
                     
                 } else {
-                    LoadingView(size: 300)
+                    LoadingView(size: 250)
                 }
                 
             }

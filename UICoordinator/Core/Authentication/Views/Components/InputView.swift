@@ -13,28 +13,32 @@ struct InputView: View {
     let placeholder: String
     var isSecureField = false
     
+    @Environment(\.horizontalSizeClass) var sizeClass
+    
     var body: some View {
+        
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .textFieldStyle(.plain)
-                .font(.system(size: 20, design: .serif))
+                .font(.title3)
             
             if isSecureField {
                 SecureField(placeholder, text: $text)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 20, design: .serif))
-                    .frame(width: 300)
+                    .font(.title3)
+                    .frame(maxWidth: 400)
             } else {
                 TextField(placeholder, text: $text)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 20, design: .serif))
-                    .frame(width: 300)
+                    .font(.title3)
+                    .frame(maxWidth: 400)
             }
             
             Rectangle()
-                .frame(width: 335, height: 1)
+                .frame(maxWidth: 415, maxHeight: 1)
         }
-        
+        .padding(.horizontal)
+        .padding(.vertical, sizeClass == .compact ? 5 : 16)
     }
 }
 
